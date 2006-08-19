@@ -12,15 +12,28 @@ PUBLIC fchg AS NEW Collection ' contains something, i dunno right now...
 PROPERTY READ changed AS Boolean ' if something was changed on the displayed files it is remarked here
 PRIVATE halt AS Boolean = FALSE ' during scanning the directories this will stop the read-in process
 
+PRIVATE Flist AS CFView
+
 PUBLIC SUB _new()
   
-  cols = Split(Settings["cols", "%f,%T,%A,%B,%Y,%G,%T,%b"], ",")
+  Flist = NEW CFView(VBox3) AS "Flist"
+  'Object.Attach(Flist, ME, "Flist")
+  Flist.x = 7
+  Flist.y = 7
+  Flist.W = 469
+  Flist.h = 441
+  Flist.expand = TRUE
+  Flist.Editable = TRUE
+  
+  cols = Split(Settings["cols", "%f,%T,%A,%B,%Y,%G,%b"], ",")
   actFlist
   Flist.Columns.Sort = If(cols.Find("%B") > -1, cols.Find("%B"), 0)
+  Flist.cols = cols
   
   ME.Center
   
 END
+
 
 ' updates columns Flist is showing based on FMain.cols as well as files
 PUBLIC SUB actFlist() 
@@ -57,6 +70,7 @@ PUBLIC SUB UpdFlist()
   
   DIM pass AS String[]
   DIM x AS Integer
+  DIM e AS CFile
   
   IF ME.changed THEN 
     IF Message.Warning("You made changes to " & fchg.Count & " files. Do you want to discard these changes?", "Yes", "No") = 2 THEN RETURN
@@ -91,11 +105,13 @@ PUBLIC SUB UpdFlist()
     pass = Dir(DirView1.Current, "*.mp3")
   END IF
   FOR x = 0 TO pass.Max ' absolute paths to files in pass
-    pass[x] = DirView1.Current &/ pass[x]
+    e = NEW CFile(DirView1.Current &/ pass[x])
+    Flist.Add(e)
+    'pass[x] = DirView1.Current &/ pass[x]
   NEXT
   ProgressBar1.Visible = TRUE
   ToolButton1.Enabled = TRUE
-  UpdFFlist(pass)
+  'UpdFFlist(pass)
   
   Status.Text = "Showing ID3v" & Str($aktTag) & "-Tag of " & Str(Flist.Count) & " files"
   ProgressBar1.Visible = FALSE
@@ -288,25 +304,25 @@ END
 
 ' Renaming in Flist
 PUBLIC SUB Flist_Rename()
-
-  DIM b AS CFile = fall[Flist.Current.Key]
-  
-  DIM a AS String = Flist.Current.Key
-  DIM n AS String = File.Dir(a) &/ Flist[a][0]
-  
-  IF a = n THEN RETURN
-  b.newpath = n
-  
-  Flist.Add(n, File.Name(n), Picture.Load("icons/16/edited.png"), NULL, a)
-  Flist[n][1] = Flist[a][1]
-  Flist[n][2] = Flist[a][2]
-  Flist[n][3] = Flist[a][3]
-  Flist[n][4] = Flist[a][4]
-  Flist[n][5] = Flist[a][5]
-  Flist[n][6] = Flist[a][6]
-  
-  Flist.Remove(a)
-
+' 
+'   DIM b AS CFile = fall[Flist.Current.Key]
+'   
+'   DIM a AS String = Flist.Current.Key
+'   DIM n AS String = File.Dir(a) &/ Flist[a][0]
+'   
+  message("BLA")
+'   IF a = n THEN RETURN
+'   b.newpath = n
+'   
+'   Flist.Add(n, File.Name(n), Picture.Load("icons/16/edited.png"), NULL, a)
+'   Flist[n][1] = Flist[a][1]
+'   Flist[n][2] = Flist[a][2]
+'   Flist[n][3] = Flist[a][3]
+'   Flist[n][4] = Flist[a][4]
+'   Flist[n][5] = Flist[a][5]
+'   Flist[n][6] = Flist[a][6]
+'   Flist.Remove(a)
+' 
 END
 
 PUBLIC SUB updFFile(fkey AS String)

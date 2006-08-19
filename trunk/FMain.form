@@ -162,9 +162,10 @@
         MoveScaled(34,1,69,69)
         'Move(238,7,483,483)
         Spacing = 3
-        { Flist ColumnView
+        { Flist4 ColumnView
           MoveScaled(1,1,67,63)
           'Move(7,7,469,441)
+          Visible = False
           Expand = True
           Mode = TreeView.Extended
           Sorted = True

@@ -1,71 +1,140 @@
 
 INHERITS ColumnView
 
+EVENT ErrorNotFound()
+EVENT Rename()
+
 PROPERTY cols AS String[] ' holding the order and the type of columns to display
-PROPERTY fall AS Object[] ' holding all CFile-Entries associated with the displayed stuff
+PROPERTY fall AS Collection ' holding all CFile-Entries associated with the displayed stuff
 PROPERTY selected AS String[] ' holding the paths (key-strings) of all selected files
 PROPERTY sort AS Integer ' sets / returns the column to sort after
 
 PRIVATE $cols AS NEW String[]
-PRIVATE $fall AS NEW Object[]
-PRIVATE $fall_sel AS NEW String[]
+PRIVATE $fall AS NEW Collection
+
+PUBLIC SUB _new()
+  
+  Object.Attach(ME, ME, "FList")
+  
+END
+
+PUBLIC SUB FList_Rename()
+  $fall[SUPER.Current.Key].newpath = SUPER.Current[0]
+  Message("BLO")
+  Object.Detach(ME)
+  RAISE Rename
+  Object.Attach(ME, ME, "FList")
+END
 
 ' replaces ColumnView.Add()
-PUBLIC SUB Add(entry AS CFile, OPTIONAL pos AS Integer)
+PUBLIC SUB Add(entry AS CFile, OPTIONAL pos AS Integer = -1)
   
-  
+  IF pos = -1 THEN 
+    SUPER.Add(entry.path, "")
+  ELSE  
+    SUPER.Add(entry.path, "", NULL, NULL, pos)
+  END IF
+  $fall.Add(entry, entry.path)
+  refresh([entry.path])
   
 END
 
 ' replaces ColumnView.Remove()
-PUBLIC SUB Remove(path AS String)
+PUBLIC SUB Remove(entry AS CFile)
   
+  DIM x AS Integer
   
+  IF NOT SUPER.Exist(entry.path) THEN 
+    RAISE ErrorNotFound
+    RETURN 
+  END IF
+  SUPER.Remove(entry.path)
+  $fall.Remove(entry.path)
   
 END
 
 ' basically is the same as ColumnView.Remove() because it works with the key
 PUBLIC SUB RemFromPath(path AS String)
   
-  
-  
-END
-
-' returns the object from $fall with the matching path
-PUBLIC FUNCTION getFromPath(path AS String) AS CFile
-  
-  
+  IF NOT SUPER.Exist(path) THEN 
+    RAISE ErrorNotFound
+    RETURN 
+  END IF
+  SUPER.Remove(path)
+  $fall.Remove(path)
   
 END
 
 ' refreshes the control
-PUBLIC SUB refresh(OPTIONAL paths AS String[])
+PUBLIC SUB refresh(OPTIONAL paths AS String[] = NULL)
   
+  DIM e AS CFile
+  DIM s AS String
+  DIM y AS Integer
   
+  IF IsNull(paths) THEN 
+    FOR EACH e IN $fall
+      IF NOT SUPER.Exist(e.path) THEN SUPER.Add(e.path, "")
+      FOR y = 0 TO $cols.Max
+        SUPER[e.path][y] = MHelp.getDesc($cols[y], e)
+      NEXT 
+    NEXT 
+  ELSE 
+    FOR EACH s IN paths
+      IF NOT $fall.Exist(s) THEN CONTINUE 
+      IF NOT SUPER.Exist(s) THEN SUPER.Add(s, "")
+      FOR y = 0 TO $cols.Max
+        IF $cols[y] = "%b" AND MHelp.getDesc($cols[y], $fall[s]) = -1 THEN 
+          SUPER[s][y] = "Variable"
+        ELSE IF $cols[y] = "%Y" AND MHelp.getDesc($cols[y], $fall[s]) = 0 THEN 
+          SUPER[s][y] = ""
+        ELSE
+          SUPER[s][y] = MHelp.getDesc($cols[y], $fall[s])
+        END IF
+      NEXT 
+    NEXT 
+  END IF    
   
 END
-
 
 PRIVATE FUNCTION cols_Read() AS String[]
   RETURN $cols
 END
 PRIVATE SUB cols_Write(Value AS String[])
-  ' todo: change columns
+  DIM x AS Integer
+  SUPER.Columns.Count = Value.Count
+  FOR x = 0 TO Value.Max
+    SUPER.Columns[x].Text = MHelp.desc[Value[x]]
+  NEXT
   $cols = Value
+  refresh
 END
-PRIVATE FUNCTION fall_Read() AS Object[]
+PRIVATE FUNCTION fall_Read() AS Collection
   RETURN $fall
 END
-PRIVATE SUB fall_Write(Value AS Object[])
-  ' todo: refresh
+PRIVATE SUB fall_Write(Value AS Collection)
   $fall = Value
+  ME.refresh
 END
 PRIVATE FUNCTION selected_Read() AS String[]
-  RETURN $fall_sel
+  DIM result AS String[]
+  TRY SUPER.MoveFirst
+  DO
+    IF SUPER.Item.Selected THEN result.Add(SUPER.Item.Key)
+  LOOP UNTIL SUPER.MoveBelow
+  SUPER.MoveBack
+  RETURN result
 END
 PRIVATE SUB selected_Write(Value AS String[])
-  ' todo: select the submitted vieches
-  $fall_sel = Value
+  DIM s AS String
+  TRY SUPER.MoveFirst
+  DO
+    SUPER.Item.Selected = FALSE
+  LOOP UNTIL SUPER.MoveBelow
+  SUPER.MoveBack
+  FOR EACH s IN Value
+    SUPER[s].Selected = TRUE
+  NEXT
 END
 PRIVATE FUNCTION sort_Read() AS Integer
   RETURN SUPER.Columns.Sort

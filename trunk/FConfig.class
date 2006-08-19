@@ -37,7 +37,7 @@ PUBLIC SUB _new()
   aCols.Add("%s", "Samplerate", NULL, "File")
   
   FOR EACH t IN FConfig.cols
-    sCols.Add(t, MHelp.desc[t])
+    TRY sCols.Add(t, MHelp.desc[t])
   NEXT 
   
   Button1.Enabled = FALSE
