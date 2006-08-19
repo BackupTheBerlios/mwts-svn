@@ -1,0 +1,75 @@
+
+INHERITS ColumnView
+
+PROPERTY cols AS String[] ' holding the order and the type of columns to display
+PROPERTY fall AS Object[] ' holding all CFile-Entries associated with the displayed stuff
+PROPERTY selected AS String[] ' holding the paths (key-strings) of all selected files
+PROPERTY sort AS Integer ' sets / returns the column to sort after
+
+PRIVATE $cols AS NEW String[]
+PRIVATE $fall AS NEW Object[]
+PRIVATE $fall_sel AS NEW String[]
+
+' replaces ColumnView.Add()
+PUBLIC SUB Add(entry AS CFile, OPTIONAL pos AS Integer)
+  
+  
+  
+END
+
+' replaces ColumnView.Remove()
+PUBLIC SUB Remove(path AS String)
+  
+  
+  
+END
+
+' basically is the same as ColumnView.Remove() because it works with the key
+PUBLIC SUB RemFromPath(path AS String)
+  
+  
+  
+END
+
+' returns the object from $fall with the matching path
+PUBLIC FUNCTION getFromPath(path AS String) AS CFile
+  
+  
+  
+END
+
+' refreshes the control
+PUBLIC SUB refresh(OPTIONAL paths AS String[])
+  
+  
+  
+END
+
+
+PRIVATE FUNCTION cols_Read() AS String[]
+  RETURN $cols
+END
+PRIVATE SUB cols_Write(Value AS String[])
+  ' todo: change columns
+  $cols = Value
+END
+PRIVATE FUNCTION fall_Read() AS Object[]
+  RETURN $fall
+END
+PRIVATE SUB fall_Write(Value AS Object[])
+  ' todo: refresh
+  $fall = Value
+END
+PRIVATE FUNCTION selected_Read() AS String[]
+  RETURN $fall_sel
+END
+PRIVATE SUB selected_Write(Value AS String[])
+  ' todo: select the submitted vieches
+  $fall_sel = Value
+END
+PRIVATE FUNCTION sort_Read() AS Integer
+  RETURN SUPER.Columns.Sort
+END
+PRIVATE SUB sort_Write(Value AS Integer)
+  SUPER.Columns.Sort = Value
+END

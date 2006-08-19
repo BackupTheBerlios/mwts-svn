@@ -1,0 +1,194 @@
+# Gambas Form File 1.0
+
+{ FMain Form
+  MoveScaled(0,0,112,84)
+  'Move(0,0,784,588)
+  Expand = True
+  Text = ("")
+  Arrangement = Arrange.Fill
+  AutoResize = True
+  { Menu1 Menu
+    Text = ("&File")
+    { Menu2 Menu
+      Text = ("&Quit")
+      Picture = Picture["icons/exit.png"]
+      Shortcut = "Alt+Q"
+    }
+  }
+  { Menu13 Menu
+    Text = ("Settings")
+    { Menu14 Menu
+      Text = ("&Options")
+    }
+  }
+  { Menu3 Menu
+    Text = ("FlistSub1")
+    Visible = False
+    { Menu4 Menu
+      Text = ("Show file-header")
+    }
+    { Menu5 Menu
+      Text = ("ID3v1")
+      { Menu6 Menu
+        Text = ("Edit Tag")
+      }
+      { Menu7 Menu
+        Text = ("Delete Tag")
+      }
+    }
+    { Menu8 Menu
+      Text = ("ID3v2")
+      { Menu9 Menu
+        Text = ("Edit Tag")
+      }
+      { Menu10 Menu
+        Text = ("Delete Tag")
+      }
+    }
+    { Menu11 Menu
+      Text = ("Save file")
+    }
+    { Menu12 Menu
+      Text = ("Delete file")
+    }
+  }
+  { VBox1 VBox
+    MoveScaled(1,1,110,78)
+    'Move(7,7,770,546)
+    Spacing = 3
+    Padding = 3
+    { Panel2 Panel
+      MoveScaled(1,1,107,4)
+      'Move(7,7,749,28)
+      Arrangement = Arrange.Horizontal
+      Padding = 2
+      { ToolButton3 ToolButton
+        MoveScaled(0,0,4,4)
+        'Move(0,0,28,28)
+        Text = ("")
+        Picture = Picture["icons/fileopen.png"]
+      }
+      { ToolButton4 ToolButton
+        MoveScaled(4,0,4,4)
+        'Move(28,0,28,28)
+        Enabled = False
+        ToolTip = ("Save Changes")
+        Text = ("")
+        Picture = Picture["icons/save_all.png"]
+      }
+      { ToolButton5 ToolButton
+        MoveScaled(8,0,4,4)
+        'Move(56,0,28,28)
+        ToolTip = ("Undo")
+        Text = ("")
+        Picture = Picture["icons/undo.png"]
+      }
+      { Separator1 Separator
+        MoveScaled(12,0,2,4)
+        'Move(84,0,14,28)
+      }
+      { ToolButton2 ToolButton
+        MoveScaled(14,0,18,4)
+        'Move(98,0,126,28)
+        Text = ("Showing ID3v1-Tag")
+        Border = True
+      }
+      { Separator2 Separator
+        MoveScaled(32,0,2,4)
+        'Move(224,0,14,28)
+      }
+      { ToolButton6 ToolButton
+        MoveScaled(34,0,4,4)
+        'Move(238,0,28,28)
+        ToolTip = ("Edit v1-Tag")
+        Text = ("")
+        Picture = Picture["icons/edit_v1.png"]
+      }
+      { ToolButton7 ToolButton
+        MoveScaled(38,0,4,4)
+        'Move(266,0,28,28)
+        ToolTip = ("Edit v2-Tag")
+        Text = ("")
+        Picture = Picture["icons/edit_v2.png"]
+      }
+      { ToolButton1 ToolButton
+        MoveScaled(43,0,4,4)
+        'Move(301,0,28,28)
+        Enabled = False
+        Text = ("")
+        Picture = Picture["icons/stop.png"]
+      }
+    }
+    { HSplit1 HSplit
+      MoveScaled(2,6,104,71)
+      'Move(14,42,728,497)
+      Expand = True
+      { VBox2 VBox
+        MoveScaled(1,1,32,69)
+        'Move(7,7,224,483)
+        Spacing = 3
+        { Panel1 Panel
+          MoveScaled(1,1,30,3)
+          'Move(7,7,210,21)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          Spacing = 3
+          { ComboBox1 ComboBox
+            MoveScaled(0,0,20,3)
+            'Move(0,0,140,21)
+            Text = ("ComboBox1")
+          }
+          { ToggleButton1 ToggleButton
+            MoveScaled(23,0,3,3)
+            'Move(161,0,21,21)
+            ToolTip = ("Show Hidden Files")
+            Text = ("H")
+          }
+          { ToggleButton2 ToggleButton
+            MoveScaled(26,0,3,3)
+            'Move(182,0,21,21)
+            ToolTip = ("List recursively")
+            Text = ("R")
+          }
+        }
+        { DirView1 DirView
+          MoveScaled(1,5,30,63)
+          'Move(7,35,210,441)
+          Expand = True
+          Root = "/music"
+        }
+      }
+      { VBox3 VBox
+        MoveScaled(34,1,69,69)
+        'Move(238,7,483,483)
+        Spacing = 3
+        { Flist ColumnView
+          MoveScaled(1,1,67,63)
+          'Move(7,7,469,441)
+          Expand = True
+          Mode = TreeView.Extended
+          Sorted = True
+          Editable = True
+        }
+        { Panel3 Panel
+          MoveScaled(1,65,67,3)
+          'Move(7,455,469,21)
+          Arrangement = Arrange.Horizontal
+          AutoResize = True
+          Border = Border.Etched
+          { Status Label
+            MoveScaled(1,0,50,3)
+            'Move(7,0,350,21)
+            Expand = True
+            Text = ("")
+          }
+          { ProgressBar1 ProgressBar
+            MoveScaled(52,0,14,3)
+            'Move(364,0,98,21)
+            Visible = False
+          }
+        }
+      }
+    }
+  }
+}

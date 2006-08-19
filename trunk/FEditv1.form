@@ -1,0 +1,137 @@
+# Gambas Form File 1.0
+
+{ FEditv1 Form
+  MoveScaled(0,0,49,29)
+  'Move(0,0,343,203)
+  Text = ("")
+  Border = Window.Fixed
+  { btnOK Button
+    MoveScaled(21,24,12.4286,3.4286)
+    'Move(147,168,87,24)
+    Text = ("OK")
+    Default = True
+  }
+  { btnCancel Button
+    MoveScaled(34.8571,24,12.4286,3.4286)
+    'Move(244,168,87,24)
+    Text = ("Cancel")
+    Cancel = True
+  }
+  { Frame1 Frame
+    MoveScaled(1,1,47,22)
+    'Move(7,7,329,154)
+    Text = ("Edit ID3v1-Tag")
+    { Label1 Label
+      MoveScaled(2,3,9,3)
+      'Move(14,21,63,21)
+      Text = ("Title:")
+    }
+    { Label2 Label
+      MoveScaled(2,6,9,3)
+      'Move(14,42,63,21)
+      Text = ("Artist:")
+    }
+    { Label3 Label
+      MoveScaled(2,9,9,3)
+      'Move(14,63,63,21)
+      Text = ("Album:")
+    }
+    { Label4 Label
+      MoveScaled(2,12,9,3)
+      'Move(14,84,63,21)
+      Text = ("Year:")
+    }
+    { Label5 Label
+      MoveScaled(2,18,9,3)
+      'Move(14,126,63,21)
+      Text = ("Comment:")
+    }
+    { TextBox1 TextBox
+      MoveScaled(12,3,30,3)
+      'Move(84,21,210,21)
+      Text = ("")
+      MaxLength = 30
+    }
+    { TextBox2 TextBox
+      MoveScaled(12,6,30,3)
+      'Move(84,42,210,21)
+      Text = ("")
+      MaxLength = 30
+    }
+    { TextBox3 TextBox
+      MoveScaled(12,9,30,3)
+      'Move(84,63,210,21)
+      Text = ("")
+      MaxLength = 30
+    }
+    { TextBox4 TextBox
+      MoveScaled(12,12,8,3)
+      'Move(84,84,56,21)
+      Text = ("")
+      MaxLength = 4
+    }
+    { TextBox5 TextBox
+      MoveScaled(12,18,30,3)
+      'Move(84,126,210,21)
+      Text = ("")
+      MaxLength = 30
+    }
+    { Label6 Label
+      MoveScaled(29,12,6,3)
+      'Move(203,84,42,21)
+      Text = ("Track:")
+    }
+    { TextBox6 TextBox
+      MoveScaled(35,12,7,3)
+      'Move(245,84,49,21)
+      Text = ("")
+      MaxLength = 3
+    }
+    { Label7 Label
+      MoveScaled(2,15,9,3)
+      'Move(14,105,63,21)
+      Text = ("Genre:")
+    }
+    { ComboBox1 ComboBox
+      MoveScaled(12,15,30,3)
+      'Move(84,105,210,21)
+      Text = ("")
+      ReadOnly = True
+    }
+    { CheckBox1 CheckBox
+      MoveScaled(43,3,3,3)
+      'Move(301,21,21,21)
+      Text = ("CheckBox1")
+    }
+    { CheckBox2 CheckBox
+      MoveScaled(43,6,3,3)
+      'Move(301,42,21,21)
+      Text = ("CheckBox1")
+    }
+    { CheckBox3 CheckBox
+      MoveScaled(43,9,3,3)
+      'Move(301,63,21,21)
+      Text = ("CheckBox1")
+    }
+    { CheckBox4 CheckBox
+      MoveScaled(21,12,3,3)
+      'Move(147,84,21,21)
+      Text = ("CheckBox1")
+    }
+    { CheckBox5 CheckBox
+      MoveScaled(43,18,3,3)
+      'Move(301,126,21,21)
+      Text = ("CheckBox1")
+    }
+    { CheckBox6 CheckBox
+      MoveScaled(43,12,3,3)
+      'Move(301,84,21,21)
+      Text = ("CheckBox1")
+    }
+    { CheckBox7 CheckBox
+      MoveScaled(43,15,3,3)
+      'Move(301,105,21,21)
+      Text = ("CheckBox1")
+    }
+  }
+}

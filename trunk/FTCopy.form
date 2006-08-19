@@ -1,0 +1,85 @@
+# Gambas Form File 1.0
+
+{ FTCopy Form
+  MoveScaled(0,0,65,37)
+  'Move(0,0,455,259)
+  Text = ("")
+  Border = Window.Fixed
+  { btnOK Button
+    MoveScaled(37.2857,32,12.5714,3.4286)
+    'Move(261,224,88,24)
+    Text = ("OK")
+    Default = True
+  }
+  { btnCancel Button
+    MoveScaled(51,32,12.5714,3.4286)
+    'Move(357,224,88,24)
+    Text = ("Cancel")
+    Cancel = True
+  }
+  { Frame1 Frame
+    MoveScaled(1,1,63,13)
+    'Move(7,7,441,91)
+    Text = ("Copy Tag")
+    { RadioButton1 RadioButton rMode
+      MoveScaled(2,4,20,3)
+      'Move(14,28,140,21)
+      Tag = "1"
+      Text = ("ID3v1 -> ID3v2")
+      Value = True
+    }
+    { RadioButton2 RadioButton rMode
+      MoveScaled(2,8,20,3)
+      'Move(14,56,140,21)
+      Tag = "3"
+      Text = ("ID3v2 -> ID3v1")
+    }
+    { RadioButton3 RadioButton rMode
+      MoveScaled(23,4,37,3)
+      'Move(161,28,259,21)
+      Tag = "2"
+      Text = ("ID3v1 -> ID3v2 (overwrite existing entries)")
+    }
+    { RadioButton4 RadioButton rMode
+      MoveScaled(23,8,37,3)
+      'Move(161,56,259,21)
+      Tag = "4"
+      Text = ("ID3v2 -> ID3v1 (overwrite existing entries)")
+    }
+  }
+  { Frame2 Frame
+    MoveScaled(1,15,63,16)
+    'Move(7,105,441,112)
+    Text = ("Preserve Fields")
+    { CheckBox1 CheckBox
+      MoveScaled(2,3,19,3)
+      'Move(14,21,133,21)
+      Text = ("Artist")
+    }
+    { CheckBox2 CheckBox
+      MoveScaled(2,7,19,3)
+      'Move(14,49,133,21)
+      Text = ("Title")
+    }
+    { CheckBox3 CheckBox
+      MoveScaled(23,3,19,3)
+      'Move(161,21,133,21)
+      Text = ("Genre")
+    }
+    { CheckBox4 CheckBox
+      MoveScaled(2,11,19,3)
+      'Move(14,77,133,21)
+      Text = ("Album")
+    }
+    { CheckBox5 CheckBox
+      MoveScaled(23,11,19,3)
+      'Move(161,77,133,21)
+      Text = ("Year")
+    }
+    { CheckBox6 CheckBox
+      MoveScaled(23,7,19,3)
+      'Move(161,49,133,21)
+      Text = ("Tracknumber")
+    }
+  }
+}

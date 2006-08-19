@@ -1,0 +1,73 @@
+
+STATIC PUBLIC TFTypes AS String[]
+
+INHERITS CTagv2Frame
+
+PROPERTY type AS String
+PROPERTY content AS String
+
+
+PRIVATE FUNCTION type_Read() AS String
+  
+END
+PRIVATE SUB type_Write(Value AS String)
+  
+END
+PRIVATE FUNCTION content_Read() AS String
+  
+END
+PRIVATE SUB content_Write(Value AS String)
+  
+END
+
+
+STATIC PUBLIC SUB _init()
+  
+  TFTypes.Add("TALB") 'Album / Movie / Show title
+  TFTypes.Add("TBPM") 'BPM(beats per Minute)
+  TFTypes.Add("TCOM") 'Composer
+  TFTypes.Add("TCON") 'Content type
+  TFTypes.Add("TCOP") 'Copyright message
+  TFTypes.Add("TDEN") 'Encoding Time
+  TFTypes.Add("TDLY") 'Playlist delay
+  TFTypes.Add("TDOR") 'Original release Time
+  TFTypes.Add("TDRC") 'Recording Time
+  TFTypes.Add("TDRL") 'Release Time
+  TFTypes.Add("TDTG") 'Tagging Time
+  TFTypes.Add("TENC") 'Encoded by
+  TFTypes.Add("TEXT") 'Lyricist / Text writer
+  TFTypes.Add("TFLT") 'File type
+  TFTypes.Add("TIPL") 'Involved people list
+  TFTypes.Add("TIT1") 'Content group description
+  TFTypes.Add("TIT2") 'Title / songname / content description
+  TFTypes.Add("TIT3") 'Subtitle / Description refinement
+  TFTypes.Add("TKEY") 'Initial key
+  TFTypes.Add("TLAN") 'Language(s)
+  TFTypes.Add("TLEN") 'Length
+  TFTypes.Add("TMCL") 'Musician credits list
+  TFTypes.Add("TMED") 'Media type
+  TFTypes.Add("TMOO") 'Mood
+  TFTypes.Add("TOAL") 'Original album / movie / show title
+  TFTypes.Add("TOFN") 'Original filename
+  TFTypes.Add("TOLY") 'Original lyricist(s) / text writer(s)
+  TFTypes.Add("TOPE") 'Original artist(s) / performer(s)
+  TFTypes.Add("TOWN") 'File owner / licensee
+  TFTypes.Add("TPE1") 'Lead performer(s) / Soloist(s)
+  TFTypes.Add("TPE2") 'Band / orchestra / accompaniment
+  TFTypes.Add("TPE3") 'Conductor / performer refinement
+  TFTypes.Add("TPE4") 'Interpreted, remixed, or otherwise modified by
+  TFTypes.Add("TPOS") 'Part of a set
+  TFTypes.Add("TPRO") 'Produced notice
+  TFTypes.Add("TPUB") 'Publisher
+  TFTypes.Add("TRCK") 'Track number / Position in set
+  TFTypes.Add("TRSN") 'Internet radio station name
+  TFTypes.Add("TRSO") 'Internet radio station owner
+  TFTypes.Add("TSOA") 'Album sort order
+  TFTypes.Add("TSOP") 'Performer sort order
+  TFTypes.Add("TSOT") 'Title sort order
+  TFTypes.Add("TSRC") 'ISRC(international standard recording code)
+  TFTypes.Add("TSSE") 'Software / Hardware and settings used for encoding
+  TFTypes.Add("TSST") 'Set subtitle
+  TFTypes.Add("TXXX") 'User defined text information frame
+  
+END

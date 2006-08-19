@@ -1,0 +1,34 @@
+' Gambas class file
+
+STATIC PUBLIC pattern AS String
+STATIC PUBLIC patterns AS String[]
+
+STATIC PUBLIC SUB _init()
+
+  patterns.Add("%A - %B - %K - %T")
+  patterns.Add("%K-%T")
+  
+END
+
+STATIC PUBLIC FUNCTION Run() AS Boolean
+
+  DIM hForm AS Form
+
+  hForm = NEW FFNamev1
+  RETURN hForm.ShowModal()
+
+END
+
+PUBLIC SUB btnOK_Click()
+  
+  IF NOT ComboBox1.Find(ComboBox1.Text) THEN patterns.Add(ComboBox1.Text)
+  FFNamev1.pattern = ComboBox1.Text
+  ME.Close(TRUE)
+
+END
+
+PUBLIC SUB btnCancel_Click()
+
+  ME.Close()
+
+END

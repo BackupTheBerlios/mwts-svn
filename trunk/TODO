@@ -1,0 +1,30 @@
+- comment the code!
+
+- FMain.Flist:
+  - show directory-column only if recursively browsed?
+  - adjust size of Samplerate column accurately if first column
+  - eigene Flist-Klasse schreiben, die fall und cols beinhaltet (wg. automatischem update, etc.)
+
+- ID3v1-Tag
+  - write support
+
+- ID3v2-Tag
+  - class itself
+    - (extended) Header
+    - Frames
+    - Footer
+  - read support
+  - write support
+  - edit-Dialog
+
+- generate nice torrent-description :)
+
+- search for functional audio-converters and offer to encode files to different formats
+  - preserve tag-entries
+
+
+BUGS:
+~~~~~
+- CMPEGHeader:
+  - samplerate is not properly set if file is MPEG 2.5
+  - layer is not properly set if file is MPEG 2.5

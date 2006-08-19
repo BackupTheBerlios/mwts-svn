@@ -1,0 +1,428 @@
+' This class represents the ID3v1-Tag of the file
+
+' holds the string-names for all available genres in ID3v1 including (nearly-standard) winamp-extensions
+STATIC PUBLIC genreDef AS NEW String[]
+
+PUBLIC CONST genreNone AS Integer = 255 ' value to set for the genre-field if information is unknown 
+PUBLIC CONST trackNone AS Integer = 0 ' value to set for the track-field if information is unknown
+
+PROPERTY artist AS String
+PROPERTY album AS String
+PROPERTY track AS Integer
+PROPERTY year AS Integer
+PROPERTY genre AS Integer
+PROPERTY title AS String
+PROPERTY comment AS String
+
+PROPERTY READ isEmpty AS Boolean ' returns if no properties of the Tag are set
+PROPERTY READ version AS Integer ' returns either 0 or 1 according to the setting of the track-property
+PROPERTY READ changed AS Boolean ' returns if any external changes were made
+
+PRIVATE $artist AS String
+PRIVATE $album AS String
+PRIVATE $track AS Integer = trackNone
+PRIVATE $year AS Integer
+PRIVATE $genre AS Integer = genreNone
+PRIVATE $title AS String
+PRIVATE $comment AS String
+
+PRIVATE $changed AS Boolean
+
+' needed for MHelp.merge()
+PUBLIC FUNCTION getNone(which AS String) AS Variant
+  
+  SELECT CASE which
+    CASE "genre"
+      RETURN genreNone
+    CASE "track"
+      RETURN trackNone
+    CASE ELSE  
+      RETURN ""
+  END SELECT 
+  
+END
+
+' if path is specified, the ID3-Tag of this file will be parsed (ISO-8859-1 is the standard charset vor v1)
+PUBLIC SUB _new(OPTIONAL path AS String = NULL)
+  
+  DIM f AS File
+  DIM t AS String
+  
+  IF IsNull(path) THEN RETURN 
+  
+  IF Stat(path).Size < 128 THEN RETURN
+  
+  f = OPEN path FOR READ
+  
+  SEEK #f, -128
+  READ #f, t, 3
+  
+  
+  IF (t = "TAG") THEN
+    READ #f, t, 30
+    $title = Conv(CFile.trimzero(t), "ISO-8859-1", Desktop.Charset)
+    READ #f, t, 30
+    $artist = Conv(CFile.trimzero(t), "ISO-8859-1", Desktop.Charset)
+    READ #f, t, 30
+    $album = Conv(CFile.trimzero(t), "ISO-8859-1", Desktop.Charset)
+    READ #f, t, 4
+    IF NOT IsNull(Val(t)) THEN $year = Val(t)
+    READ #f, t, 30
+    IF Mid(t, 29, 1) = Chr(0) THEN ' v1.1
+      $comment = Conv(CFile.trimzero(Left(t, 28)), "ISO-8859-1", Desktop.Charset)
+      $track = Asc(Right(t, 1))
+    ELSE 'v1.0
+      $comment = Conv(CFile.trimzero(t), "ISO-8859-1", Desktop.Charset)
+      $track = trackNone
+    END IF
+    READ #f, t, 1
+    $genre = Asc(t)
+  END IF
+  
+  CLOSE #f
+  
+END
+
+' merges multiple tags together so that different entries in any property become emtpy, same stay same
+' ! replaced by MHelp.merge() !
+' STATIC PUBLIC FUNCTION mergeTags(tags AS Object[]) AS CTagv1
+'   
+'   DIM result AS NEW CTagv1
+'   DIM t AS CTagv1
+'   DIM a1 AS Boolean
+'   DIM a2 AS Boolean
+'   DIM a3 AS Boolean
+'   DIM a4 AS Boolean
+'   DIM a5 AS Boolean
+'   DIM a6 AS Boolean
+'   DIM a7 AS Boolean
+'   
+'   IF IsNull(tags) THEN RETURN NULL
+'   
+'   FOR EACH t IN tags
+'     IF NOT a1 THEN 
+'       result.album = t.album
+'       a1 = TRUE
+'     ELSE 
+'       IF NOT (result.album = t.album) THEN 
+'         result.album = ""
+'       END IF
+'     END IF
+'     
+'     IF NOT a2 THEN 
+'       result.artist = t.artist
+'       a2 = TRUE
+'     ELSE 
+'       IF NOT (result.artist = t.artist) THEN 
+'         result.artist = ""
+'       END IF
+'     END IF
+'     
+'     IF NOT a4 THEN 
+'       result.comment = t.comment
+'       a3 = TRUE
+'     ELSE 
+'       IF NOT (result.comment = t.comment) THEN 
+'         result.comment = ""
+'       END IF
+'     END IF
+'     
+'     IF NOT a4 THEN 
+'       result.genre = t.genre
+'       a4 = TRUE
+'     ELSE 
+'       IF NOT (result.genre = t.genre) THEN 
+'         result.genre = genreNone
+'       END IF
+'     END IF
+'     
+'     IF NOT a5 THEN 
+'       result.title = t.title
+'       a5 = TRUE
+'     ELSE 
+'       IF NOT (result.title = t.title) THEN 
+'         result.title = ""
+'       END IF
+'     END IF
+'     
+'     IF NOT a6 THEN 
+'       result.track = t.track
+'       a6 = TRUE
+'     ELSE 
+'       IF NOT (result.track = t.track) THEN 
+'         result.track = trackNone
+'       END IF
+'     END IF
+'     
+'     IF NOT a7 THEN 
+'       result.year = t.year
+'       a7 = TRUE
+'     ELSE 
+'       IF NOT (result.year = t.year) THEN 
+'         result.year = 0
+'       END IF
+'     END IF
+'   NEXT 
+'   
+'   RETURN result
+' 
+' END
+
+' checks if the properties comply with the ID3v1-specification, basically checks the length of them
+PRIVATE SUB normalize()
+  
+  IF Len($title) > 30 THEN $title = Left$($title, 30)
+  IF Len($artist) > 30 THEN $artist = Left$($artist, 30)
+  IF Len($album) > 30 THEN $album = Left$($album, 30)
+  IF Len($comment) > 28 THEN $comment = Left($comment, 28)
+  IF $year < 0 OR $year > 9999 THEN $year = 0
+  IF $track < 0 OR $track > 255 THEN $track = trackNone
+  IF $genre < 0 OR $genre > 147 THEN $genre = genreNone
+  
+END
+
+' returns the genre as string
+PUBLIC FUNCTION getsGenre() AS String
+  IF $genre < 0 OR $genre > 147 THEN
+    RETURN ""
+  ELSE 
+    RETURN CTagv1.genreDef[$genre]
+  END IF  
+END
+
+' returns the whole ID3v1-Tag with the set properties as 128 byte long string
+PUBLIC FUNCTION render() AS String
+  
+  DIM result AS String
+  
+  normalize
+  
+  result = "TAG"
+  result &= $title & String$(30 - Len($title), Chr(0))
+  result &= $artist & String$(30 - Len($artist), Chr(0))
+  result &= $album & String$(30 - Len($album), Chr(0))
+  result &= $year
+  result &= $comment & String$(28 - Len($comment), Chr(0))
+  result &= Chr(0)
+  result &= Chr($track)
+  result &= Chr($genre)
+  
+  RETURN Conv$(result, Desktop.Charset, "ISO-8859-1")
+  
+END
+
+
+PRIVATE FUNCTION artist_Read() AS String
+  RETURN $artist
+END
+PRIVATE SUB artist_Write(Value AS String)
+  $artist = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION album_Read() AS String
+  RETURN $album
+END
+PRIVATE SUB album_Write(Value AS String)
+  $album = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION track_Read() AS Integer
+  RETURN $track
+END
+PRIVATE SUB track_Write(Value AS Integer)
+  $track = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION year_Read() AS Integer
+  RETURN $year
+END
+PRIVATE SUB year_Write(Value AS Integer)
+  $year = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION genre_Read() AS Integer
+  RETURN $genre
+END
+PRIVATE SUB genre_Write(Value AS Integer)
+  IF Value < 0 OR (Value > 147 AND NOT Value = genreNone) THEN RETURN 
+  $genre = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION title_Read() AS String
+  RETURN $title
+END
+PRIVATE SUB title_Write(Value AS String)
+  $title = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION isEmpty_Read() AS Boolean
+  
+END 
+PRIVATE FUNCTION comment_Read() AS String
+  RETURN $comment
+END
+PRIVATE SUB comment_Write(Value AS String)
+  $comment = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION version_Read() AS Integer
+  RETURN If($track = trackNone, 0, 1)
+END
+PRIVATE FUNCTION changed_Read() AS Boolean
+  RETURN $changed
+END
+
+STATIC PUBLIC SUB _init()
+  
+  genreDef.Add("Blues")
+  genreDef.Add("Classic Rock")
+  genreDef.Add("Country")
+  genreDef.Add("Dance")
+  genreDef.Add("Disco")
+  genreDef.Add("Punk")
+  genreDef.Add("Grunge")
+  genreDef.Add("Hip-Hop")
+  genreDef.Add("Jazz")
+  genreDef.Add("Metal")
+  genreDef.Add("New Age")
+  genreDef.Add("Oldies")
+  genreDef.Add("Other")
+  genreDef.Add("Pop")
+  genreDef.Add("R&B")
+  genreDef.Add("Rap")
+  genreDef.Add("Reggae")
+  genreDef.Add("Rock")
+  genreDef.Add("Techno")
+  genreDef.Add("Industrial")
+  genreDef.Add("Alternative")
+  genreDef.Add("Ska")
+  genreDef.Add("Death Metal")
+  genreDef.Add("Pranks")
+  genreDef.Add("Soundtrack")
+  genreDef.Add("Euro-Techno")
+  genreDef.Add("Ambient")
+  genreDef.Add("Trip-Hop")
+  genreDef.Add("Vocal")
+  genreDef.Add("Jazz&Funk")
+  genreDef.Add("Fusion")
+  genreDef.Add("Trance")
+  genreDef.Add("Classical")
+  genreDef.Add("Instrumental")
+  genreDef.Add("Acid")
+  genreDef.Add("House")
+  genreDef.Add("Game")
+  genreDef.Add("Sound Clip")
+  genreDef.Add("Gospel")
+  genreDef.Add("Noise")
+  genreDef.Add("Alternative Rock")
+  genreDef.Add("Bass")
+  genreDef.Add("Soul")
+  genreDef.Add("Punk")
+  genreDef.Add("Space")
+  genreDef.Add("Meditative")
+  genreDef.Add("Instrumental Pop")
+  genreDef.Add("Instrumental Rock")
+  genreDef.Add("Ethnic")
+  genreDef.Add("Gothic")
+  genreDef.Add("Darkwave")
+  genreDef.Add("Techno-Industrial")
+  genreDef.Add("Electronic")
+  genreDef.Add("Pop-Folk")
+  genreDef.Add("Eurodance")
+  genreDef.Add("Dream")
+  genreDef.Add("Southern Rock")
+  genreDef.Add("Comedy")
+  genreDef.Add("Cult")
+  genreDef.Add("Gangsta")
+  genreDef.Add("Top 40")
+  genreDef.Add("Christian Rap")
+  genreDef.Add("Pop/Funk")
+  genreDef.Add("Jungle")
+  genreDef.Add("Native US")
+  genreDef.Add("Cabaret")
+  genreDef.Add("New Wave")
+  genreDef.Add("Psychedelic")
+  genreDef.Add("Rave")
+  genreDef.Add("Showtunes")
+  genreDef.Add("Trailer")
+  genreDef.Add("Lo-Fi")
+  genreDef.Add("Tribal")
+  genreDef.Add("Acid Punk")
+  genreDef.Add("Acid Jazz")
+  genreDef.Add("Polka")
+  genreDef.Add("Retro")
+  genreDef.Add("Musical")
+  genreDef.Add("Rock & Roll")
+  genreDef.Add("Hard Rock")
+  genreDef.Add("Folk")
+
+  genreDef.Add("Folk-Rock")
+  genreDef.Add("National Folk")
+  genreDef.Add("Swing")
+  genreDef.Add("Fast Fusion")
+  genreDef.Add("Bebop")
+  genreDef.Add("Latin")
+  genreDef.Add("Revival")
+  genreDef.Add("Celtic")
+  genreDef.Add("Bluegrass")
+  genreDef.Add("Avantgarde")
+  genreDef.Add("Gothic Rock")
+  genreDef.Add("Progressive Rock")
+  genreDef.Add("Psychedelic Rock")
+  genreDef.Add("Symphonic Rock")
+  genreDef.Add("Slow Rock")
+  genreDef.Add("Big Band")
+  genreDef.Add("Chorus")
+  genreDef.Add("Easy Listening")
+  genreDef.Add("Acoustic")
+  genreDef.Add("Humour")
+  genreDef.Add("Speech")
+  genreDef.Add("Chanson")
+  genreDef.Add("Opera")
+  genreDef.Add("Chamber Music")
+  genreDef.Add("Sonata")
+  genreDef.Add("Symphony")
+  genreDef.Add("Booty Bass")
+  genreDef.Add("Primus")
+  genreDef.Add("Porn Groove")
+  genreDef.Add("Satire")
+  genreDef.Add("Slow Jam")
+  genreDef.Add("Club")
+  genreDef.Add("Tango")
+  genreDef.Add("Samba")
+  genreDef.Add("Folklore")
+  genreDef.Add("Ballad")
+  genreDef.Add("Power Ballad")
+  genreDef.Add("Rhytmic Soul")
+  genreDef.Add("Freestyle")
+  genreDef.Add("Duet")
+  genreDef.Add("Punk Rock")
+  genreDef.Add("Drum Solo")
+  genreDef.Add("Acapella")
+  genreDef.Add("Euro - House")
+  genreDef.Add("Dance Hall")
+
+  genreDef.Add("Goa")
+  genreDef.Add("Drum & Bass")
+  genreDef.Add("Club-House")
+  genreDef.Add("Hardcore")
+  genreDef.Add("Terror")
+  genreDef.Add("Indie")
+  genreDef.Add("BritPop")
+  genreDef.Add("Negerpunk")
+  genreDef.Add("Polsk Punk")
+  genreDef.Add("Beat")
+  genreDef.Add("Christian Gangsta")
+  genreDef.Add("Heavy Metal")
+  genreDef.Add("Black Metal")
+  genreDef.Add("Crossover")
+  genreDef.Add("Contemporary Christian")
+  genreDef.Add("Christian Rock")
+  genreDef.Add("Merengue")
+  genreDef.Add("Salsa")
+  genreDef.Add("Thrash Metal")
+  genreDef.Add("Anime")
+  genreDef.Add("JPop")
+  genreDef.Add("SynthPop")
+  
+END

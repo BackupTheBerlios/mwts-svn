@@ -1,0 +1,25 @@
+' Gambas class file
+
+PUBLIC CONST ENC_ISO AS String = "ISO-8859-1"
+PUBLIC CONST ENC_UTF AS String = "UTF-8"
+
+'PROPERTY encoding AS String
+
+' Frame flags - status information
+'PROPERTY isTagAlterPreserved AS Boolean
+'PROPERTY isFileAlterPreserved AS Boolean
+'PROPERTY isReadOnly AS Boolean
+
+' Frame flags - additional information
+'PROPERTY isGrouped AS Boolean
+'PROPERTY isEncrypted AS Boolean
+'PROPERTY isUnsynchronized AS Boolean
+'PROPERTY isDataLengthIndicatorSet AS Boolean
+
+
+
+PUBLIC SUB _new()
+  
+  
+  
+END

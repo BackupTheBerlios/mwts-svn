@@ -1,0 +1,14 @@
+# Gambas Project File 1.0
+Title=Music without Tags is Shit
+Startup=FMain
+TabSize=2
+Version=0.1.1
+Library=gb.qt
+Library=gb.form
+Library=gb.settings
+SnapToGrid=1
+ShowGrid=1
+Translate=0
+KeepDebugInfo=0
+ControlPublic=1
+Prefix=0

@@ -1,0 +1,115 @@
+# Gambas Form File 1.0
+
+{ FFNamev1 Form
+  MoveScaled(0,0,57,27)
+  'Move(0,0,399,189)
+  Text = ("")
+  Border = Window.Fixed
+  { btnOK Button
+    MoveScaled(29,23,12.5714,3.4286)
+    'Move(203,161,88,24)
+    Text = ("OK")
+    Default = True
+  }
+  { btnCancel Button
+    MoveScaled(42.7143,23,12.5714,3.4286)
+    'Move(299,161,88,24)
+    Text = ("Cancel")
+    Cancel = True
+  }
+  { Frame1 Frame
+    MoveScaled(1,1,55,21)
+    'Move(7,7,385,147)
+    Text = ("Generate Filename")
+    { Label1 Label
+      MoveScaled(2,4,8,3)
+      'Move(14,28,56,21)
+      Text = ("Pattern:")
+    }
+    { ComboBox1 ComboBox
+      MoveScaled(10,4,43,3)
+      'Move(70,28,301,21)
+      Text = ("")
+    }
+    { Label2 Label
+      MoveScaled(2,8,4,3)
+      'Move(14,56,28,21)
+      Text = ("%A")
+    }
+    { Label3 Label
+      MoveScaled(7,8,11,3)
+      'Move(49,56,77,21)
+      Text = ("Artist")
+    }
+    { Label4 Label
+      MoveScaled(7,11,11,3)
+      'Move(49,77,77,21)
+      Text = ("Album")
+    }
+    { Label5 Label
+      MoveScaled(2,11,4,3)
+      'Move(14,77,28,21)
+      Text = ("%B")
+    }
+    { Label6 Label
+      MoveScaled(7,14,11,3)
+      'Move(49,98,77,21)
+      Text = ("Title")
+    }
+    { Label7 Label
+      MoveScaled(2,14,4,3)
+      'Move(14,98,28,21)
+      Text = ("%T")
+    }
+    { Label8 Label
+      MoveScaled(24,8,11,3)
+      'Move(168,56,77,21)
+      Text = ("Genre")
+    }
+    { Label9 Label
+      MoveScaled(19,8,4,3)
+      'Move(133,56,28,21)
+      Text = ("%G")
+    }
+    { Label10 Label
+      MoveScaled(24,11,11,3)
+      'Move(168,77,77,21)
+      Text = ("Year")
+    }
+    { Label11 Label
+      MoveScaled(19,11,4,3)
+      'Move(133,77,28,21)
+      Text = ("%Y")
+    }
+    { Label12 Label
+      MoveScaled(24,14,11,3)
+      'Move(168,98,77,21)
+      Text = ("Tracknumber")
+    }
+    { Label13 Label
+      MoveScaled(19,14,4,3)
+      'Move(133,98,28,21)
+      Text = ("%K")
+    }
+    { Label14 Label
+      MoveScaled(42,11,11,3)
+      'Move(294,77,77,21)
+      Text = ("Samplerate")
+    }
+    { Label15 Label
+      MoveScaled(42,8,11,3)
+      'Move(294,56,77,21)
+      Text = ("Bitrate")
+    }
+    { Label16 Label
+      MoveScaled(37,11,4,3)
+      'Move(259,77,28,21)
+      Text = ("%s")
+    }
+    { Label18 Label
+      MoveScaled(37,8,4,3)
+      'Move(259,56,28,21)
+      Text = ("%b")
+    }
+  }
+}

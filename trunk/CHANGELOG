@@ -1,0 +1,52 @@
+* Wed Aug 8 2006 Franz Brauße <mike-nought@gmx.de>
+  - extended merge-function by more return values if values differ (min/max/average)
+
+* Tue Aug 8 2006 Franz Brauße <mike-nought@gmx.de>
+  - ID3v1-Tag charset now is correctly converted from and to ISO-8859-1
+  - some updates for GUI, displaying progress while reading files
+  - added possibility to cancel reading of files
+  - new method updating GUI
+  - fixed bug in pattern-replacement function (%A, %f, etc.)
+  - updated project-version number to 0.1
+  - added patterns:
+    - %K : Tracknumber
+    - %s : Sample-Rate
+    - %b : Bitrate
+    - %d : Directory file resides in
+  - added dialog to deal with copying / replacements of Tags in different versions (not functional yet)
+  - added settings-dialog: columns to display (changeable order)
+  - fixed bug in generic merge-function which caused genre to be "Blues" if differed and had possible other
+    side effects due to setting different values to either 0, "" or NULL, which is not always right
+  - enhanced ID3v1-Parser to support MPEG 1.0, 2.0 and 2.5 (incompletely: sample- and bitrate is somehow
+    wrong or my files here are crap)
+  - fixed possible wrong handling of parameter in FMain.FeditEntry()
+  - (internal) renaming of files added (no changes to file itself up to now, more testing needed, I don't
+    want to destroy my music-collection ;) )
+
+* Mon Aug 7 2006 Franz Brauße <mike-nought@gmx.de>
+  - added extra checkboxes to editv1-dialog, if changes should be applied
+  - added function to convert the following strings to their correspondant information from file:
+    - %A : Artist
+    - %B : Album
+    - %T : Track
+    - %f : Filename without path
+    - %Y : Year
+  - changed items are marked in File-View now via Picture
+  - removed workaround for #11-bug since Benoit fixed it => generic merging of classes works now
+
+* Sun Aug 6 2006 Franz Brauße <mike-nought@gmx.de>
+  - added function for generic merging
+  - tried workaround in merging function for #11-error bug in MHelp.merge
+  - added bitrate (if constant) to File-listing and some general file-information in extra dialog
+  - the first MPEG-frame-header is read and parsed correctly (except the sample rate at MPEG 2.5-files,
+    why ever)
+
+* Sat Aug 5 2006 Franz Brauße <mike-nought@gmx.de>
+  - initial version 0.1
+  - added working ID3v1-Edit-Dialog (saving not yet supported)
+  - added function to merge v1-Tags
+  - added working File-View (listing of files including Tags, also recursively)
+  - added abstract Tag-Class (optional: writing both tags / reading merged)
+  - added working File-Class
+  - added fragmentary ID3v2-Class
+  - added working ID3v1-Class including merge-function for several tags

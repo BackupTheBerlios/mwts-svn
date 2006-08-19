@@ -1,0 +1,160 @@
+' Gambas class file
+
+STATIC PUBLIC cols AS String[]
+
+STATIC PUBLIC SUB _init()
+  
+'   cols = NEW String[]
+'   cols.Add("%f")
+'   cols.Add("%T")
+'   cols.Add("%A")
+'   cols.Add("%B")
+'   cols.Add("%Y")
+'   cols.Add("%G")
+'   cols.Add("%K")
+'   cols.Add("%b")
+  
+END
+
+PUBLIC SUB _new()
+  
+  DIM t AS String
+  
+  cols = FMain.cols
+  
+  aCols.Add("Tag", "Tag specific")
+  aCols.Add("%A", "Artist", NULL, "Tag")
+  aCols.Add("%B", "Album", NULL, "Tag")
+  aCols.Add("%T", "Title", NULL, "Tag")
+  aCols.Add("%Y", "Year", NULL, "Tag")
+  aCols.Add("%K", "Track", NULL, "Tag")
+  aCols.Add("%G", "Genre", NULL, "Tag")
+  
+  aCols.Add("File", "File specific")
+  aCols.Add("%f", "Filename", NULL, "File")
+  aCols.Add("%d", "Directory", NULL, "File")
+  aCols.Add("%b", "Bitrate", NULL, "File")
+  aCols.Add("%s", "Samplerate", NULL, "File")
+  
+  FOR EACH t IN FConfig.cols
+    sCols.Add(t, MHelp.desc[t])
+  NEXT 
+  
+  Button1.Enabled = FALSE
+  Button2.Enabled = FALSE
+  Button3.Enabled = FALSE
+  Button4.Enabled = FALSE
+  
+  ME.Center
+  
+END
+
+STATIC PUBLIC FUNCTION Run() AS Boolean
+
+  DIM hForm AS Form
+
+  hForm = NEW FConfig
+  RETURN hForm.ShowModal()
+
+END
+
+PUBLIC SUB btnOK_Click()
+  
+  DIM x AS Integer
+  
+  FConfig.cols = NEW String[]
+  IF sCols.Count > 0 THEN 
+    sCols.MoveFirst
+    DO
+      FConfig.cols.Add(sCols.Item.Key)
+    LOOP UNTIL sCols.MoveBelow()
+  END IF
+  ME.Close(TRUE)
+
+END
+
+PUBLIC SUB btnCancel_Click()
+
+  ME.Close()
+
+END
+
+PUBLIC SUB aCols_Select()
+
+  IF aCols.Current.Key = "Tag" OR aCols.Current.Key = "File" THEN
+    Button1.Enabled = FALSE
+  ELSE  
+    Button1.Enabled = TRUE
+  END IF
+
+END
+
+PUBLIC SUB sCols_Select()
+
+  IF NOT IsNull(sCols.Current) THEN 
+    IF sCols.Current.Selected THEN
+      Button2.Enabled = TRUE
+      Button3.Enabled = TRUE
+      Button4.Enabled = TRUE
+    END IF
+  END IF
+
+END
+
+PUBLIC SUB Button3_Click()
+
+  DIM t AS String = sCols.Current.Key
+  DIM s AS String
+  
+  sCols.MoveCurrent
+  IF sCols.MoveAbove() THEN RETURN 
+  IF sCols.MoveAbove() THEN 
+    sCols.MoveFirst
+    s = sCols.Item.Key
+    sCols.Remove(s)
+    sCols.Add(s, MHelp.desc[s], NULL, NULL, t)
+    sCols[t].Selected = TRUE
+  ELSE
+    sCols.Remove(t)
+    sCols.Add(t, MHelp.desc[t], NULL, NULL, sCols.Item.Key).Selected = TRUE
+  END IF
+
+END
+
+PUBLIC SUB Button4_Click()
+
+  DIM t AS String = sCols.Current.Key
+  
+  sCols.MoveCurrent
+  IF sCols.MoveBelow() THEN RETURN 
+  sCols.Remove(t)
+  sCols.Add(t, MHelp.desc[t], NULL, NULL, sCols.Item.Key).Selected = TRUE
+
+END
+
+PUBLIC SUB Button1_Click()
+
+  IF sCols.Exist(aCols.Current.Key) THEN RETURN 
+  
+  IF NOT sCols.Current.Selected THEN 
+    sCols.Add(aCols.Current.Key, MHelp.desc[aCols.Current.Key])
+  ELSE
+    sCols.Add(aCols.Current.Key, MHelp.desc[aCols.Current.Key], NULL, NULL, sCols.Current.Key)
+  END IF
+
+END
+
+PUBLIC SUB Button2_Click()
+  
+  IF IsNull(sCols.Current) THEN RETURN 
+  
+  sCols.Remove(sCols.Current.Key)
+  
+END
+
+
+
+
+
+
+

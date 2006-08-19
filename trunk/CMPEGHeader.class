@@ -1,0 +1,110 @@
+
+PUBLIC CONST chanStereo AS Integer = 0
+PUBLIC CONST chanJStereo AS Integer = 1
+PUBLIC CONST chanDual AS Integer = 2
+PUBLIC CONST chanMono AS Integer = 3
+
+PROPERTY READ bitrate AS Integer ' returns bitrate of this frame-header in KBit/s
+PROPERTY READ vbr AS Boolean ' returns whether this frame uses VBR
+PROPERTY READ sampleRate AS Integer ' returns samplerate of this frame
+PROPERTY READ mpegversion AS String ' returns the mpeg-version of this frame, may be either "1.0", "2.0". "2.5" or empty
+PROPERTY READ layer AS Integer ' returns the audio-layer used; 0 means invalid information in frame-header
+PROPERTY READ isCRCprotected AS Boolean ' returns whether the CRC-bit is set in frame header
+PROPERTY READ privbit AS Boolean ' returns whether the "private"-bit is set in frame header
+PROPERTY READ channels AS Integer ' returns how channels are set in this frame, see chan*-constants
+PROPERTY READ copyright AS Boolean ' returns whether the copyright-bit is set in frame header
+PROPERTY READ original AS Boolean ' returns whether the original-bit is set in frame header
+
+PRIVATE $bitrate AS Integer
+PRIVATE $vbr AS Boolean
+PRIVATE $samplerate AS Integer
+PRIVATE $mpegversion AS String
+PRIVATE $layer AS Integer
+PRIVATE $isCRCprotected AS Boolean
+PRIVATE $privbit AS Boolean
+PRIVATE $channelmode AS Integer
+PRIVATE $copyright AS Boolean
+PRIVATE $original AS Boolean
+
+' parses the frame-header; rawdata are the 4 bytes defining the begin of a new frame (ergo: the header)
+PUBLIC SUB _new(OPTIONAL rawdata AS String = NULL)
+  
+  DIM f1 AS Byte 
+  DIM f2 AS Byte
+  DIM f3 AS Byte 
+  DIM f4 AS Byte 
+  DIM t AS Variant
+  
+  IF IsNull(rawdata) THEN RETURN 
+  
+  f1 = CByte(Asc(Mid(rawdata, 1, 1)))
+  f2 = CByte(Asc(Mid(rawdata, 2, 1)))
+  f3 = CByte(Asc(Mid(rawdata, 3, 1)))
+  f4 = CByte(Asc(Mid(rawdata, 4, 1)))
+  
+  $mpegversion = Choose((Shr(f2, 3) AND 3) + 1, "2.5", "", "2.0", "1.0")
+  
+  $layer = Choose((Shr(f2, 1) AND 3) + 1, 0, 3, 2, 1)
+  
+  $isCRCprotected = (f2 AND 1)
+  
+  IF $mpegversion = "1.0" THEN 
+    IF $layer = 1 THEN t = Choose((Shr(f3, 4) AND 15), 32, 64, 96, 128, 160, 192, 224, 256, 288, 320, 352, 384, 416, 448, -2)
+    IF $layer = 2 THEN t = Choose((Shr(f3, 4) AND 15), 32, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 384, -2)
+    IF $layer = 3 THEN t = Choose((Shr(f3, 4) AND 15), 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, -2) 
+  ELSE 
+    IF $layer = 1 THEN
+      t = Choose((Shr(f3, 4) AND 15), 32, 48, 56, 64, 80, 96, 112, 128, 144, 160, 176, 192, 224, 256, -2)
+    ELSE 
+      t = Choose((Shr(f3, 4) AND 15), 8, 16, 24, 32, 40, 48, 56, 64, 80, 96, 112, 128, 144, 160, -2)
+    END IF
+  END IF
+  IF IsNull(t) THEN
+  
+    $vbr = TRUE
+    $bitrate = -1
+  ELSE  
+    $bitrate = t
+  END IF
+  
+  $samplerate = Choose((Shr(f3, 2) AND 3) + 1, 44100, 48000, 32000, 0)
+  $samplerate = If($mpegversion = "2.0", $samplerate / 2, $samplerate)
+  $samplerate = If($mpegversion = "2.5", $samplerate / 4, $samplerate)
+  
+  $privbit = f3 AND 2
+  $channelmode = Shr(f4, 6)
+  $copyright = f4 AND 8
+  $original = f4 AND 4
+  
+END
+
+PRIVATE FUNCTION bitrate_Read() AS Integer
+  RETURN $bitrate
+END
+PRIVATE FUNCTION vbr_Read() AS Boolean
+  RETURN $vbr
+END
+PRIVATE FUNCTION sampleRate_Read() AS Integer
+  RETURN $samplerate
+END
+PRIVATE FUNCTION mpegversion_Read() AS String
+  RETURN $mpegversion
+END
+PRIVATE FUNCTION layer_Read() AS Integer
+  RETURN $layer
+END
+PRIVATE FUNCTION isCRCprotected_Read() AS Boolean
+  RETURN $isCRCprotected
+END
+PRIVATE FUNCTION privbit_Read() AS Boolean
+  RETURN $privbit
+END
+PRIVATE FUNCTION copyright_Read() AS Boolean
+  RETURN $copyright
+END
+PRIVATE FUNCTION original_Read() AS Boolean
+  RETURN $original
+END
+PRIVATE FUNCTION channels_Read() AS Integer
+  RETURN $channelmode
+END

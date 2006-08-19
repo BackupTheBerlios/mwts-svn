@@ -1,0 +1,14 @@
+
+CFile +--> CTag +--> CTagv1
+      |         |
+      |         +--> CTagv2 + -> CTagv2Frame + -> CTagv2FrameText
+      |                                      
+      |         |           |                + -> CTagv2FrameURL
+      |                                      
+      |         |           |                \ -> CTagv2FrameHeader
+      |                      
+      |         |           \ -> CTagv2Header
+      |          
+      |         \ -> OGG und FLAC
+      |
+      \--> CMPEGHeader

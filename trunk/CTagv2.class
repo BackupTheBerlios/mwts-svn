@@ -1,0 +1,111 @@
+
+PUBLIC CONST trackNone AS Integer = 0
+
+PROPERTY artist AS String
+PROPERTY album AS String
+PROPERTY track AS Integer
+PROPERTY year AS Integer
+PROPERTY genre AS String
+PROPERTY title AS String
+PROPERTY comment AS String
+
+PROPERTY READ isEmpty AS Boolean
+PROPERTY version AS Integer
+PROPERTY READ changed AS Boolean
+
+PRIVATE $artist AS String
+PRIVATE $album AS String
+PRIVATE $track AS Integer
+PRIVATE $year AS Integer
+PRIVATE $genre AS String
+PRIVATE $title AS String
+PRIVATE $comment AS String
+
+PRIVATE $changed AS Boolean
+PRIVATE $version AS Integer
+
+PUBLIC SUB _new(OPTIONAL path AS String = NULL)
+  
+  IF IsNull(path) THEN RETURN 
+  
+END
+
+PUBLIC FUNCTION getNone(which AS String) AS Variant
+  
+  SELECT CASE which
+    CASE "track"
+      RETURN trackNone
+    CASE ELSE  
+      RETURN ""
+  END SELECT 
+  
+END
+
+PRIVATE FUNCTION artist_Read() AS String
+  RETURN $artist
+END
+PRIVATE SUB artist_Write(Value AS String)
+  $artist = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION album_Read() AS String
+  RETURN $album
+END
+PRIVATE SUB album_Write(Value AS String)
+  $album = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION track_Read() AS Integer
+  RETURN $track
+END
+PRIVATE SUB track_Write(Value AS Integer)
+  $track = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION year_Read() AS Integer
+  RETURN $year
+END
+PRIVATE SUB year_Write(Value AS Integer)
+  $year = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION genre_Read() AS String
+  RETURN $genre
+END
+PRIVATE SUB genre_Write(Value AS String)
+  $genre = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION title_Read() AS String
+  RETURN $title
+END
+PRIVATE SUB title_Write(Value AS String)
+  $title = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION isEmpty_Read() AS Boolean
+  IF Len(ME.album) > 0 THEN RETURN FALSE
+  IF Len(ME.artist) > 0 THEN RETURN FALSE
+  IF Len(ME.comment) > 0 THEN RETURN FALSE
+  IF Len(ME.genre) > 0 THEN RETURN FALSE
+  IF Len(ME.title) > 0 THEN RETURN FALSE
+  IF ME.track >= 0 THEN RETURN FALSE
+  IF ME.year > 0 THEN RETURN FALSE
+  RETURN TRUE
+END 
+PRIVATE FUNCTION comment_Read() AS String
+  RETURN $comment
+END
+PRIVATE SUB comment_Write(Value AS String)
+  $comment = Value
+  $changed = TRUE
+END
+PRIVATE FUNCTION version_Read() AS Integer
+  RETURN $version
+END
+PRIVATE SUB version_Write(Value AS Integer)
+  $version = Value
+END
+PRIVATE FUNCTION changed_Read() AS Boolean
+  RETURN $changed
+END

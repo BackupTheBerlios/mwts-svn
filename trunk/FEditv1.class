@@ -1,0 +1,90 @@
+' Gambas class file
+
+STATIC PUBLIC v1tag AS CTag
+
+PUBLIC SUB _new()
+  
+  DIM t AS FMain = ME.parent
+  DIM a AS String
+  
+  v1tag = t.fsel
+  
+  TextBox1.Text = FEditv1.v1tag.title
+  TextBox2.Text = FEditv1.v1tag.artist
+  TextBox3.Text = FEditv1.v1tag.album
+  TextBox4.Text = If(FEditv1.v1tag.year > 0, Str(FEditv1.v1tag.year), "")
+  TextBox5.Text = FEditv1.v1tag.comment
+  TextBox6.Text = If(FEditv1.v1tag.track > 0, Str(FEditv1.v1tag.track), "")
+  
+  ComboBox1.Add("")
+  FOR EACH a IN CTagv1.genreDef
+    ComboBox1.Add(a)
+  NEXT 
+  ComboBox1.Index = If(FEditv1.v1tag.v1.genre >= 0 AND (FEditv1.v1tag.v1.genre < 147), FEditv1.v1tag.v1.genre + 1, -1)
+  
+END
+
+
+STATIC PUBLIC FUNCTION Run() AS Boolean
+
+  DIM hForm AS Form
+  
+  hForm = NEW FEditv1
+  
+  RETURN hForm.ShowModal()
+
+END
+
+PUBLIC SUB btnOK_Click()
+
+  IF CheckBox1.Value THEN FEditv1.v1tag.title = TextBox1.Text
+  IF CheckBox2.Value THEN FEditv1.v1tag.artist = TextBox2.Text
+  IF CheckBox3.Value THEN FEditv1.v1tag.album = TextBox3.Text
+  IF CheckBox4.Value THEN 
+    IF IsNull(Val(TextBox4.Text)) THEN  
+      FEditv1.v1tag.year = 0
+    ELSE 
+      FEditv1.v1tag.year = Val(TextBox4.Text)
+    END IF
+  END IF
+  IF CheckBox5.Value THEN FEditv1.v1tag.comment = TextBox5.Text
+  IF CheckBox6.Value THEN 
+    IF IsNull(Val(TextBox6.Text)) THEN 
+      FEditv1.v1tag.track = 0
+    ELSE 
+      FEditv1.v1tag.track = Val(TextBox6.Text)
+    END IF
+  END IF
+  IF CheckBox7.Value THEN FEditv1.v1tag.genre = ComboBox1.Current.Text
+  ME.Close(TRUE)
+  
+END
+
+PUBLIC SUB btnCancel_Click()
+  ME.Close()
+END
+
+PUBLIC SUB TextBox1_Change()
+  CheckBox1.Value = TRUE
+END
+PUBLIC SUB TextBox2_Change()
+  CheckBox2.Value = TRUE
+END
+PUBLIC SUB TextBox3_Change()
+  CheckBox3.Value = TRUE
+END
+PUBLIC SUB TextBox4_Change()
+  CheckBox4.Value = TRUE
+END
+PUBLIC SUB TextBox5_Change()
+  CheckBox5.Value = TRUE
+END
+PUBLIC SUB TextBox6_Change()
+  CheckBox6.Value = TRUE
+END
+PUBLIC SUB ComboBox1_Change()
+  CheckBox7.Value = TRUE
+END
+PUBLIC SUB ComboBox1_Click()
+  CheckBox7.Value = TRUE
+END

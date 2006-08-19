@@ -1,0 +1,66 @@
+' Gambas class file
+
+STATIC PUBLIC pArtist AS Boolean
+STATIC PUBLIC pAlbum AS Boolean
+STATIC PUBLIC pTitle AS Boolean
+STATIC PUBLIC pTrack AS Boolean
+STATIC PUBLIC pYear AS Boolean
+STATIC PUBLIC pGenre AS Boolean
+
+STATIC PUBLIC mode AS Integer
+
+PRIVATE tmode AS Integer
+
+PUBLIC SUB _new()
+
+  SELECT CASE mode
+    CASE 1
+      RadioButton1.Value = TRUE
+    CASE 2
+      RadioButton2.Value = TRUE
+    CASE 3
+      RadioButton3.Value = TRUE
+    CASE 4
+      RadioButton4.Value = TRUE
+  END SELECT 
+  
+  CheckBox1.Value = pArtist
+  CheckBox2.Value = pTitle
+  CheckBox4.Value = pAlbum
+  CheckBox3.Value = pGenre
+  CheckBox5.Value = pYear
+  CheckBox6.Value = pTrack
+
+END
+
+STATIC PUBLIC FUNCTION Run() AS Boolean
+
+  DIM hForm AS Form
+
+  hForm = NEW FTCopy
+  RETURN hForm.ShowModal()
+
+END
+
+PUBLIC SUB btnOK_Click()
+  
+  FTCopy.pArtist = CheckBox1.Value
+  FTCopy.pAlbum = CheckBox2.Value
+  FTCopy.pAlbum = CheckBox4.Value
+  FTCopy.pGenre = CheckBox3.Value
+  FTCopy.pYear = CheckBox5.Value
+  FTCopy.pTrack = CheckBox6.Value
+  
+  FTCopy.mode = tmode
+  
+  ME.Close(TRUE)
+
+END
+
+PUBLIC SUB btnCancel_Click()
+  ME.Close()
+END
+
+PUBLIC SUB rMode_Click()
+  tmode = LAST.tag
+END

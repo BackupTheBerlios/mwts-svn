@@ -1,0 +1,206 @@
+
+PUBLIC desc AS NEW Collection
+
+PUBLIC SUB _init()
+  
+  desc.Add("Artist", "%A")
+  desc.Add("Album", "%B")
+  desc.Add("Year", "%Y")
+  desc.Add("Track", "%K")
+  desc.Add("Title", "%T")
+  desc.Add("Genre", "%G")
+  
+  desc.Add("Filename", "%f")
+  desc.Add("Directory", "%d")
+  desc.Add("Bitrate", "%b")
+  desc.Add("Samplerate", "%s")
+  
+END
+
+PUBLIC FUNCTION replaceByPattern(text AS String, f AS CFile) AS String
+  
+  DIM p AS String
+  
+  FOR EACH p IN desc 
+    text = Replace(text, desc.Key, getDesc(desc.Key, f))
+  NEXT
+  RETURN text
+  
+END
+
+PUBLIC FUNCTION getDesc(pattern AS String, f AS CFile) AS String
+
+  SELECT CASE pattern
+  
+    CASE "%A"
+      RETURN f.tag.artist
+    CASE "%B"
+      RETURN f.tag.album
+    CASE "%Y"
+      RETURN f.tag.year
+    CASE "%K"
+      RETURN f.tag.track
+    CASE "%T"
+      RETURN f.tag.title
+    CASE "%G"
+      RETURN f.tag.genre
+    
+    CASE "%f"
+      RETURN File.Name(f.newpath)
+    CASE "%d"
+      RETURN File.Dir(f.newpath)
+    CASE "%b"
+      RETURN f.header.bitrate
+    CASE "%s"
+      RETURN f.header.sampleRate
+      
+  END SELECT 
+  
+END
+
+' does not work, i think... dunno y
+PUBLIC FUNCTION isSame(v1 AS Object, v2 AS Object, OPTIONAL recursive AS Boolean = FALSE) AS Boolean
+  
+  DIM i AS String
+  DIM t AS String = Object.Type(v1)
+  
+  FOR EACH i IN Classes[t].Symbols
+    IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
+    IF NOT (Object.GetProperty(v1, i) = Object.GetProperty(v2, i)) THEN RETURN FALSE
+  NEXT 
+  RETURN TRUE
+  
+END
+
+
+' sets all values either on .getNone(identifier as string), "" or NULL, depending on the current
+' implementation of the class to merge (is number, is string or is object)
+PUBLIC CONST mergeDelete AS Integer = 0
+
+' if value is a number, it is set to the lowest appearing value
+' otherwise it is set to the first appearing value of it's kind
+PUBLIC CONST mergeMin AS Integer = 1
+
+' if value is a number, it is set to the average of all values of it's kind,
+' otherwise it is set to the value in the middle (and to the first value in the middle if values.Count()
+' is even respectively)
+PUBLIC CONST mergeAverage AS Integer = 2
+
+' if value is a number, it is set to the highest appearing value
+' otherwise it is set to the last appearing value of it's kind
+PUBLIC CONST mergeMax AS Integer = 3
+
+PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDelete) AS Object
+  
+  DIM o AS Object
+  DIM i AS String
+  DIM x AS Boolean
+  DIM result AS Object
+  DIM t AS String
+  DIM v1 AS Variant
+  DIM v2 AS Variant
+  DIM avg AS NEW Collection
+  
+  IF values.Count = 0 THEN RETURN NULL
+  t = Object.Type(values[0])
+  
+  result = NEW (t)
+  
+  FOR EACH i IN Classes[t].Symbols
+    IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
+    FOR EACH o IN values
+      IF NOT x THEN 
+        TRY Object.SetProperty(result, i, Object.GetProperty(o, i))
+        x = TRUE
+      ELSE 
+        v1 = NULL
+        v2 = NULL
+        TRY v1 = Object.GetProperty(result, i)
+        TRY v2 = Object.GetProperty(o, i)
+        
+        IF NOT (v1 = v2) THEN 
+          SELECT CASE onDiffer
+          
+            CASE mergeDelete
+              IF IsNumber(v1) THEN 
+                TRY Object.SetProperty(result, i, Object.Call(result, "getNone", [i]))
+              ELSE IF IsString(v1) THEN 
+                TRY Object.SetProperty(result, i, "")
+              ELSE 
+                TRY Object.SetProperty(result, i, NULL)
+              END IF
+              
+            CASE mergeMin
+              IF IsNumber(v2) THEN 
+                IF avg.Exist(i) THEN 
+                  IF avg[i] > v2 THEN avg[i] = v2
+                ELSE 
+                  avg.Add(v2, i)
+                END IF
+              END IF
+              
+            CASE mergeMax
+              IF IsNumber(v2) THEN 
+                IF avg.Exist(i) THEN 
+                  IF avg[i] < v2 THEN avg[i] = v2
+                ELSE 
+                  avg.Add(v2, i)
+                END IF
+              END IF
+            
+            CASE mergeAverage
+              IF IsNumber(v2) THEN
+                IF avg.Exist(i) THEN
+                  avg[i] += v2
+                ELSE 
+                  avg.Add(v2, i)
+                END IF
+              END IF
+            
+          END SELECT 
+        END IF
+        
+      END IF
+    NEXT 
+    x = FALSE
+  NEXT
+  
+  SELECT CASE onDiffer
+  
+    CASE mergeMin
+      FOR EACH i IN Classes[t].Symbols
+        IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
+        IF IsNumber(Object.GetProperty(values[0], i)) THEN 
+          TRY Object.SetProperty(result, i, avg[i])
+        ELSE 
+          TRY Object.SetProperty(result, i, Object.GetProperty(values[0], i))
+        END IF
+      NEXT 
+      
+    CASE mergeMax
+      FOR EACH i IN Classes[t].Symbols
+        IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
+        IF IsNumber(Object.GetProperty(values[0], i)) THEN 
+          TRY Object.SetProperty(result, i, avg[i])
+        ELSE 
+          TRY Object.SetProperty(result, i, Object.GetProperty(values[values.Max], i))
+        END IF
+      NEXT 
+      
+    CASE mergeAverage
+      FOR EACH i IN Classes[t].Symbols
+        IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
+        IF IsNumber(Object.GetProperty(values[0], i)) THEN 
+          TRY Object.SetProperty(result, i, avg[i] / values.Count)
+        ELSE 
+          TRY Object.SetProperty(result, i, Object.GetProperty(values[values.Max \ 2], i))
+        END IF
+      NEXT
+      
+  END SELECT 
+  
+  RETURN result
+  
+END
+
+
