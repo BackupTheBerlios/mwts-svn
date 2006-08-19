@@ -8,15 +8,57 @@ PROPERTY cols AS String[] ' holding the order and the type of columns to display
 PROPERTY fall AS Collection ' holding all CFile-Entries associated with the displayed stuff
 PROPERTY selected AS String[] ' holding the paths (key-strings) of all selected files
 PROPERTY sort AS Integer ' sets / returns the column to sort after
+PROPERTY tips AS Boolean ' show tips about last selected file
 
 PRIVATE $cols AS NEW String[]
 PRIVATE $fall AS NEW Collection
+PRIVATE $tips AS Boolean
+PRIVATE tim AS timer
+PRIVATE mx AS Integer
+PRIVATE my AS Integer
 
 PUBLIC SUB _new()
   
   Object.Attach(ME, ME, "FList")
   
+  SUPER.Editable = TRUE
+  SUPER.Sorted = TRUE
+  SUPER.Mode = ColumnView.Extended
+  
 END
+
+PUBLIC SUB tim_Timer()
+  
+  DIM s AS String
+  DIM f AS CFile
+  
+  IF NOT IsNull(SUPER.Current) AND $tips THEN 
+    SUPER.Current.EnsureVisible()
+    f = $fall[SUPER.Current.Key]
+    s = "Filename: %f\n"
+    s &= "Bitrate: %b\n"
+    s &= "MP3-Type: MPEG " & f.header.mpegversion & " Layer " & f.header.layer & "\n"
+    s &= "Sample-Rate: %s\n"
+    s &= "Channels: " & Choose(f.header.channels + 1, "Stereo", "Joint-Stereo", "Dual-Mono", "Mono")
+    Balloon.Info(MHelp.replaceByPattern(s, f), ME, mx - ME.ScreenX, my - ME.ScreenY)
+  END IF
+  
+  IF NOT IsNull(tim) THEN tim.Enabled = FALSE
+  
+END
+
+PUBLIC SUB FList_Select()
+  
+  IF $tips THEN
+    tim = NEW Timer AS "tim"
+    tim.Delay = 2000
+    tim.Enabled = TRUE
+    mx = mouse.ScreenX
+    my = mouse.ScreenY
+  END IF
+  
+END
+
 
 PUBLIC SUB FList_Rename()
   $fall[SUPER.Current.Key].newpath = SUPER.Current[0]
@@ -141,4 +183,10 @@ PRIVATE FUNCTION sort_Read() AS Integer
 END
 PRIVATE SUB sort_Write(Value AS Integer)
   SUPER.Columns.Sort = Value
+END
+PRIVATE FUNCTION tips_Read() AS Boolean
+  RETURN $tips
+END
+PRIVATE SUB tips_Write(Value AS Boolean)
+  $tips = Value
 END

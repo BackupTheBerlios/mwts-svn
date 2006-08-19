@@ -1,6 +1,7 @@
 ' Gambas class file
 
 STATIC PUBLIC cols AS String[]
+STATIC PUBLIC tips AS Boolean
 
 STATIC PUBLIC SUB _init()
   
@@ -20,6 +21,9 @@ PUBLIC SUB _new()
   
   DIM t AS String
   
+  tips = FMain.Flist.tips
+  CheckBox1.Value = tips
+  
   cols = FMain.cols
   
   aCols.Add("Tag", "Tag specific")
@@ -36,7 +40,7 @@ PUBLIC SUB _new()
   aCols.Add("%b", "Bitrate", NULL, "File")
   aCols.Add("%s", "Samplerate", NULL, "File")
   
-  FOR EACH t IN FConfig.cols
+  FOR EACH t IN Split(Settings["cols"], ",")
     TRY sCols.Add(t, MHelp.desc[t])
   NEXT 
   
@@ -69,6 +73,8 @@ PUBLIC SUB btnOK_Click()
       FConfig.cols.Add(sCols.Item.Key)
     LOOP UNTIL sCols.MoveBelow()
   END IF
+  Settings["cols"] = FConfig.cols
+  Settings["tips"] = CheckBox1.Value
   ME.Close(TRUE)
 
 END

@@ -1,3 +1,7 @@
+* Sun Aug 20 2006 Franz Brauße <mike-nought@gmx.de>
+  - migrated to new file-display class (nearly complete)
+  - added optional file-info-tips
+
 * Wed Aug 8 2006 Franz Brauße <mike-nought@gmx.de>
   - extended merge-function by more return values if values differ (min/max/average)
 
