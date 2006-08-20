@@ -3,7 +3,6 @@
 - FMain.Flist:
   - show directory-column only if recursively browsed?
   - adjust size of Samplerate column accurately if first column
-  - eigene Flist-Klasse schreiben, die fall und cols beinhaltet (wg. automatischem update, etc.)
 
 - ID3v1-Tag
   - write support

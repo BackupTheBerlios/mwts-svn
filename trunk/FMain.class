@@ -403,21 +403,26 @@ END
 PUBLIC SUB Menu4_Click()
   
   DIM t AS String
-  DIM f AS CFile
+  DIM s AS Object[]
+  DIM f AS Variant
+  
+  s = Flist.selected
+  
+  IF s.Count = 0 THEN RETURN 
+' if s.Count = 1 then f = s[0]
+  IF s.Count > 1 THEN 
+    s = [MHelp.merge(s)]
+  END IF
   
   f = getACFiles(getSelected())[0]
   t = "Bitrate: %b" & Chr(10)
-  t &= "MP3-Type: MPEG " & f.header.mpegversion & " Layer " & f.header.layer & Chr(10)
+  t &= "MP3-Type: MPEG " & s[0].header.mpegversion & " Layer " & s[0].header.layer & Chr(10)
   t &= "Sample-Rate: %s" & Chr(10)
-  t &= "Channels: " & Choose(f.header.channels + 1, "Stereo", "Joint-Stereo", "Dual-Mono", "Mono")
-  Message(MHelp.replaceByPattern(t, f))
+  t &= "Channels: " & Choose(s[0].header.channels + 1, "Stereo", "Joint-Stereo", "Dual-Mono", "Mono")
+  Message(MHelp.replaceByPattern(t, s[0]))
   
 END
 
-
-PUBLIC SUB Flist_Menu()
-  IF getSelected().Count > 0 THEN Menu3.Popup
-END
 
 ' generate torrent-description
 PUBLIC SUB DirView1_Menu()
@@ -434,7 +439,7 @@ END
 PUBLIC SUB Menu14_Click()
 
   IF FConfig.Run() THEN 
-   Flist.cols = Settings["cols"]
+   Flist.cols = Split(Settings["cols"], ",")
     Flist.tips = Settings["tips"]
     'actFlist
   END IF

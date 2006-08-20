@@ -48,7 +48,10 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   DIM f AS File
   DIM t AS String
   
-  IF IsNull(path) THEN RETURN 
+  IF IsNull(path) THEN
+    
+    RETURN 
+  END IF
   
   IF Stat(path).Size < 128 THEN RETURN
   
@@ -82,91 +85,6 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   CLOSE #f
   
 END
-
-' merges multiple tags together so that different entries in any property become emtpy, same stay same
-' ! replaced by MHelp.merge() !
-' STATIC PUBLIC FUNCTION mergeTags(tags AS Object[]) AS CTagv1
-'   
-'   DIM result AS NEW CTagv1
-'   DIM t AS CTagv1
-'   DIM a1 AS Boolean
-'   DIM a2 AS Boolean
-'   DIM a3 AS Boolean
-'   DIM a4 AS Boolean
-'   DIM a5 AS Boolean
-'   DIM a6 AS Boolean
-'   DIM a7 AS Boolean
-'   
-'   IF IsNull(tags) THEN RETURN NULL
-'   
-'   FOR EACH t IN tags
-'     IF NOT a1 THEN 
-'       result.album = t.album
-'       a1 = TRUE
-'     ELSE 
-'       IF NOT (result.album = t.album) THEN 
-'         result.album = ""
-'       END IF
-'     END IF
-'     
-'     IF NOT a2 THEN 
-'       result.artist = t.artist
-'       a2 = TRUE
-'     ELSE 
-'       IF NOT (result.artist = t.artist) THEN 
-'         result.artist = ""
-'       END IF
-'     END IF
-'     
-'     IF NOT a4 THEN 
-'       result.comment = t.comment
-'       a3 = TRUE
-'     ELSE 
-'       IF NOT (result.comment = t.comment) THEN 
-'         result.comment = ""
-'       END IF
-'     END IF
-'     
-'     IF NOT a4 THEN 
-'       result.genre = t.genre
-'       a4 = TRUE
-'     ELSE 
-'       IF NOT (result.genre = t.genre) THEN 
-'         result.genre = genreNone
-'       END IF
-'     END IF
-'     
-'     IF NOT a5 THEN 
-'       result.title = t.title
-'       a5 = TRUE
-'     ELSE 
-'       IF NOT (result.title = t.title) THEN 
-'         result.title = ""
-'       END IF
-'     END IF
-'     
-'     IF NOT a6 THEN 
-'       result.track = t.track
-'       a6 = TRUE
-'     ELSE 
-'       IF NOT (result.track = t.track) THEN 
-'         result.track = trackNone
-'       END IF
-'     END IF
-'     
-'     IF NOT a7 THEN 
-'       result.year = t.year
-'       a7 = TRUE
-'     ELSE 
-'       IF NOT (result.year = t.year) THEN 
-'         result.year = 0
-'       END IF
-'     END IF
-'   NEXT 
-'   
-'   RETURN result
-' 
-' END
 
 ' checks if the properties comply with the ID3v1-specification, basically checks the length of them
 PRIVATE SUB normalize()

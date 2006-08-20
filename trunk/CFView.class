@@ -6,16 +6,16 @@ EVENT Rename()
 
 PROPERTY cols AS String[] ' holding the order and the type of columns to display
 PROPERTY fall AS Collection ' holding all CFile-Entries associated with the displayed stuff
-PROPERTY selected AS String[] ' holding the paths (key-strings) of all selected files
+PROPERTY selected AS Object[] ' holding all selected CFiles
 PROPERTY sort AS Integer ' sets / returns the column to sort after
 PROPERTY tips AS Boolean ' show tips about last selected file
 
 PRIVATE $cols AS NEW String[]
 PRIVATE $fall AS NEW Collection
 PRIVATE $tips AS Boolean
-PRIVATE tim AS timer
-PRIVATE mx AS Integer
-PRIVATE my AS Integer
+PRIVATE $tim AS timer
+PRIVATE $mx AS Integer
+PRIVATE $my AS Integer
 
 PUBLIC SUB _new()
   
@@ -26,6 +26,14 @@ PUBLIC SUB _new()
   SUPER.Mode = ColumnView.Extended
   
 END
+
+PUBLIC SUB _free()
+  
+  $cols = NEW String[]
+  $fall = NEW Collection
+  
+END
+
 
 PUBLIC SUB tim_Timer()
   
@@ -40,25 +48,28 @@ PUBLIC SUB tim_Timer()
     s &= "MP3-Type: MPEG " & f.header.mpegversion & " Layer " & f.header.layer & "\n"
     s &= "Sample-Rate: %s\n"
     s &= "Channels: " & Choose(f.header.channels + 1, "Stereo", "Joint-Stereo", "Dual-Mono", "Mono")
-    Balloon.Info(MHelp.replaceByPattern(s, f), ME, mx - ME.ScreenX, my - ME.ScreenY)
+    Balloon.Info(MHelp.replaceByPattern(s, f), ME, $mx - ME.ScreenX, $my - ME.ScreenY)
   END IF
   
-  IF NOT IsNull(tim) THEN tim.Enabled = FALSE
+  IF NOT IsNull($tim) THEN $tim.Enabled = FALSE
   
 END
 
 PUBLIC SUB FList_Select()
   
   IF $tips THEN
-    tim = NEW Timer AS "tim"
-    tim.Delay = 2000
-    tim.Enabled = TRUE
-    mx = mouse.ScreenX
-    my = mouse.ScreenY
+    $tim = NEW Timer AS "tim"
+    $tim.Delay = 2000
+    $tim.Enabled = TRUE
+    $mx = mouse.ScreenX
+    $my = mouse.ScreenY
   END IF
   
 END
 
+PUBLIC SUB FList_Menu()
+  IF ME.selected.Count > 0 THEN FMain.Menu3.Popup
+END
 
 PUBLIC SUB FList_Rename()
   $fall[SUPER.Current.Key].newpath = SUPER.Current[0]
@@ -158,24 +169,24 @@ PRIVATE SUB fall_Write(Value AS Collection)
   $fall = Value
   ME.refresh
 END
-PRIVATE FUNCTION selected_Read() AS String[]
-  DIM result AS String[]
+PRIVATE FUNCTION selected_Read() AS Object[]
+  DIM result AS NEW Object[]
   TRY SUPER.MoveFirst
   DO
-    IF SUPER.Item.Selected THEN result.Add(SUPER.Item.Key)
-  LOOP UNTIL SUPER.MoveBelow
+    IF SUPER.Item.Selected THEN result.Add($fall[SUPER.Item.Key])
+  LOOP UNTIL SUPER.MoveBelow()
   SUPER.MoveBack
   RETURN result
 END
-PRIVATE SUB selected_Write(Value AS String[])
-  DIM s AS String
+PRIVATE SUB selected_Write(Value AS Object[])
+  DIM o AS CFile
   TRY SUPER.MoveFirst
   DO
     SUPER.Item.Selected = FALSE
-  LOOP UNTIL SUPER.MoveBelow
+  LOOP UNTIL SUPER.MoveBelow()
   SUPER.MoveBack
-  FOR EACH s IN Value
-    SUPER[s].Selected = TRUE
+  FOR EACH o IN Value
+    SUPER[o.path].Selected = TRUE
   NEXT
 END
 PRIVATE FUNCTION sort_Read() AS Integer

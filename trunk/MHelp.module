@@ -100,6 +100,7 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
   DIM v1 AS Variant
   DIM v2 AS Variant
   DIM avg AS NEW Collection
+  DIM tmpArray AS Object[]
   
   IF values.Count = 0 THEN RETURN NULL
   t = Object.Type(values[0])
@@ -108,6 +109,7 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
   
   FOR EACH i IN Classes[t].Symbols
     IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
+    IF Classes[t][i].ReadOnly THEN CONTINUE 
     FOR EACH o IN values
       IF NOT x THEN 
         TRY Object.SetProperty(result, i, Object.GetProperty(o, i))
@@ -126,6 +128,11 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
                 TRY Object.SetProperty(result, i, Object.Call(result, "getNone", [i]))
               ELSE IF IsString(v1) THEN 
                 TRY Object.SetProperty(result, i, "")
+              ELSE IF IsObject(v1) THEN 
+                tmpArray = NEW Object[]
+                tmpArray.Add(v1)
+                tmpArray.Add(v2)
+                TRY Object.SetProperty(result, i, merge(tmpArray))
               ELSE 
                 TRY Object.SetProperty(result, i, NULL)
               END IF

@@ -1,4 +1,5 @@
 * Sun Aug 20 2006 Franz Brauße <mike-nought@gmx.de>
+  - added recursion to merge-function (only in onDifferDelete-part up to now, more is not yet used anyways)
   - migrated to new file-display class (nearly complete)
   - added optional file-info-tips
 

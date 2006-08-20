@@ -73,7 +73,7 @@ PUBLIC SUB btnOK_Click()
       FConfig.cols.Add(sCols.Item.Key)
     LOOP UNTIL sCols.MoveBelow()
   END IF
-  Settings["cols"] = FConfig.cols
+  Settings["cols"] = FConfig.cols.Join(",")
   Settings["tips"] = CheckBox1.Value
   ME.Close(TRUE)
 

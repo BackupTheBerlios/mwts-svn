@@ -31,7 +31,7 @@ PUBLIC FUNCTION getNone(which AS String) AS Variant
 END
 
 ' reading all "knowable" information: tags and headers
-PUBLIC SUB _new(filepath AS String)
+PUBLIC SUB _new(OPTIONAL filepath AS String = "")
   
   DIM t AS CMPEGHeader
   
@@ -42,6 +42,17 @@ PUBLIC SUB _new(filepath AS String)
   $header = getFileHeader(filepath)
   
 END
+
+PUBLIC SUB save()
+  
+  DIM t AS CTagv1
+  
+  t = NEW CTagv1($path)
+  
+  
+END
+
+
 
 ' returns the first MPEG-header in file
 STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
