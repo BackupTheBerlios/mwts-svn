@@ -1,3 +1,7 @@
+* Mon Aug 21 2006 Franz Brauße <mike-nought@gmx.de>
+  - the code was not working as expected so I had to rewrite large parts of the new file-display class
+    (not finished yet)
+
 * Sun Aug 20 2006 Franz Brauße <mike-nought@gmx.de>
   - added recursion to merge-function (only in onDifferDelete-part up to now, more is not yet used anyways)
   - migrated to new file-display class (nearly complete)

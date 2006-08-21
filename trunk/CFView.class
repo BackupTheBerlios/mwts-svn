@@ -1,36 +1,81 @@
 
-INHERITS ColumnView
+INHERITS UserControl
 
 EVENT ErrorNotFound()
+
+EVENT Activate()
+EVENT Click()
+EVENT Collapse()
+EVENT Compare(Key AS String, OtherKey AS String)
+EVENT DblClick()
+EVENT Drag()
+EVENT DragMove()
+EVENT Drop()
+EVENT Enter()
+EVENT Expand()
+EVENT GotFocus()
+EVENT KeyPress()
+EVENT KeyRelease()
+EVENT Leave()
+EVENT LostFocus()
+EVENT Menu()
+EVENT MouseDown()
+EVENT MouseMove()
+EVENT MouseUp()
+EVENT MouseWheel()
 EVENT Rename()
+EVENT Select()
+
+
+'Add Clear Delete Drag Exist Find Grab Hide Lower MOVE MoveAbove MoveBack MoveBelow MoveChild MoveCurrent MoveFirst MoveLast MoveNext MoveParent MovePrevious MoveScaled MoveTo RAISE Refresh Remove Reparent Resize ResizeScaled SelectAll SetFocus Show   
 
 PROPERTY cols AS String[] ' holding the order and the type of columns to display
 PROPERTY fall AS Collection ' holding all CFile-Entries associated with the displayed stuff
 PROPERTY selected AS Object[] ' holding all selected CFiles
 PROPERTY sort AS Integer ' sets / returns the column to sort after
 PROPERTY tips AS Boolean ' show tips about last selected file
+PROPERTY READ Count AS Integer
+PROPERTY READ Item AS CFViewItem
+PROPERTY READ Current AS CFViewItem
 
 PRIVATE $cols AS NEW String[]
 PRIVATE $fall AS NEW Collection
+
+' private vars for tips
 PRIVATE $tips AS Boolean
 PRIVATE $tim AS timer
 PRIVATE $mx AS Integer
 PRIVATE $my AS Integer
 
+PRIVATE FList AS ColumnView
+PRIVATE $pointer AS String
+
 PUBLIC SUB _new()
   
-  Object.Attach(ME, ME, "FList")
+  FList = NEW ColumnView(SUPER.Container) AS "FList"
+  'Object.Attach(ME, ME, "FList")
   
-  SUPER.Editable = TRUE
-  SUPER.Sorted = TRUE
-  SUPER.Mode = ColumnView.Extended
+  Flist.Editable = TRUE
+  Flist.Sorted = TRUE
+  Flist.Mode = ColumnView.Extended
   
 END
 
-PUBLIC SUB _free()
+PUBLIC FUNCTION _get(Key AS String) AS CFViewItem
+  DIM result AS CFViewItem
+  IF IsNull(Flist[Key]) THEN RETURN NULL
+  result = NEW CFViewItem(ME, Flist, Key)
+  RETURN result
+END
+
+PUBLIC FUNCTION _next() AS CFViewItem
   
-  $cols = NEW String[]
-  $fall = NEW Collection
+  DIM result AS CFViewItem
+  Flist.MoveTo($pointer)
+  Flist.MoveBelow()
+  $pointer = Flist.Item.Key
+  result = NEW CFViewItem(ME, Flist, $pointer)
+  RETURN result
   
 END
 
@@ -39,10 +84,11 @@ PUBLIC SUB tim_Timer()
   
   DIM s AS String
   DIM f AS CFile
-  
+  DIM b AS CFViewItem
+
   IF NOT IsNull(SUPER.Current) AND $tips THEN 
-    SUPER.Current.EnsureVisible()
-    f = $fall[SUPER.Current.Key]
+    Flist.Current.EnsureVisible()
+    f = $fall[Flist.Current.Key]
     s = "Filename: %f\n"
     s &= "Bitrate: %b\n"
     s &= "MP3-Type: MPEG " & f.header.mpegversion & " Layer " & f.header.layer & "\n"
@@ -51,9 +97,32 @@ PUBLIC SUB tim_Timer()
     Balloon.Info(MHelp.replaceByPattern(s, f), ME, $mx - ME.ScreenX, $my - ME.ScreenY)
   END IF
   
+  FOR EACH b IN Flist
+  NEXT 
+    
   IF NOT IsNull($tim) THEN $tim.Enabled = FALSE
   
 END
+
+PUBLIC SUB Clear()
+  $fall.Clear
+  Flist.Clear
+  $cols.Clear  
+END
+PUBLIC FUNCTION MoveFirst() AS Boolean
+  RETURN Flist.MoveFirst()
+END
+PUBLIC FUNCTION MoveBack() AS Boolean
+  RETURN Flist.MoveBack()
+END
+PUBLIC FUNCTION MoveBelow() AS Boolean
+  RETURN Flist.MoveBelow()
+END
+PUBLIC FUNCTION MoveNext() AS Boolean
+  RETURN Flist.MoveNext()
+END
+
+
 
 PUBLIC SUB FList_Select()
   
@@ -64,28 +133,27 @@ PUBLIC SUB FList_Select()
     $mx = mouse.ScreenX
     $my = mouse.ScreenY
   END IF
+  RAISE Select()
   
 END
 
 PUBLIC SUB FList_Menu()
-  IF ME.selected.Count > 0 THEN FMain.Menu3.Popup
+  RAISE Menu
 END
 
 PUBLIC SUB FList_Rename()
-  $fall[SUPER.Current.Key].newpath = SUPER.Current[0]
+  $fall[Flist.Current.Key].newpath = Flist.Current[0]
   Message("BLO")
-  Object.Detach(ME)
   RAISE Rename
-  Object.Attach(ME, ME, "FList")
 END
 
 ' replaces ColumnView.Add()
 PUBLIC SUB Add(entry AS CFile, OPTIONAL pos AS Integer = -1)
   
   IF pos = -1 THEN 
-    SUPER.Add(entry.path, "")
+    Flist.Add(entry.path, "")
   ELSE  
-    SUPER.Add(entry.path, "", NULL, NULL, pos)
+    Flist.Add(entry.path, "", NULL, NULL, pos)
   END IF
   $fall.Add(entry, entry.path)
   refresh([entry.path])
@@ -97,11 +165,11 @@ PUBLIC SUB Remove(entry AS CFile)
   
   DIM x AS Integer
   
-  IF NOT SUPER.Exist(entry.path) THEN 
+  IF NOT Flist.Exist(entry.path) THEN 
     RAISE ErrorNotFound
     RETURN 
   END IF
-  SUPER.Remove(entry.path)
+  Flist.Remove(entry.path)
   $fall.Remove(entry.path)
   
 END
@@ -109,11 +177,11 @@ END
 ' basically is the same as ColumnView.Remove() because it works with the key
 PUBLIC SUB RemFromPath(path AS String)
   
-  IF NOT SUPER.Exist(path) THEN 
+  IF NOT Flist.Exist(path) THEN 
     RAISE ErrorNotFound
     RETURN 
   END IF
-  SUPER.Remove(path)
+  Flist.Remove(path)
   $fall.Remove(path)
   
 END
@@ -127,22 +195,22 @@ PUBLIC SUB refresh(OPTIONAL paths AS String[] = NULL)
   
   IF IsNull(paths) THEN 
     FOR EACH e IN $fall
-      IF NOT SUPER.Exist(e.path) THEN SUPER.Add(e.path, "")
+      IF NOT Flist.Exist(e.path) THEN Flist.Add(e.path, "")
       FOR y = 0 TO $cols.Max
-        SUPER[e.path][y] = MHelp.getDesc($cols[y], e)
+        Flist[e.path][y] = MHelp.getDesc($cols[y], e)
       NEXT 
     NEXT 
   ELSE 
     FOR EACH s IN paths
       IF NOT $fall.Exist(s) THEN CONTINUE 
-      IF NOT SUPER.Exist(s) THEN SUPER.Add(s, "")
+      IF NOT Flist.Exist(s) THEN Flist.Add(s, "")
       FOR y = 0 TO $cols.Max
         IF $cols[y] = "%b" AND MHelp.getDesc($cols[y], $fall[s]) = -1 THEN 
-          SUPER[s][y] = "Variable"
+          Flist[s][y] = "Variable"
         ELSE IF $cols[y] = "%Y" AND MHelp.getDesc($cols[y], $fall[s]) = 0 THEN 
-          SUPER[s][y] = ""
+          Flist[s][y] = ""
         ELSE
-          SUPER[s][y] = MHelp.getDesc($cols[y], $fall[s])
+          Flist[s][y] = MHelp.getDesc($cols[y], $fall[s])
         END IF
       NEXT 
     NEXT 
@@ -155,9 +223,9 @@ PRIVATE FUNCTION cols_Read() AS String[]
 END
 PRIVATE SUB cols_Write(Value AS String[])
   DIM x AS Integer
-  SUPER.Columns.Count = Value.Count
+  Flist.Columns.Count = Value.Count
   FOR x = 0 TO Value.Max
-    SUPER.Columns[x].Text = MHelp.desc[Value[x]]
+    Flist.Columns[x].Text = MHelp.desc[Value[x]]
   NEXT
   $cols = Value
   refresh
@@ -171,33 +239,116 @@ PRIVATE SUB fall_Write(Value AS Collection)
 END
 PRIVATE FUNCTION selected_Read() AS Object[]
   DIM result AS NEW Object[]
-  TRY SUPER.MoveFirst
+  TRY Flist.MoveFirst
   DO
-    IF SUPER.Item.Selected THEN result.Add($fall[SUPER.Item.Key])
-  LOOP UNTIL SUPER.MoveBelow()
-  SUPER.MoveBack
+    IF Flist.Item.Selected THEN result.Add($fall[Flist.Item.Key])
+  LOOP UNTIL Flist.MoveBelow()
+  Flist.MoveBack
   RETURN result
 END
 PRIVATE SUB selected_Write(Value AS Object[])
   DIM o AS CFile
-  TRY SUPER.MoveFirst
+  TRY Flist.MoveFirst
   DO
-    SUPER.Item.Selected = FALSE
-  LOOP UNTIL SUPER.MoveBelow()
-  SUPER.MoveBack
+    Flist.Item.Selected = FALSE
+  LOOP UNTIL Flist.MoveBelow()
+  Flist.MoveBack
   FOR EACH o IN Value
-    SUPER[o.path].Selected = TRUE
+    Flist[o.path].Selected = TRUE
   NEXT
 END
 PRIVATE FUNCTION sort_Read() AS Integer
-  RETURN SUPER.Columns.Sort
+  RETURN Flist.Columns.Sort
 END
 PRIVATE SUB sort_Write(Value AS Integer)
-  SUPER.Columns.Sort = Value
+  Flist.Columns.Sort = Value
 END
 PRIVATE FUNCTION tips_Read() AS Boolean
   RETURN $tips
 END
 PRIVATE SUB tips_Write(Value AS Boolean)
   $tips = Value
+END
+
+PUBLIC SUB Flist_Activate()
+  RAISE Activate
+END
+PUBLIC SUB Flist_Click()
+  RAISE Click
+END
+PUBLIC SUB Flist_Collapse()
+  RAISE Collapse
+END
+PUBLIC SUB Flist_Compare(Key AS String, OtherKey AS String)
+  RAISE Compare(Key, OtherKey)
+END
+PUBLIC SUB Flist_DblClick()
+  RAISE DblClick
+END
+PUBLIC SUB Flist_Drag()
+  RAISE Drag
+END
+PUBLIC SUB Flist_DragMove()
+  RAISE DragMove
+END
+PUBLIC SUB Flist_Drop()
+  RAISE Drop
+END
+PUBLIC SUB Flist_Enter()
+  RAISE Enter
+END
+PUBLIC SUB Flist_Expand()
+  RAISE Expand
+END
+PUBLIC SUB Flist_GotFocus()
+  RAISE GotFocus
+END
+PUBLIC SUB Flist_KeyPress()
+  RAISE KeyPress
+END
+PUBLIC SUB Flist_KeyRelease()
+  RAISE KeyRelease
+END
+PUBLIC SUB Flist_Leave()
+  RAISE Leave
+END
+PUBLIC SUB Flist_LostFocus()
+  RAISE LostFocus
+END
+'PUBLIC SUB Flist_Menu()
+'  RAISE Menu
+'END
+PUBLIC SUB Flist_MouseDown()
+  RAISE MouseDown
+END
+PUBLIC SUB Flist_MouseMove()
+  RAISE MouseMove
+END
+PUBLIC SUB Flist_MouseUp()
+  RAISE MouseUp
+END
+PUBLIC SUB Flist_MouseWheel()
+  RAISE MouseWheel
+END
+'PUBLIC SUB Flist_Rename()
+'  RAISE Rename
+'END
+'PUBLIC SUB Flist_Select()
+'  RAISE SELECT
+'END
+
+PRIVATE FUNCTION Count_Read() AS Integer
+  RETURN $fall.Count
+END
+PRIVATE FUNCTION Item_Read() AS CFViewItem
+  DIM result AS CFViewItem
+  IF IsNull(Flist.Item) THEN RETURN NULL
+  result = NEW CFViewItem(ME, Flist, Flist.Item.Key)
+  RETURN result
+END
+PRIVATE FUNCTION Current_Read() AS CFViewItem
+  DIM result AS CFViewItem
+  IF IsNull(Flist.Current) THEN RETURN NULL
+  result = NEW CFViewItem(ME, Flist, Flist.Current.Key)
+  RETURN result
 END

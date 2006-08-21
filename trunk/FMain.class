@@ -25,8 +25,8 @@ PUBLIC SUB _new()
   Flist.expand = TRUE
   
   cols = Split(Settings["cols", "%f,%T,%A,%B,%Y,%G,%b"], ",")
-  actFlist
-  Flist.Columns.Sort = If(cols.Find("%B") > -1, cols.Find("%B"), 0)
+  'actFlist
+  Flist.sort = If(cols.Find("%B") > -1, cols.Find("%B"), 0)
   Flist.cols = cols
   
   ME.Center
@@ -45,8 +45,8 @@ PUBLIC SUB actFlist()
   b = Picture.Load("icons/16/blank.png")
   e = Picture.Load("icons/16/edited.png")
   
-  Flist.Columns.Count = cols.Count
-  Flist.Columns.Sort = -1
+  Flist.cols = cols
+  Flist.sort = -1
   
   FOR EACH a IN fall
     FOR x = 0 TO cols.Max
@@ -84,8 +84,8 @@ PUBLIC SUB UpdFlist()
   WAIT 0.001
   
   Flist.Clear
-  FOR x = 0 TO Flist.Columns.Count - 1
-    Flist.Columns[x].Width = 50
+  FOR x = 0 TO Flist.cols.Count - 1
+    'Flist.cols[x].Width = 50
   NEXT 
   fall = NEW Collection
   fchg = NEW Collection
@@ -324,6 +324,11 @@ PUBLIC SUB Flist_Rename()
 ' 
 END
 
+PUBLIC SUB Flist_Menu()
+  IF Flist.selected.Count > 0 THEN Menu3.Popup
+END
+
+
 PUBLIC SUB updFFile(fkey AS String)
   
   DIM x AS Integer
@@ -411,6 +416,7 @@ PUBLIC SUB Menu4_Click()
   IF s.Count = 0 THEN RETURN 
 ' if s.Count = 1 then f = s[0]
   IF s.Count > 1 THEN 
+    RETURN 
     s = [MHelp.merge(s)]
   END IF
   
@@ -439,7 +445,7 @@ END
 PUBLIC SUB Menu14_Click()
 
   IF FConfig.Run() THEN 
-   Flist.cols = Split(Settings["cols"], ",")
+    Flist.cols = FConfig.cols
     Flist.tips = Settings["tips"]
     'actFlist
   END IF

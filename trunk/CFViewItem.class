@@ -1,0 +1,100 @@
+
+PROPERTY READ Children AS Integer
+PROPERTY READ Count AS Integer
+PROPERTY Editable AS Boolean
+PROPERTY Expanded AS Boolean
+PROPERTY READ Key AS String
+PROPERTY Picture AS Picture
+PROPERTY Selected AS Boolean
+PROPERTY Text AS String
+PROPERTY READ AFile AS CFile
+
+PRIVATE $key AS String
+PRIVATE $parent AS ColumnView
+PRIVATE $par AS CFView
+
+PUBLIC SUB _new(par AS CFView, parent AS ColumnView, sKey AS String)
+  $key = sKey
+  $parent = parent
+  $par = par
+END
+
+PUBLIC SUB _free()
+  $key = ""
+  $par = NULL
+  $parent = NULL
+END
+
+PUBLIC SUB Clear()
+  $parent[$key].Clear
+END
+PUBLIC SUB Delete()
+  $parent[$key].Delete
+END
+PUBLIC SUB EnsureVisible()
+  $parent[$key].EnsureVisible
+END
+PUBLIC FUNCTION MoveAbove() AS Boolean
+  RETURN $parent[$key].MoveAbove()
+END
+PUBLIC FUNCTION Movebelow() AS Boolean
+  RETURN $parent[$key].MoveBelow()
+END
+PUBLIC FUNCTION MoveChild() AS Boolean
+  RETURN $parent[$key].MoveChild()
+END
+PUBLIC FUNCTION MoveNext() AS Boolean
+  RETURN $parent[$key].MoveNext()
+END
+PUBLIC FUNCTION MoveParent() AS Boolean
+  RETURN $parent[$key].MoveParent()
+END
+PUBLIC FUNCTION MovePrevious() AS Boolean
+  RETURN $parent[$key].MovePrevious()
+END
+PUBLIC SUB Rename()
+  $parent[$key].Rename
+END
+
+PRIVATE FUNCTION Children_Read() AS Integer
+  RETURN $parent[$key].Children
+END
+PRIVATE FUNCTION Count_Read() AS Integer
+  RETURN $parent[$key].Count
+END
+PRIVATE FUNCTION Editable_Read() AS Boolean
+  RETURN $parent[$key].Editable
+END
+PRIVATE SUB Editable_Write(Value AS Boolean)
+  $parent[$key].Editable = Value
+END
+PRIVATE FUNCTION Expanded_Read() AS Boolean
+  RETURN $parent[$key].Expanded
+END
+PRIVATE SUB Expanded_Write(Value AS Boolean)
+  $parent[$key].Expanded = Value
+END
+PRIVATE FUNCTION Key_Read() AS String
+  RETURN $key
+END
+PRIVATE FUNCTION Picture_Read() AS Picture
+  RETURN $parent[$key].Picture
+END
+PRIVATE SUB Picture_Write(Value AS Picture)
+  $parent[$key].Picture = Value
+END
+PRIVATE FUNCTION Selected_Read() AS Boolean
+  RETURN $parent[$key].Selected
+END
+PRIVATE SUB Selected_Write(Value AS Boolean)
+  $parent[$key].Selected = Value
+END
+PRIVATE FUNCTION Text_Read() AS String
+  RETURN $parent[$key].Text
+END
+PRIVATE SUB Text_Write(Value AS String)
+  $parent[$key].Text = Value
+END
+PRIVATE FUNCTION AFile_Read() AS CFile
+  RETURN $par.fall[$key]
+END
