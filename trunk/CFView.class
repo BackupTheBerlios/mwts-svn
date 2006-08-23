@@ -223,6 +223,7 @@ PRIVATE FUNCTION cols_Read() AS String[]
 END
 PRIVATE SUB cols_Write(Value AS String[])
   DIM x AS Integer
+  IF Value.Count < 1 THEN RETURN 
   Flist.Columns.Count = Value.Count
   FOR x = 0 TO Value.Max
     Flist.Columns[x].Text = MHelp.desc[Value[x]]
