@@ -62,7 +62,10 @@ END
 PUBLIC FUNCTION isSame(v1 AS Object, v2 AS Object, OPTIONAL recursive AS Boolean = FALSE) AS Boolean
   
   DIM i AS String
-  DIM t AS String = Object.Type(v1)
+  DIM t AS String
+  
+  IF Object.Type(v1) <> Object.Type(v2) THEN RETURN FALSE
+  t = Object.Type(v1)
   
   FOR EACH i IN Classes[t].Symbols
     IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 

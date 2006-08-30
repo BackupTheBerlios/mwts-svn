@@ -27,7 +27,7 @@ EVENT Rename()
 EVENT Select()
 
 
-'Add Clear Delete Drag Exist Find Grab Hide Lower MOVE MoveAbove MoveBack MoveBelow MoveChild MoveCurrent MoveFirst MoveLast MoveNext MoveParent MovePrevious MoveScaled MoveTo RAISE Refresh Remove Reparent Resize ResizeScaled SelectAll SetFocus Show   
+'Add Clear Delete Drag Exist Find Grab Hide Lower Move MoveAbove MoveBack MoveBelow MoveChild MoveCurrent MoveFirst MoveLast MoveNext MoveParent MovePrevious MoveScaled MoveTo Raise Refresh Remove Reparent Resize ResizeScaled SelectAll SetFocus Show
 
 PROPERTY cols AS String[] ' holding the order and the type of columns to display
 PROPERTY fall AS Collection ' holding all CFile-Entries associated with the displayed stuff
@@ -37,13 +37,14 @@ PROPERTY tips AS Boolean ' show tips about last selected file
 PROPERTY READ Count AS Integer
 PROPERTY READ Item AS CFViewItem
 PROPERTY READ Current AS CFViewItem
+PROPERTY READ changed AS Object[]
 
 PRIVATE $cols AS NEW String[]
 PRIVATE $fall AS NEW Collection
 
 ' private vars for tips
 PRIVATE $tips AS Boolean
-PRIVATE $tim AS timer
+PRIVATE $tim AS Timer
 PRIVATE $mx AS Integer
 PRIVATE $my AS Integer
 
@@ -71,14 +72,17 @@ END
 PUBLIC FUNCTION _next() AS CFViewItem
   
   DIM result AS CFViewItem
-  Flist.MoveTo($pointer)
-  Flist.MoveBelow()
+  IF $pointer = "" THEN 
+    IF Flist.MoveFirst() THEN RETURN 
+  ELSE
+    IF Flist.MoveTo($pointer) THEN RETURN 
+  END IF
+  IF Flist.MoveBelow() THEN RETURN 
   $pointer = Flist.Item.Key
   result = NEW CFViewItem(ME, Flist, $pointer)
   RETURN result
   
 END
-
 
 PUBLIC SUB tim_Timer()
   
@@ -107,7 +111,6 @@ END
 PUBLIC SUB Clear()
   $fall.Clear
   Flist.Clear
-  $cols.Clear  
 END
 PUBLIC FUNCTION MoveFirst() AS Boolean
   RETURN Flist.MoveFirst()
@@ -121,8 +124,6 @@ END
 PUBLIC FUNCTION MoveNext() AS Boolean
   RETURN Flist.MoveNext()
 END
-
-
 
 PUBLIC SUB FList_Select()
   
@@ -351,5 +352,18 @@ PRIVATE FUNCTION Current_Read() AS CFViewItem
   DIM result AS CFViewItem
   IF IsNull(Flist.Current) THEN RETURN NULL
   result = NEW CFViewItem(ME, Flist, Flist.Current.Key)
+  RETURN result
+END
+PRIVATE FUNCTION changed_Read() AS Object[]
+  DIM result AS NEW Object[]
+  DIM t AS CFViewItem
+  Flist.MoveFirst
+  DO
+    IF $fall[Flist.Item.Key].changed THEN 
+      t = NEW CFViewItem(ME, Flist, Flist.Item.Key)
+      result.Add(t)
+    END IF
+  LOOP UNTIL Flist.MoveBelow()
+  Flist.MoveBack
   RETURN result
 END

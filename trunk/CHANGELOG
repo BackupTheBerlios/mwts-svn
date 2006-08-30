@@ -1,3 +1,13 @@
+* Wed Aug 30 2006 Franz Brauße <mike-nought@gmx.de>
+  - enhanced file-display class by property changed items
+  - some bug-fixing in file-display class (CFView):
+    - fixed possible null-item during enumeration
+    - fixed missing displaying of descriptions caused by accidental deletion of all rows to show
+  - fixed bug: comparison of non-equal types always returns false
+  - further migration from Main class to CFView
+  - removed many unused functions from Main class
+  - fixed wrong behaviour of ID3v1-Edit dialog  
+
 * Mon Aug 21 2006 Franz Brauße <mike-nought@gmx.de>
   - the code was not working as expected so I had to rewrite large parts of the new file-display class
     (not finished yet)

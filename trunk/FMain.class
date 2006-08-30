@@ -5,9 +5,9 @@ PRIVATE $recursive AS Boolean = FALSE ' list files recursively
 
 STATIC PUBLIC cols AS String[] ' contains the patterns to display in Flist
 
-PUBLIC fall AS NEW Collection ' contains the keys (paths) of all files displayed in Flist
-PUBLIC fsel AS NEW CTag ' should contain the Tag of the selected file (not sure if everywhere possible set)
-PUBLIC fchg AS NEW Collection ' contains something, i dunno right now...
+'PUBLIC fall AS NEW Collection ' contains the keys (paths) of all files displayed in Flist
+'PUBLIC fsel AS NEW CTag ' should contain the Tag of the selected file (not sure if everywhere possible set)
+'PUBLIC fchg AS NEW Collection ' contains something, i dunno right now...
 
 PROPERTY READ changed AS Boolean ' if something was changed on the displayed files it is remarked here
 PRIVATE halt AS Boolean = FALSE ' during scanning the directories this will stop the read-in process
@@ -37,30 +37,32 @@ END
 ' updates columns Flist is showing based on FMain.cols as well as files
 PUBLIC SUB actFlist() 
   
-  DIM x AS Integer
-  DIM a AS CFile
-  DIM b AS NEW Picture
-  DIM e AS NEW Picture
+  Flist.refresh()
   
-  b = Picture.Load("icons/16/blank.png")
-  e = Picture.Load("icons/16/edited.png")
-  
-  Flist.cols = cols
-  Flist.sort = -1
-  
-  FOR EACH a IN fall
-    FOR x = 0 TO cols.Max
-      Flist[a.path][x] = MHelp.getDesc(cols[x], a)
-      IF cols[x] = "%Y" AND Flist[a.path][x] = 0 THEN Flist[a.path][x] = ""
-      Flist[a.path].Picture = If(a.changed, e, b)
-    NEXT 
-  NEXT
-  FOR x = 0 TO cols.Max
-    Flist.Columns[x].Text = MHelp.desc[cols[x]]
-    'Flist.Columns[x].AutoResize = TRUE
-  NEXT 
-  
-  Flist.Columns.Sort = 3
+'   DIM x AS Integer
+'   DIM a AS CFile
+'   DIM b AS NEW Picture
+'   DIM e AS NEW Picture
+'   
+'   b = Picture.Load("icons/16/blank.png")
+'   e = Picture.Load("icons/16/edited.png")
+'   
+'   Flist.cols = cols
+'   Flist.sort = -1
+'   
+'   FOR EACH a IN fall
+'     FOR x = 0 TO cols.Max
+'       Flist[a.path][x] = MHelp.getDesc(cols[x], a)
+'       IF cols[x] = "%Y" AND Flist[a.path][x] = 0 THEN Flist[a.path][x] = ""
+'       Flist[a.path].Picture = If(a.changed, e, b)
+'     NEXT 
+'   NEXT
+'   FOR x = 0 TO cols.Max
+'     Flist.Columns[x].Text = MHelp.desc[cols[x]]
+'     'Flist.Columns[x].AutoResize = TRUE
+'   NEXT 
+'   
+'   Flist.Columns.Sort = 3
   
 END
 
@@ -72,7 +74,7 @@ PUBLIC SUB UpdFlist()
   DIM e AS CFile
   
   IF ME.changed THEN 
-    IF Message.Warning("You made changes to " & fchg.Count & " files. Do you want to discard these changes?", "Yes", "No") = 2 THEN RETURN
+    IF Message.Warning("You made changes to " & Str(Flist.changed.Count) & " files. Do you want to discard these changes?", "Yes", "No") = 2 THEN RETURN
   END IF
   
   INC Application.Busy
@@ -87,8 +89,8 @@ PUBLIC SUB UpdFlist()
   FOR x = 0 TO Flist.cols.Count - 1
     'Flist.cols[x].Width = 50
   NEXT 
-  fall = NEW Collection
-  fchg = NEW Collection
+'  fall = NEW Collection
+'  fchg = NEW Collection
   
   IF $recursive THEN 
     pass = RDir(DirView1.Current, "*.mp3")
@@ -121,36 +123,37 @@ END
 
 
 ' adds all files specified in files to Flist, returns how many files are read
-PUBLIC SUB UpdFFlist(files AS String[])
-  
-  DIM vt AS CFile
-  DIM t AS String
-  DIM c AS Integer = files.Count
-  DIM x AS Integer
-  'DIM a AS Float = Timer()
-  'DIM tmp AS Integer
-  
-  FOR EACH t IN files
-    INC x
-    vt = NEW CFile(t)
-    vt.tag.aktTag = $aktTag
-    Flist.Add(t, File.Name(t))
-    fall.Add(vt, t)
-    IF (x MOD 10) = 0 THEN
-      Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(c) & ")"
-      ProgressBar1.Value = x / c
-      WAIT 0.001
-      IF halt THEN  
-        halt = FALSE
-        BREAK 
-      END IF
-    END IF
-  NEXT
-  
-  actFlist
-  'FeditEntries(files, getACFiles(files))
-  
-END
+' PUBLIC FUNCTION UpdFFlist(files AS String[]) AS Integer
+'   
+'   DIM vt AS CFile
+'   DIM t AS String
+'   DIM c AS Integer = files.Count
+'   DIM x AS Integer
+'   'DIM a AS Float = Timer()
+'   'DIM tmp AS Integer
+'   
+'   FOR EACH t IN files
+'     INC x
+'     vt = NEW CFile(t)
+'     vt.tag.aktTag = $aktTag
+'     Flist.Add(t, File.Name(t))
+'     fall.Add(vt, t)
+'     IF (x MOD 10) = 0 THEN
+'       Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(c) & ")"
+'       ProgressBar1.Value = x / c
+'       WAIT 0.001
+'       IF halt THEN  
+'         halt = FALSE
+'         BREAK 
+'       END IF
+'     END IF
+'   NEXT
+'   
+'   actFlist
+'   'FeditEntries(files, getACFiles(files))
+'   RETURN x
+'   
+' END
 
 ' ' updates all files specified if keys with either the corresponding tag in ftags
 ' ' or - if ftags contains only one entry - this tag (for multiple file-updates)
@@ -251,18 +254,18 @@ PUBLIC FUNCTION getSelected() AS String[]
 END
 
 ' get all files as CFile from fall, meaning the (possibly) modified versions
-PUBLIC FUNCTION getACFiles(files AS String[]) AS Object[]
-  
-  DIM t AS String
-  DIM x AS Integer
-  DIM result AS NEW Object[]
-  
-  FOR EACH t IN files
-    result.Add(fall[t])
-  NEXT 
-  RETURN result
-  
-END
+' PUBLIC FUNCTION getACFiles(files AS String[]) AS Object[]
+'   
+'   DIM t AS String
+'   DIM x AS Integer
+'   DIM result AS NEW Object[]
+'   
+'   FOR EACH t IN files
+'     result.Add(fall[t])
+'   NEXT 
+'   RETURN result
+'   
+' END
 
 ' get all Tags of version if specified (CTagv1 or CTagv2) otherwise CTag
 PUBLIC FUNCTION getACTags(files AS String[], OPTIONAL version AS Integer = 0) AS Object[]
@@ -275,15 +278,15 @@ PUBLIC FUNCTION getACTags(files AS String[], OPTIONAL version AS Integer = 0) AS
   
   IF version = 0 THEN 
     FOR EACH t IN files
-      result.Add(fall[t].tag)
+      result.Add(Flist[t].AFile.tag)
     NEXT 
   ELSE IF version = 1 THEN 
     FOR EACH t IN files
-      result.Add(FList.fall[t].Tag.v1)
+      result.Add(FList[t].AFile.Tag.v1)
     NEXT 
   ELSE IF version = 2 THEN 
     FOR EACH t IN files
-      result.Add(fall[t].Tag.v2)
+      result.Add(Flist[t].AFile.Tag.v2)
     NEXT 
   END IF
   RETURN result
@@ -329,35 +332,35 @@ PUBLIC SUB Flist_Menu()
 END
 
 
-PUBLIC SUB updFFile(fkey AS String)
-  
-  DIM x AS Integer
-  DIM a AS CFile = fall[fkey]
-  DIM b AS NEW Picture
-  DIM e AS NEW Picture
-  
-  b = Picture.Load("icons/16/blank.png")
-  e = Picture.Load("icons/16/edited.png")
-  
-  FOR x = 0 TO cols.Max
-    Flist[a.path][x] = MHelp.getDesc(cols[x], a)
-    Flist[a.path].Picture = If(a.changed, e, b)
-  NEXT 
-  
-END
+' PUBLIC SUB updFFile(fkey AS String)
+'   
+'   DIM x AS Integer
+'   DIM a AS CFile = fall[fkey]
+'   DIM b AS NEW Picture
+'   DIM e AS NEW Picture
+'   
+'   b = Picture.Load("icons/16/blank.png")
+'   e = Picture.Load("icons/16/edited.png")
+'   
+'   FOR x = 0 TO cols.Max
+'     Flist[a.path][x] = MHelp.getDesc(cols[x], a)
+'     Flist[a.path].Picture = If(a.changed, e, b)
+'   NEXT 
+'   
+' END
 
 
 PUBLIC SUB renameFFile(fkey AS String, newname AS String)
   
   DIM d AS String
-  DIM b AS CFile = fall[fkey]
+  DIM b AS CFile = Flist[fkey].AFile
   DIM f AS Integer
   
   IF File.Name(b.path) = newname THEN RETURN 
   b.newpath = File.Dir(b.path) &/ newname &/ File.Ext(b.path)
   
   f = cols.Find("%f")
-  updFFile(fkey)
+  Flist.refresh([fkey])
   
 END
 
@@ -368,20 +371,28 @@ PUBLIC SUB ToolButton6_Click()
   DIM sel AS String[]
   DIM edit AS Object[]
   DIM t AS String
+  'DIM fsel AS NEW CTag
   
   sel = getSelected()
-  edit = getACTags(sel, 1)
+  edit = getACTags(sel)
   
-  fsel = NEW CTag
   'fsel.v1 = CTagv1.mergeTags(edit)
-  fsel.v1 = MHelp.merge(edit)
-  IF IsNull(fsel.v1) THEN RETURN 
+  FEditv1.v1tag = MHelp.merge(edit)
+  IF IsNull(FEditv1.v1tag) THEN RETURN 
   IF FEditv1.Run() THEN 
+    IF FEditv1.changed = 0 THEN RETURN 
     FOR EACH t IN sel
-      fall[t].Tag.v1 = FEditv1.v1tag.v1
-      Message(MHelp.isSame(fsel.v1, FEditv1.v1tag.v1))
-      fchg.Add(fall[t], t)
-      FeditEntry(t, FEditv1.v1tag)
+      IF FEditv1.changed AND FEditv1.chgAlbum THEN Flist[t].AFile.Tag.v1.album = FEditv1.v1tag.v1.album
+      IF FEditv1.changed AND FEditv1.chgArtist THEN Flist[t].AFile.Tag.v1.artist = FEditv1.v1tag.v1.artist
+      IF FEditv1.changed AND FEditv1.chgTitle THEN Flist[t].AFile.Tag.v1.title = FEditv1.v1tag.v1.title
+      IF FEditv1.changed AND FEditv1.chgGenre THEN Flist[t].AFile.Tag.v1.genre = FEditv1.v1tag.v1.genre
+      IF FEditv1.changed AND FEditv1.chgTrack THEN Flist[t].AFile.Tag.v1.track = FEditv1.v1tag.v1.track
+      IF FEditv1.changed AND FEditv1.chgComment THEN Flist[t].AFile.Tag.v1.comment = FEditv1.v1tag.v1.comment
+      IF FEditv1.changed AND FEditv1.chgYear THEN Flist[t].AFile.Tag.v1.year = FEditv1.v1tag.v1.year
+      Message("New Tag for " & File.Name(t) & " equals the old one: " & Str(MHelp.isSame(MHelp.merge(edit), FEditv1.v1tag)))
+'      fchg.Add(fall[t], t)
+      FList.refresh([t])
+      'FeditEntry(t, FEditv1.v1tag)
     NEXT 
   END IF
 
@@ -389,11 +400,12 @@ END
 
 PRIVATE FUNCTION changed_Read() AS Boolean
 
-  DIM t AS CFile
+  DIM t AS CFViewItem
   DIM result AS Boolean
   
-  FOR EACH t IN fall
-    result = result OR t.changed
+  FOR EACH t IN Flist
+    IF IsNull(t) THEN RETURN FALSE
+    result = result OR t.AFile.changed
   NEXT 
   RETURN result
 
@@ -420,7 +432,7 @@ PUBLIC SUB Menu4_Click()
     s = [MHelp.merge(s)]
   END IF
   
-  f = getACFiles(getSelected())[0]
+  f = Flist.selected[0]
   t = "Bitrate: %b" & Chr(10)
   t &= "MP3-Type: MPEG " & s[0].header.mpegversion & " Layer " & s[0].header.layer & Chr(10)
   t &= "Sample-Rate: %s" & Chr(10)
@@ -428,7 +440,6 @@ PUBLIC SUB Menu4_Click()
   Message(MHelp.replaceByPattern(t, s[0]))
   
 END
-
 
 ' generate torrent-description
 PUBLIC SUB DirView1_Menu()
