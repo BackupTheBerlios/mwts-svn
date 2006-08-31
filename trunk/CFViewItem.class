@@ -1,4 +1,5 @@
 
+PROPERTY READ AFile AS CFile
 PROPERTY READ Children AS Integer
 PROPERTY READ Count AS Integer
 PROPERTY Editable AS Boolean
@@ -7,7 +8,6 @@ PROPERTY READ Key AS String
 PROPERTY Picture AS Picture
 PROPERTY Selected AS Boolean
 PROPERTY Text AS String
-PROPERTY READ AFile AS CFile
 
 PRIVATE $key AS String
 PRIVATE $parent AS ColumnView

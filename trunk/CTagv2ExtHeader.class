@@ -1,0 +1,91 @@
+
+CONST max128F1MB AS Integer = 0
+CONST max64F128KB AS Integer = 64
+CONST max32F40KB AS Integer = 128
+CONST max32F4KB AS Integer = 192
+
+CONST noRestriction AS Integer = 0
+CONST shorter1024C AS Integer = 8
+CONST shorter128C AS Integer = 16
+CONST shorter30C AS Integer = 24
+
+CONST lessOrEqual256px AS Integer = 1
+CONST lessOrEqual64px AS Integer = 2
+CONST exactly64px AS Integer = 3
+
+PROPERTY READ size AS Integer
+PROPERTY READ tagIsUpdate AS Boolean
+PROPERTY READ hasCRC AS Boolean
+PROPERTY READ CRC AS Integer
+PROPERTY READ isRestricted AS Boolean
+PROPERTY READ resTSize AS Integer
+PROPERTY READ resTextEnc AS Boolean
+PROPERTY READ resTFSize AS Integer
+PROPERTY READ resImgEnc AS Boolean
+PROPERTY READ resImgSize AS Integer
+
+PRIVATE $data AS String
+PRIVATE $flags AS NEW Byte[]
+PRIVATE $CRC AS Integer
+PRIVATE $restrictions AS Byte
+
+PUBLIC SUB _new(data AS String)
+  
+  DIM tmp AS String
+  DIM x AS Integer
+  DIM y AS Integer
+  
+  $data = data
+  
+  tmp = Mid(data, 6, Asc(Mid(data, 5, 1)))
+  FOR x = 1 TO Len(tmp)
+    $flags.Add(Asc(Mid(tmp, x, 1)))
+  NEXT
+  
+  x = 6 + Asc(Mid(data, 5, 1))
+  IF BTst($flags[0], 6) THEN INC x
+  IF BTst($flags[0], 5) THEN
+    y = Asc(Mid(data, x, 1))
+    INC x
+    $CRC = CTagv2.DeSynchsafe(Mid(data, x, y))
+    x += y
+  END IF
+  IF BTst($flags[0], 4) THEN $restrictions = Mid(data, x + 1, Asc(Mid(data, x, 1)))
+  
+END
+
+PRIVATE FUNCTION size_Read() AS Integer
+  RETURN CInt(CTagv2.DeSynchsafe(Left($data, 4)))
+END
+PRIVATE FUNCTION tagIsUpdate_Read() AS Boolean
+  RETURN BTst($flags[0], 6)
+END
+PRIVATE FUNCTION hasCRC_Read() AS Boolean
+  RETURN BTst($flags[0], 5)
+END
+PRIVATE FUNCTION CRC_Read() AS Integer
+  RETURN $CRC
+END
+PRIVATE FUNCTION isRestricted_Read() AS Boolean
+  RETURN BTst($flags[0], 4)
+END
+PRIVATE FUNCTION resTSize_Read() AS Integer
+  IF NOT ME.isRestricted THEN RETURN 0
+  RETURN $restrictions AND 192
+END
+PRIVATE FUNCTION resTextEnc_Read() AS Boolean
+  IF NOT ME.isRestricted THEN RETURN FALSE
+  RETURN BTst($restrictions, 5)
+END
+PRIVATE FUNCTION resTFSize_Read() AS Integer
+  IF NOT ME.isRestricted THEN RETURN 0
+  RETURN $restrictions AND 24
+END
+PRIVATE FUNCTION resImgEnc_Read() AS Boolean
+  IF NOT ME.isRestricted THEN RETURN FALSE
+  RETURN BTst($restrictions, 2)
+END
+PRIVATE FUNCTION resImgSize_Read() AS Integer
+  IF NOT ME.isRestricted THEN RETURN 0
+  RETURN $restrictions AND 3
+END

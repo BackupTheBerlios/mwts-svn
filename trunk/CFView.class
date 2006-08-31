@@ -26,7 +26,6 @@ EVENT MouseWheel()
 EVENT Rename()
 EVENT Select()
 
-
 'Add Clear Delete Drag Exist Find Grab Hide Lower Move MoveAbove MoveBack MoveBelow MoveChild MoveCurrent MoveFirst MoveLast MoveNext MoveParent MovePrevious MoveScaled MoveTo Raise Refresh Remove Reparent Resize ResizeScaled SelectAll SetFocus Show
 
 PROPERTY cols AS String[] ' holding the order and the type of columns to display

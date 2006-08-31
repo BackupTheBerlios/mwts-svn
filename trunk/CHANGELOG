@@ -1,3 +1,6 @@
+* Thu Aug 31 2006 Franz Brauße <mike-nought@gmx.de>
+  - basic functionality for ID3v2-Tags added: Header and Extended Header parsing
+
 * Wed Aug 30 2006 Franz Brauße <mike-nought@gmx.de>
   - enhanced file-display class by property changed items
   - some bug-fixing in file-display class (CFView):

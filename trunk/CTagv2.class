@@ -10,8 +10,10 @@ PROPERTY title AS String
 PROPERTY comment AS String
 
 PROPERTY READ isEmpty AS Boolean
-PROPERTY version AS Integer
+PROPERTY version AS Float
 PROPERTY READ changed AS Boolean
+PROPERTY READ header AS CTagv2Header
+PROPERTY READ extHeader AS CTagv2ExtHeader
 
 PRIVATE $artist AS String
 PRIVATE $album AS String
@@ -22,13 +24,52 @@ PRIVATE $title AS String
 PRIVATE $comment AS String
 
 PRIVATE $changed AS Boolean
-PRIVATE $version AS Integer
+PRIVATE $version AS String
+PRIVATE $header AS CTagv2Header
+PRIVATE $extHeader AS CTagv2ExtHeader
+PRIVATE $body AS String ' contains all frames and the optional padding
 
 PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   
-  IF IsNull(path) THEN RETURN 
+  DIM s AS String
+  DIM x AS Integer
+  DIM y AS Integer
+  
+  DIM begin AS Integer
+  DIM size AS Integer
+  
+  IF IsNull(path) OR NOT Exist(path) THEN RETURN 
+  
+  begin = InStr(s, "ID3")
+  IF begin = 0 THEN RETURN 
+  
+  $header = NEW CTagv2Header(Mid(s, begin, 10))
+  $version = $header.version
+  
+  $extHeader = NEW CTagv2ExtHeader(Mid(s, begin + $header.size))
+  $body = Mid(s, begin + $header.size + $extHeader.size, $header.tagSize - $extHeader.size)
   
 END
+
+STATIC PUBLIC FUNCTION DeSynchsafe(s AS String) AS Long
+
+  DIM result AS Long
+  DIM x AS Integer
+  DIM y AS Byte
+  DIM z AS Integer = 0
+  
+  FOR x = Len(s) TO 1 STEP -1
+    y = CByte(Asc(Mid(s, x, 1)))
+    IF BTst(y, 7) THEN STOP 
+    DO
+      IF BTst(y, z MOD 7) THEN BSet(result, z)
+      INC z
+    LOOP UNTIL (z MOD 7) = 0
+  NEXT 
+  RETURN result
+  
+END
+
 
 PUBLIC FUNCTION getNone(which AS String) AS Variant
   
@@ -100,12 +141,18 @@ PRIVATE SUB comment_Write(Value AS String)
   $comment = Value
   $changed = TRUE
 END
-PRIVATE FUNCTION version_Read() AS Integer
-  RETURN $version
+PRIVATE FUNCTION version_Read() AS Float
+  RETURN Val($version)
 END
-PRIVATE SUB version_Write(Value AS Integer)
-  $version = Value
+PRIVATE SUB version_Write(Value AS Float)
+  $version = Str(Value)
 END
 PRIVATE FUNCTION changed_Read() AS Boolean
   RETURN $changed
+END
+PRIVATE FUNCTION header_Read() AS CTagv2Header
+  RETURN $header
+END
+PRIVATE FUNCTION extHeader_Read() AS CTagv2ExtHeader
+  RETURN $extHeader
 END

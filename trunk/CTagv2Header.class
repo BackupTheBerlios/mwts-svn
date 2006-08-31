@@ -1,0 +1,40 @@
+' Gambas class file
+
+PROPERTY READ size AS Integer
+PROPERTY READ tagSize AS Integer
+PROPERTY READ version AS Float
+PROPERTY READ useUnsync AS Boolean
+PROPERTY READ useExtHeader AS Boolean
+PROPERTY READ useExperimental AS Boolean
+PROPERTY READ useFooter AS Boolean
+
+PRIVATE $data AS String
+
+PUBLIC SUB _new(data AS String)
+  
+  IF Left(data, 3) <> "ID3" THEN RETURN 
+  $data = data
+  
+END
+
+PRIVATE FUNCTION size_Read() AS Integer
+  RETURN 10
+END
+PRIVATE FUNCTION tagSize_Read() AS Integer
+  RETURN CInt(CTagv2.DeSynchsafe(Right($data, 4)))
+END
+PRIVATE FUNCTION version_Read() AS Float
+  RETURN Val(Str(Asc(Mid($data, 4, 1))) & "." & Str(Asc(Mid($data, 5, 1))))
+END
+PRIVATE FUNCTION useUnsync_Read() AS Boolean
+  RETURN BTst(Asc(Mid($data, 6, 1)), 7)
+END
+PRIVATE FUNCTION useExtHeader_Read() AS Boolean
+  RETURN BTst(Asc(Mid($data, 6, 1)), 6)
+END
+PRIVATE FUNCTION useExperimental_Read() AS Boolean
+  RETURN BTst(Asc(Mid($data, 6, 1)), 5)
+END
+PRIVATE FUNCTION useFooter_Read() AS Boolean
+  RETURN BTst(Asc(Mid($data, 6, 1)), 4)
+END
