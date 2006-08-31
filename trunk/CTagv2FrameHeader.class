@@ -1,0 +1,59 @@
+
+PROPERTY READ id AS String
+PROPERTY READ size AS Integer
+
+PROPERTY READ frameSize AS Integer
+PROPERTY READ tagAlterPreservation AS Boolean
+PROPERTY READ fileAlterPreservation AS Boolean
+PROPERTY READ readOnly AS Boolean
+PROPERTY READ frameGroup AS Boolean
+PROPERTY READ compressed AS Boolean
+PROPERTY READ encrypted AS Boolean
+PROPERTY READ unsynchronised AS Boolean
+PROPERTY READ existsDataLengthIndicator AS Boolean
+
+PRIVATE $data AS String
+PRIVATE $statusFlags AS Byte
+PRIVATE $formatFlags AS Byte
+
+PUBLIC SUB _new(s AS String)
+  
+  $data = s
+  $statusFlags = CByte(Asc(Mid(s, 9, 1)))
+  $formatFlags = CByte(Asc(Right(s, 1)))
+  
+END
+
+PRIVATE FUNCTION id_Read() AS String
+  RETURN Left($data, 4)
+END
+PRIVATE FUNCTION frameSize_Read() AS Integer
+  RETURN CInt(CTagv2.DeSynchsafe(Mid($data, 5, 4)))
+END
+PRIVATE FUNCTION tagAlterPreservation_Read() AS Boolean
+  RETURN NOT BTst($statusFlags, 6)
+END
+PRIVATE FUNCTION fileAlterPreservation_Read() AS Boolean
+  RETURN NOT BTst($statusFlags, 5)
+END
+PRIVATE FUNCTION readOnly_Read() AS Boolean
+  RETURN BTst($statusFlags, 4)
+END
+PRIVATE FUNCTION frameGroup_Read() AS Boolean
+  RETURN BTst($formatFlags, 6)
+END
+PRIVATE FUNCTION compressed_Read() AS Boolean
+  RETURN BTst($formatFlags, 3)
+END
+PRIVATE FUNCTION encrypted_Read() AS Boolean
+  RETURN BTst($formatFlags, 2)
+END
+PRIVATE FUNCTION unsynchronised_Read() AS Boolean
+  RETURN BTst($formatFlags, 1)
+END
+PRIVATE FUNCTION existsDataLengthIndicator_Read() AS Boolean
+  RETURN BTst($formatFlags, 0)
+END
+PRIVATE FUNCTION size_Read() AS Integer
+  RETURN 10
+END
