@@ -1,7 +1,7 @@
 
-STATIC PUBLIC TFTypes AS String[]
-
 INHERITS CTagv2Frame
+
+STATIC PUBLIC TFTypes AS String[]
 
 PROPERTY type AS String
 PROPERTY content AS String

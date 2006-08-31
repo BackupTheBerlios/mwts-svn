@@ -25,44 +25,9 @@ PUBLIC SUB _new()
   Flist.expand = TRUE
   
   cols = Split(Settings["cols", "%f,%T,%A,%B,%Y,%G,%b"], ",")
-  'actFlist
-  Flist.sort = If(cols.Find("%B") > -1, cols.Find("%B"), 0)
   Flist.cols = cols
   
   ME.Center
-  
-END
-
-
-' updates columns Flist is showing based on FMain.cols as well as files
-PUBLIC SUB actFlist() 
-  
-  Flist.refresh()
-  
-'   DIM x AS Integer
-'   DIM a AS CFile
-'   DIM b AS NEW Picture
-'   DIM e AS NEW Picture
-'   
-'   b = Picture.Load("icons/16/blank.png")
-'   e = Picture.Load("icons/16/edited.png")
-'   
-'   Flist.cols = cols
-'   Flist.sort = -1
-'   
-'   FOR EACH a IN fall
-'     FOR x = 0 TO cols.Max
-'       Flist[a.path][x] = MHelp.getDesc(cols[x], a)
-'       IF cols[x] = "%Y" AND Flist[a.path][x] = 0 THEN Flist[a.path][x] = ""
-'       Flist[a.path].Picture = If(a.changed, e, b)
-'     NEXT 
-'   NEXT
-'   FOR x = 0 TO cols.Max
-'     Flist.Columns[x].Text = MHelp.desc[cols[x]]
-'     'Flist.Columns[x].AutoResize = TRUE
-'   NEXT 
-'   
-'   Flist.Columns.Sort = 3
   
 END
 
@@ -72,6 +37,7 @@ PUBLIC SUB UpdFlist()
   DIM pass AS String[]
   DIM x AS Integer
   DIM e AS CFile
+  DIM z AS Float
   
   IF ME.changed THEN 
     IF Message.Warning("You made changes to " & Str(Flist.changed.Count) & " files. Do you want to discard these changes?", "Yes", "No") = 2 THEN RETURN
@@ -93,7 +59,7 @@ PUBLIC SUB UpdFlist()
 '  fchg = NEW Collection
   
   IF $recursive THEN 
-    pass = RDir(DirView1.Current, "*.mp3")
+    pass = RDir(DirView1.Current, "*.mp3").Sort(gb.Ascent AND gb.Text)
     IF pass.Count > 250 THEN
       DEC Application.Busy
       IF Message.Warning("Do you really want to display all files in this Directory recursively? This might take quite a long time...", "Yes", "No") = 2 THEN
@@ -103,17 +69,28 @@ PUBLIC SUB UpdFlist()
       INC Application.Busy
     END IF
   ELSE
-    pass = Dir(DirView1.Current, "*.mp3")
+    pass = Dir(DirView1.Current, "*.mp3").Sort(gb.Descent AND gb.Binary)
   END IF
+  z = Timer()
+  ToolButton1.Enabled = TRUE
+  ProgressBar1.Visible = TRUE
   FOR x = 0 TO pass.Max ' absolute paths to files in pass
+    IF NOT Exist(DirView1.Current &/ pass[x]) THEN CONTINUE  
     e = NEW CFile(DirView1.Current &/ pass[x])
     Flist.Add(e)
-    'pass[x] = DirView1.Current &/ pass[x]
+    IF CInt(((z - Timer()) * 10)) MOD 3 = 0 THEN
+      Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(pass.Max) & ")"
+      ProgressBar1.Value = x / pass.Max
+      WAIT 0.01
+      IF halt THEN  
+        halt = FALSE
+        ToggleButton2.Value = FALSE
+        BREAK 
+      END IF
+    END IF
   NEXT
-  ProgressBar1.Visible = TRUE
-  ToolButton1.Enabled = TRUE
-  'UpdFFlist(pass)
   
+  Flist.refresh
   Status.Text = "Showing ID3v" & Str($aktTag) & "-Tag of " & Str(Flist.Count) & " files"
   ProgressBar1.Visible = FALSE
   ToolButton1.Enabled = FALSE
@@ -122,78 +99,6 @@ PUBLIC SUB UpdFlist()
 END
 
 
-' adds all files specified in files to Flist, returns how many files are read
-' PUBLIC FUNCTION UpdFFlist(files AS String[]) AS Integer
-'   
-'   DIM vt AS CFile
-'   DIM t AS String
-'   DIM c AS Integer = files.Count
-'   DIM x AS Integer
-'   'DIM a AS Float = Timer()
-'   'DIM tmp AS Integer
-'   
-'   FOR EACH t IN files
-'     INC x
-'     vt = NEW CFile(t)
-'     vt.tag.aktTag = $aktTag
-'     Flist.Add(t, File.Name(t))
-'     fall.Add(vt, t)
-'     IF (x MOD 10) = 0 THEN
-'       Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(c) & ")"
-'       ProgressBar1.Value = x / c
-'       WAIT 0.001
-'       IF halt THEN  
-'         halt = FALSE
-'         BREAK 
-'       END IF
-'     END IF
-'   NEXT
-'   
-'   actFlist
-'   'FeditEntries(files, getACFiles(files))
-'   RETURN x
-'   
-' END
-
-' ' updates all files specified if keys with either the corresponding tag in ftags
-' ' or - if ftags contains only one entry - this tag (for multiple file-updates)
-' ' replaced by actFlist
-' PUBLIC SUB FeditEntries(keys AS String[], ftags AS Object[])
-'   
-'   DIM t AS String
-'   DIM a AS CTag
-'   DIM x AS Integer
-'   
-'   IF NOT (keys.Count = ftags.Count OR ftags.Count = 1) THEN STOP 
-'   
-'   IF ftags.Count = 1 THEN 
-'     FOR x = 0 TO keys.Max
-'       FeditEntry(keys[x], ftags[0])
-'     NEXT 
-'   ELSE 
-'     FOR x = 0 TO keys.Max
-'       FeditEntry(keys[x], ftags[x])
-'     NEXT 
-'   END IF
-'   
-'   Flist.Columns[0].Width = 50
-'   Flist.Columns[0].AutoResize = TRUE
-'   Flist.Columns[1].Width = 50
-'   Flist.Columns[1].AutoResize = TRUE
-'   Flist.Columns[2].Width = 50
-'   Flist.Columns[2].AutoResize = TRUE
-'   Flist.Columns[3].Width = 50
-'   Flist.Columns[3].AutoResize = TRUE
-'   Flist.Columns[4].Width = 50
-'   Flist.Columns[4].AutoResize = TRUE
-'   Flist.Columns[5].Width = 50
-'   Flist.Columns[5].AutoResize = TRUE
-'   Flist.Columns[6].Width = 50
-'   Flist.Columns[6].AutoResize = TRUE
-'   Flist.Columns[7].Width = 50
-'   Flist.Columns[7].AutoResize = TRUE
-'   
-' END
 
 ' updates the Tag-Fields in Flist for file specified in t
 PUBLIC SUB FeditEntry(t AS String, f AS Object)
@@ -232,6 +137,7 @@ END
 ' change from viewing the v1-Tag to v2-Tag or the other way round
 PUBLIC SUB ToolButton2_Click()
   $aktTag = If($aktTag = 1, 2, 1)
+  Flist.tag2Display = $aktTag
   ToolButton2.Text = "Showing ID3v" & $aktTag & "-Tag"
   UpdFlist
 END
@@ -252,20 +158,6 @@ PUBLIC FUNCTION getSelected() AS String[]
   RETURN result
   
 END
-
-' get all files as CFile from fall, meaning the (possibly) modified versions
-' PUBLIC FUNCTION getACFiles(files AS String[]) AS Object[]
-'   
-'   DIM t AS String
-'   DIM x AS Integer
-'   DIM result AS NEW Object[]
-'   
-'   FOR EACH t IN files
-'     result.Add(fall[t])
-'   NEXT 
-'   RETURN result
-'   
-' END
 
 ' get all Tags of version if specified (CTagv1 or CTagv2) otherwise CTag
 PUBLIC FUNCTION getACTags(files AS String[], OPTIONAL version AS Integer = 0) AS Object[]
@@ -304,51 +196,9 @@ PUBLIC SUB ToggleButton2_Click()
   UpdFlist
 END
 
-' Renaming in Flist
-PUBLIC SUB Flist_Rename()
-' 
-'   DIM b AS CFile = fall[Flist.Current.Key]
-'   
-'   DIM a AS String = Flist.Current.Key
-'   DIM n AS String = File.Dir(a) &/ Flist[a][0]
-'   
-  message("BLA")
-'   IF a = n THEN RETURN
-'   b.newpath = n
-'   
-'   Flist.Add(n, File.Name(n), Picture.Load("icons/16/edited.png"), NULL, a)
-'   Flist[n][1] = Flist[a][1]
-'   Flist[n][2] = Flist[a][2]
-'   Flist[n][3] = Flist[a][3]
-'   Flist[n][4] = Flist[a][4]
-'   Flist[n][5] = Flist[a][5]
-'   Flist[n][6] = Flist[a][6]
-'   Flist.Remove(a)
-' 
-END
-
 PUBLIC SUB Flist_Menu()
   IF Flist.selected.Count > 0 THEN Menu3.Popup
 END
-
-
-' PUBLIC SUB updFFile(fkey AS String)
-'   
-'   DIM x AS Integer
-'   DIM a AS CFile = fall[fkey]
-'   DIM b AS NEW Picture
-'   DIM e AS NEW Picture
-'   
-'   b = Picture.Load("icons/16/blank.png")
-'   e = Picture.Load("icons/16/edited.png")
-'   
-'   FOR x = 0 TO cols.Max
-'     Flist[a.path][x] = MHelp.getDesc(cols[x], a)
-'     Flist[a.path].Picture = If(a.changed, e, b)
-'   NEXT 
-'   
-' END
-
 
 PUBLIC SUB renameFFile(fkey AS String, newname AS String)
   
@@ -363,7 +213,6 @@ PUBLIC SUB renameFFile(fkey AS String, newname AS String)
   Flist.refresh([fkey])
   
 END
-
 
 ' Edit ID3v1-Tag of selected files
 PUBLIC SUB ToolButton6_Click()
@@ -441,12 +290,33 @@ PUBLIC SUB Menu4_Click()
   
 END
 
-' generate torrent-description
 PUBLIC SUB DirView1_Menu()
 
+  DIM f AS NEW Menu(ME, TRUE)
+  DIM g AS Menu
+  DIM x AS String[] = ["Generate Torrent Info"]
+  DIM s AS String
+  DIM y AS Integer
   
+  FOR EACH s IN x
+    g = NEW Menu(f) AS "FMM"
+    g.Text = s
+    INC y
+    f.Tag = y
+    INC y
+  NEXT
+  f.Popup
 
 END
+
+' TODO !!!
+PUBLIC SUB FMM_Click()
+  SELECT CASE LAST.tag
+    CASE 1 ' generate torrent-description
+      Message("bla")
+  END SELECT 
+END
+
 
 PUBLIC SUB ToolButton1_Click()
   ToolButton1.Enabled = FALSE
@@ -467,6 +337,6 @@ PUBLIC SUB Form_Close()
 
   Settings["cols"] = cols.Join(",")
   Settings.Save
-  ME.Delete
+  ME.Delete 
 
 END

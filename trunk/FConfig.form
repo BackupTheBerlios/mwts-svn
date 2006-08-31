@@ -5,18 +5,6 @@
   'Move(0,0,420,315)
   Text = ("Settings")
   Border = Window.Fixed
-  { btnOK Button
-    MoveScaled(32.1429,40,12.4286,3.4286)
-    'Move(225,280,87,24)
-    Text = ("OK")
-    Default = True
-  }
-  { btnCancel Button
-    MoveScaled(46,40,12.4286,3.4286)
-    'Move(322,280,87,24)
-    Text = ("Cancel")
-    Cancel = True
-  }
   { TabStrip1 TabStrip
     MoveScaled(1,1,58,38)
     'Move(7,7,406,266)
@@ -43,6 +31,11 @@
         MoveScaled(1,1,22,30)
         'Move(7,7,154,210)
       }
+      { sCols TreeView
+        MoveScaled(32,1,22,30)
+        'Move(224,7,154,210)
+        Root = False
+      }
       { Button3 Button
         MoveScaled(24,8,7,4)
         'Move(168,56,49,28)
@@ -63,12 +56,19 @@
         'Move(168,140,49,28)
         Text = ("Down")
       }
-      { sCols TreeView
-        MoveScaled(32,1,22,30)
-        'Move(224,7,154,210)
-        Root = False
-      }
     }
     Index = 0
+  }
+  { btnOK Button
+    MoveScaled(32.1429,40,12.4286,3.4286)
+    'Move(225,280,87,24)
+    Text = ("OK")
+    Default = True
+  }
+  { btnCancel Button
+    MoveScaled(46,40,12.4286,3.4286)
+    'Move(322,280,87,24)
+    Text = ("Cancel")
+    Cancel = True
   }
 }

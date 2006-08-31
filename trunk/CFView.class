@@ -6,7 +6,8 @@ EVENT ErrorNotFound()
 EVENT Activate()
 EVENT Click()
 EVENT Collapse()
-EVENT Compare(Key AS String, OtherKey AS String)
+EVENT ColumnClick(Column AS Integer)
+'EVENT Compare(Key AS String, OtherKey AS String)
 EVENT DblClick()
 EVENT Drag()
 EVENT DragMove()
@@ -37,6 +38,8 @@ PROPERTY READ Count AS Integer
 PROPERTY READ Item AS CFViewItem
 PROPERTY READ Current AS CFViewItem
 PROPERTY READ changed AS Object[]
+PROPERTY tag2Display AS Integer
+PROPERTY Compare AS Integer
 
 PRIVATE $cols AS NEW String[]
 PRIVATE $fall AS NEW Collection
@@ -49,15 +52,21 @@ PRIVATE $my AS Integer
 
 PRIVATE FList AS ColumnView
 PRIVATE $pointer AS String
+PRIVATE $tag AS Integer = 1
 
 PUBLIC SUB _new()
   
   FList = NEW ColumnView(SUPER.Container) AS "FList"
-  'Object.Attach(ME, ME, "FList")
+  'Object.Attach(Flist, ME, "Flist")
   
   Flist.Editable = TRUE
-  Flist.Sorted = TRUE
   Flist.Mode = ColumnView.Extended
+  Flist.Sorted = TRUE
+  Flist.Header = TRUE
+  Flist.Resizable = TRUE
+  Flist.Root = FALSE
+  Flist.ScrollBar = Scroll.Both
+  Flist.Columns.Sort = 0
   
 END
 
@@ -151,12 +160,12 @@ END
 PUBLIC SUB Add(entry AS CFile, OPTIONAL pos AS Integer = -1)
   
   IF pos = -1 THEN 
-    Flist.Add(entry.path, "")
+    Flist.Add(entry.path, File.Name(entry.path))
   ELSE  
-    Flist.Add(entry.path, "", NULL, NULL, pos)
+    Flist.Add(entry.path, File.Name(entry.path), NULL, NULL, pos)
   END IF
   $fall.Add(entry, entry.path)
-  refresh([entry.path])
+  'refresh([entry.path])
   
 END
 
@@ -193,9 +202,17 @@ PUBLIC SUB refresh(OPTIONAL paths AS String[] = NULL)
   DIM s AS String
   DIM y AS Integer
   
+  DIM bl AS Picture
+  DIM ed AS Picture
+  
+  bl = Picture.Load("icons/16/blank.png")
+  ed = Picture.Load("icons/16/edited.png")
+  
   IF IsNull(paths) THEN 
     FOR EACH e IN $fall
-      IF NOT Flist.Exist(e.path) THEN Flist.Add(e.path, "")
+      'IF NOT Flist.Exist(e.path) THEN Flist.Add(e.path, "")
+      Flist[e.path].Picture = If(e.changed, ed, bl)
+      e.tag.aktTag = $tag
       FOR y = 0 TO $cols.Max
         Flist[e.path][y] = MHelp.getDesc($cols[y], e)
       NEXT 
@@ -203,18 +220,25 @@ PUBLIC SUB refresh(OPTIONAL paths AS String[] = NULL)
   ELSE 
     FOR EACH s IN paths
       IF NOT $fall.Exist(s) THEN CONTINUE 
-      IF NOT Flist.Exist(s) THEN Flist.Add(s, "")
+      'IF NOT Flist.Exist(s) THEN Flist.Add(s, "")
+      e = $fall[s]
+      e.tag.aktTag = $tag
+      Flist[s].Picture = If(e.changed, ed, bl)
       FOR y = 0 TO $cols.Max
-        IF $cols[y] = "%b" AND MHelp.getDesc($cols[y], $fall[s]) = -1 THEN 
-          Flist[s][y] = "Variable"
-        ELSE IF $cols[y] = "%Y" AND MHelp.getDesc($cols[y], $fall[s]) = 0 THEN 
+        IF ($cols[y] = "%b") THEN 
+          IF (MHelp.getDesc($cols[y], e) = "-1") THEN 
+            Flist[s][y] = "Variable"
+          ELSE 
+            Flist[s][y] = MHelp.getDesc($cols[y], e) & " KBit/s"
+          END IF
+        ELSE IF (($cols[y] = "%Y") OR ($cols[y] = "%T")) AND (MHelp.getDesc($cols[y], e) = "0") THEN 
           Flist[s][y] = ""
         ELSE
-          Flist[s][y] = MHelp.getDesc($cols[y], $fall[s])
+          Flist[s][y] = MHelp.getDesc($cols[y], e)
         END IF
       NEXT 
     NEXT 
-  END IF    
+  END IF
   
 END
 
@@ -223,13 +247,16 @@ PRIVATE FUNCTION cols_Read() AS String[]
 END
 PRIVATE SUB cols_Write(Value AS String[])
   DIM x AS Integer
+  'DIM y AS Integer = Flist.Columns.Sort
+  'Flist.Columns.Sort = -1
   IF Value.Count < 1 THEN RETURN 
   Flist.Columns.Count = Value.Count
   FOR x = 0 TO Value.Max
     Flist.Columns[x].Text = MHelp.desc[Value[x]]
   NEXT
   $cols = Value
-  refresh
+  'Flist.Columns.Sort = y
+  'refresh
 END
 PRIVATE FUNCTION fall_Read() AS Collection
   RETURN $fall
@@ -263,6 +290,7 @@ PRIVATE FUNCTION sort_Read() AS Integer
 END
 PRIVATE SUB sort_Write(Value AS Integer)
   Flist.Columns.Sort = Value
+  Flist.Sorted = TRUE
 END
 PRIVATE FUNCTION tips_Read() AS Boolean
   RETURN $tips
@@ -277,12 +305,16 @@ END
 PUBLIC SUB Flist_Click()
   RAISE Click
 END
+PUBLIC SUB Flist_ColumnClick(Column AS Integer)
+  RAISE ColumnClick(Column)
+END
 PUBLIC SUB Flist_Collapse()
   RAISE Collapse
 END
-PUBLIC SUB Flist_Compare(Key AS String, OtherKey AS String)
-  RAISE Compare(Key, OtherKey)
-END
+'PUBLIC SUB Flist_Compare(Key AS String, OtherKey AS String)
+'  RAISE Compare(Key, OtherKey)
+'  Flist.Compare = Comp(Key, OtherKey)
+'END
 PUBLIC SUB Flist_DblClick()
   RAISE DblClick
 END
@@ -365,4 +397,20 @@ PRIVATE FUNCTION changed_Read() AS Object[]
   LOOP UNTIL Flist.MoveBelow()
   Flist.MoveBack
   RETURN result
+END
+PRIVATE FUNCTION tag2Display_Read() AS Integer
+  RETURN $tag
+END
+PRIVATE SUB tag2Display_Write(Value AS Integer)
+  DIM e AS CFile
+  $tag = Value
+  FOR EACH e IN $fall
+    e.tag.aktTag = $tag
+  NEXT 
+END
+PRIVATE FUNCTION Compare_Read() AS Integer
+  RETURN Flist.Compare
+END
+PRIVATE SUB Compare_Write(Value AS Integer)
+  Flist.Compare = Value
 END

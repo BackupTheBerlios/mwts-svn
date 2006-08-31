@@ -28,6 +28,7 @@ PRIVATE $version AS String
 PRIVATE $header AS CTagv2Header
 PRIVATE $extHeader AS CTagv2ExtHeader
 PRIVATE $body AS String ' contains all frames and the optional padding
+PRIVATE $frames AS Object[] ' contains all frames
 
 PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   
@@ -37,9 +38,10 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   
   DIM begin AS Integer
   DIM size AS Integer
-  
+  RETURN 
   IF IsNull(path) OR NOT Exist(path) THEN RETURN 
   
+  s = File.Load(path)
   begin = InStr(s, "ID3")
   IF begin = 0 THEN RETURN 
   
@@ -49,7 +51,40 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   $extHeader = NEW CTagv2ExtHeader(Mid(s, begin + $header.size))
   $body = Mid(s, begin + $header.size + $extHeader.size, $header.tagSize - $extHeader.size)
   
+  $frames = getFrames($body)
+  
 END
+
+STATIC PUBLIC FUNCTION getFrames(data AS String) AS Collection
+  
+  DIM result AS NEW Collection
+  DIM h AS CTagv2FrameHeader
+  DIM f AS CTagv2Frame
+  DIM t AS CTagv2FrameText
+  DIM w AS CTagv2FrameURL
+  
+  DIM s AS String
+  
+  DO
+    IF Left(data) = Chr(0) THEN BREAK 
+    h = NEW CTagv2FrameHeader(Left(data, 10))
+    s = Mid(data, 1 + h.size, h.frameSize)
+    IF Left(h.id) = "T" AND h.id <> "TXXX" THEN 
+      t = NEW CTagv2FrameText(s, h)
+      result.Add(t, h.id)
+    ELSE IF Left(h.id) = "W" AND h.id <> "WXXX" THEN 
+      w = NEW CTagv2FrameURL(s, h)
+      result.Add(w, h.id)
+    ELSE 
+      f = NEW CTagv2Frame(s, h)
+      result.Add(f, h.id)
+    END IF
+    data = Mid(data, 1 + h.size + h.frameSize)
+  LOOP 
+  RETURN result
+  
+END
+
 
 STATIC PUBLIC FUNCTION DeSynchsafe(s AS String) AS Long
 

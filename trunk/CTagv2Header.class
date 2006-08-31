@@ -1,4 +1,3 @@
-' Gambas class file
 
 PROPERTY READ size AS Integer
 PROPERTY READ tagSize AS Integer

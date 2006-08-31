@@ -1,5 +1,8 @@
 * Thu Aug 31 2006 Franz Brauße <mike-nought@gmx.de>
   - basic functionality for ID3v2-Tags added: Header and Extended Header parsing
+  - fixed silly bug of wrong sorting of columns in file-display caused by non-documented behaviour when
+    catching the Compare-Event
+  - many other fixes in CFView (see svn log for complete overview)
 
 * Wed Aug 30 2006 Franz Brauße <mike-nought@gmx.de>
   - enhanced file-display class by property changed items

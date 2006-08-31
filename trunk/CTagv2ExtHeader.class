@@ -41,16 +41,17 @@ PUBLIC SUB _new(data AS String)
   FOR x = 1 TO Len(tmp)
     $flags.Add(Asc(Mid(tmp, x, 1)))
   NEXT
-  
-  x = 6 + Asc(Mid(data, 5, 1))
-  IF BTst($flags[0], 6) THEN INC x
-  IF BTst($flags[0], 5) THEN
-    y = Asc(Mid(data, x, 1))
-    INC x
-    $CRC = CTagv2.DeSynchsafe(Mid(data, x, y))
-    x += y
+  IF Len(tmp) > 0 THEN
+    x = 6 + Asc(Mid(data, 5, 1))
+    IF BTst($flags[0], 6) THEN INC x
+    IF BTst($flags[0], 5) THEN
+      y = Asc(Mid(data, x, 1))
+      INC x
+      $CRC = CTagv2.DeSynchsafe(Mid(data, x, y))
+      x += y
+    END IF
+    IF BTst($flags[0], 4) THEN $restrictions = Mid(data, x + 1, Asc(Mid(data, x, 1)))
   END IF
-  IF BTst($flags[0], 4) THEN $restrictions = Mid(data, x + 1, Asc(Mid(data, x, 1)))
   
 END
 
