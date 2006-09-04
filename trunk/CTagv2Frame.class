@@ -1,25 +1,113 @@
 
-PUBLIC CONST ENC_ISO AS String = "ISO-8859-1"
-PUBLIC CONST ENC_UTF AS String = "UTF-8"
+STATIC PRIVATE ENC AS String[] = ["ISO-8859-1", "UTF-16", "UTF-16", "UTF-8"]
+STATIC PUBLIC FTypes AS NEW Collection
 
-'PROPERTY encoding AS String
+PUBLIC CONST encISO AS Byte = &H00
+PUBLIC CONST encUTF16BOM AS Byte = &H01
+PUBLIC CONST encUTF16 AS Byte = &H02
+PUBLIC CONST encUTF8 AS Byte = &H03
 
-' Frame flags - status information
-'PROPERTY isTagAlterPreserved AS Boolean
-'PROPERTY isFileAlterPreserved AS Boolean
-'PROPERTY isReadOnly AS Boolean
+PROPERTY encoding AS Byte
+PROPERTY rawContent AS String
+PROPERTY READ header AS CTagv2FrameHeader
+PROPERTY READ description AS String
+STATIC PROPERTY READ encString AS String[]
 
-' Frame flags - additional information
-'PROPERTY isGrouped AS Boolean
-'PROPERTY isEncrypted AS Boolean
-'PROPERTY isUnsynchronized AS Boolean
-'PROPERTY isDataLengthIndicatorSet AS Boolean
+PRIVATE $encoding AS Byte
+PRIVATE $raw AS String
+PRIVATE $desc AS String
 
-PUBLIC SUB _new()
+PRIVATE $header AS CTagv2FrameHeader
+
+PUBLIC SUB _new(OPTIONAL header AS CTagv2FrameHeader = NULL)
   
-  
+  IF IsNull(header) THEN 
+    $header = NEW CTagv2FrameHeader(NULL, 1)
+  ELSE
+    $header = header
+  END IF
   
 END
 
+PUBLIC SUB setRawData(data AS String)
+  
+  $raw = data
+  
+END
+
+STATIC PUBLIC FUNCTION getFrame(header AS CTagv2FrameHeader, OPTIONAL rawData AS String = NULL) AS CTagv2Frame  
+
+  DIM result AS Object
+  
+  IF Left(header.id) = "T" AND header.id <> "TXXX" THEN
+    result = NEW CTagv2FrameText(header)
+  ELSE IF Left(header.id) = "W" AND header.id <> "WXXX" THEN
+    result = NEW CTagv2FrameURL(header)
+  ELSE 
+    result = NEW CTagv2Frame(header)
+  END IF
+  result.setRawData(rawData)
+  
+END
+
+PRIVATE FUNCTION encoding_Read() AS Byte
+  RETURN $encoding
+END
+PRIVATE SUB encoding_Write(Value AS Byte)
+  $raw = Conv($raw, $encoding, Value)
+  $encoding = Value
+END
+PRIVATE FUNCTION rawContent_Read() AS String
+  RETURN $raw
+END
+PRIVATE SUB rawContent_Write(Value AS String)
+  $raw = Conv(Value, Desktop.Charset, ENC[CInt($encoding)])
+END
+PRIVATE FUNCTION header_Read() AS CTagv2FrameHeader
+  RETURN $header
+END
+STATIC PRIVATE FUNCTION encString_Read() AS String[]
+  RETURN ENC
+END
+PRIVATE FUNCTION description_Read() AS String
+  IF FTypes.Exist($header.id) THEN
+    RETURN FTypes[$header.id]
+  ELSE 
+    RETURN $desc
+  END IF
+END
 
 
+STATIC PUBLIC SUB _init()
+  
+  FTypes.Add("Audio encryption", "AENC")
+  FTypes.Add("Attached picture", "APIC")
+  FTypes.Add("Audio seek point index", "ASPI")
+  FTypes.Add("Comments", "COMM")
+  FTypes.Add("Commercial frame", "COMR")
+  FTypes.Add("Encrypton method registration", "ENCR")
+  FTypes.Add("Equalisation (2)", "EQU2")
+  FTypes.Add("Event timing codes", "ETCO")
+  FTypes.Add("General encapsulated object", "GEOB")
+  FTypes.Add("Group identification registration", "GRID")
+  FTypes.Add("Linked information", "LINK")
+  FTypes.Add("Music CD identifier", "MCDI")
+  FTypes.Add("MPEG location lookup table", "MLLT")
+  FTypes.Add("Ownership frame", "OWNE")
+  FTypes.Add("Private frame", "PRIV")
+  FTypes.Add("Play counter", "PCNT")
+  FTypes.Add("Popularimenter", "POPM")
+  FTypes.Add("Position synchronisation frame", "POSS")
+  FTypes.Add("Recommended buffer size", "RBUF")
+  FTypes.Add("Relative volume adjustment (2)", "RVA2")
+  FTypes.Add("Reverb", "RVRB")
+  FTypes.Add("Seek frame", "SEEK")
+  FTypes.Add("Signature frame", "SIGN")
+  FTypes.Add("Synchronised lyric/text", "SYLT")
+  FTypes.Add("Synchronised tempo codes", "SYTC")
+  FTypes.Add("Unqiue file identifier", "UFID")
+  FTypes.Add("Terms of use", "USER")
+  FTypes.Add("Unsynchronised lyric/text transcription", "USLT")
+  FTypes.Count = 18
+  
+END

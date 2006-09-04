@@ -37,9 +37,9 @@ PUBLIC FUNCTION getDesc(pattern AS String, f AS CFile) AS String
     CASE "%B"
       RETURN f.tag.album
     CASE "%Y"
-      RETURN f.tag.year
+      RETURN If(f.tag.year <> 0, Str(f.tag.year), "")
     CASE "%K"
-      RETURN f.tag.track
+      RETURN If(f.tag.track <> 0, Str(f.tag.track), "")
     CASE "%T"
       RETURN f.tag.title
     CASE "%G"

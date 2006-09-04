@@ -72,12 +72,16 @@ STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
   
   WHILE NOT Eof(f)
     READ #f, t, 1
+    bla:
     IF t = Chr(255) THEN 
       READ #f, u, 1
       IF (Asc(u) AND &HE0) = &HE0 THEN 
         READ #f, v, 2
         result = NEW CMPEGHeader(t & u & v)
         BREAK 
+      ELSE IF u = Chr(255) THEN 
+        t = u
+        GOTO bla
       END IF
     END IF
   WEND 

@@ -1,0 +1,23 @@
+
+INHERITS CTagv2Frame
+
+PUBLIC SUB setRawData(data AS String)
+  
+  
+  
+END
+
+
+STATIC PUBLIC SUB _init()
+  
+  SUPER.FTypes.Add("Commercial information", "WCOM")
+  SUPER.FTypes.Add("Copyright/Legal information", "WCOP")
+  SUPER.FTypes.Add("Official audio file webpage", "WOAF")
+  SUPER.FTypes.Add("Official artist/performer webpage", "WOAR")
+  SUPER.FTypes.Add("Official audio source webpage", "WOAS")
+  SUPER.FTypes.Add("Official Internet radio station homepage", "WORS")
+  SUPER.FTypes.Add("Payment", "WPAY")
+  SUPER.FTypes.Add("Publishers official webpage", "WPUB")
+  SUPER.FTypes.Add("User definied URL link frame", "WXXX")
+  
+END

@@ -25,6 +25,14 @@ PUBLIC SUB _free()
   $parent = NULL
 END
 
+PUBLIC FUNCTION _get(Column AS Integer) AS String
+  RETURN $parent[$key][Column]
+END
+
+PUBLIC SUB _put(Text AS String, Column AS Integer)
+  $parent[$key][Column] = Text
+END
+
 PUBLIC SUB Clear()
   $parent[$key].Clear
 END

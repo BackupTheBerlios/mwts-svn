@@ -78,13 +78,13 @@ PUBLIC SUB UpdFlist()
     IF NOT Exist(DirView1.Current &/ pass[x]) THEN CONTINUE  
     e = NEW CFile(DirView1.Current &/ pass[x])
     Flist.Add(e)
-    IF CInt(((z - Timer()) * 10)) MOD 3 = 0 THEN
+    IF CInt((z - Timer()) * 10) MOD 5 = 0 THEN
       Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(pass.Max) & ")"
-      ProgressBar1.Value = x / pass.Max
-      WAIT 0.01
+      ProgressBar1.Value = x / pass.Count
+      WAIT 0.001
       IF halt THEN  
         halt = FALSE
-        ToggleButton2.Value = FALSE
+        'ToggleButton2.Value = FALSE
         BREAK 
       END IF
     END IF

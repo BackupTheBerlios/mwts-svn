@@ -1,73 +1,81 @@
 
 INHERITS CTagv2Frame
 
-STATIC PUBLIC TFTypes AS String[]
+STATIC PUBLIC FTypes AS Collection
 
-PROPERTY type AS String
+PROPERTY READ id AS String
 PROPERTY content AS String
 
+PRIVATE $content AS String
 
-PRIVATE FUNCTION type_Read() AS String
+PUBLIC SUB _new()
+END 
+
+PUBLIC SUB setRawData(data AS String)
+  
+  
   
 END
-PRIVATE SUB type_Write(Value AS String)
-  
+
+PRIVATE FUNCTION id_Read() AS String
+  RETURN SUPER.header.id
 END
 PRIVATE FUNCTION content_Read() AS String
-  
+  RETURN $content
 END
 PRIVATE SUB content_Write(Value AS String)
-  
+  $content = Value
+  SUPER.rawContent = Value
 END
 
 
 STATIC PUBLIC SUB _init()
   
-  TFTypes.Add("TALB") 'Album / Movie / Show title
-  TFTypes.Add("TBPM") 'BPM(beats per Minute)
-  TFTypes.Add("TCOM") 'Composer
-  TFTypes.Add("TCON") 'Content type
-  TFTypes.Add("TCOP") 'Copyright message
-  TFTypes.Add("TDEN") 'Encoding Time
-  TFTypes.Add("TDLY") 'Playlist delay
-  TFTypes.Add("TDOR") 'Original release Time
-  TFTypes.Add("TDRC") 'Recording Time
-  TFTypes.Add("TDRL") 'Release Time
-  TFTypes.Add("TDTG") 'Tagging Time
-  TFTypes.Add("TENC") 'Encoded by
-  TFTypes.Add("TEXT") 'Lyricist / Text writer
-  TFTypes.Add("TFLT") 'File type
-  TFTypes.Add("TIPL") 'Involved people list
-  TFTypes.Add("TIT1") 'Content group description
-  TFTypes.Add("TIT2") 'Title / songname / content description
-  TFTypes.Add("TIT3") 'Subtitle / Description refinement
-  TFTypes.Add("TKEY") 'Initial key
-  TFTypes.Add("TLAN") 'Language(s)
-  TFTypes.Add("TLEN") 'Length
-  TFTypes.Add("TMCL") 'Musician credits list
-  TFTypes.Add("TMED") 'Media type
-  TFTypes.Add("TMOO") 'Mood
-  TFTypes.Add("TOAL") 'Original album / movie / show title
-  TFTypes.Add("TOFN") 'Original filename
-  TFTypes.Add("TOLY") 'Original lyricist(s) / text writer(s)
-  TFTypes.Add("TOPE") 'Original artist(s) / performer(s)
-  TFTypes.Add("TOWN") 'File owner / licensee
-  TFTypes.Add("TPE1") 'Lead performer(s) / Soloist(s)
-  TFTypes.Add("TPE2") 'Band / orchestra / accompaniment
-  TFTypes.Add("TPE3") 'Conductor / performer refinement
-  TFTypes.Add("TPE4") 'Interpreted, remixed, or otherwise modified by
-  TFTypes.Add("TPOS") 'Part of a set
-  TFTypes.Add("TPRO") 'Produced notice
-  TFTypes.Add("TPUB") 'Publisher
-  TFTypes.Add("TRCK") 'Track number / Position in set
-  TFTypes.Add("TRSN") 'Internet radio station name
-  TFTypes.Add("TRSO") 'Internet radio station owner
-  TFTypes.Add("TSOA") 'Album sort order
-  TFTypes.Add("TSOP") 'Performer sort order
-  TFTypes.Add("TSOT") 'Title sort order
-  TFTypes.Add("TSRC") 'ISRC(international standard recording code)
-  TFTypes.Add("TSSE") 'Software / Hardware and settings used for encoding
-  TFTypes.Add("TSST") 'Set subtitle
-  TFTypes.Add("TXXX") 'User defined text information frame
+  SUPER.FTypes.Add("Album/Movie/Show title", "TALB")
+  SUPER.FTypes.Add("BPM (beats per Minute)", "TBPM")
+  SUPER.FTypes.Add("Composer", "TCOM")
+  SUPER.FTypes.Add("Content type", "TCON")
+  SUPER.FTypes.Add("Copyright message", "TCOP")
+  SUPER.FTypes.Add("Encoding Time", "TDEN")
+  SUPER.FTypes.Add("Playlist delay", "TDLY")
+  SUPER.FTypes.Add("Original release Time", "TDOR")
+  SUPER.FTypes.Add("Recording Time", "TDRC")
+  SUPER.FTypes.Add("Release Time", "TDRL")
+  SUPER.FTypes.Add("Tagging Time", "TDTG")
+  SUPER.FTypes.Add("Encoded by", "TENC")
+  SUPER.FTypes.Add("Lyricist/Text writer", "TEXT")
+  SUPER.FTypes.Add("File type", "TFLT")
+  SUPER.FTypes.Add("Involved people list", "TIPL")
+  SUPER.FTypes.Add("Content group description", "TIT1")
+  SUPER.FTypes.Add("Title/songname/content description", "TIT2")
+  SUPER.FTypes.Add("Subtitle/Description refinement", "TIT3")
+  SUPER.FTypes.Add("Initial key", "TKEY")
+  SUPER.FTypes.Add("Language(s)", "TLAN")
+  SUPER.FTypes.Add("Length", "TLEN")
+  SUPER.FTypes.Add("Musician credits list", "TMCL")
+  SUPER.FTypes.Add("Media type", "TMED")
+  SUPER.FTypes.Add("Mood", "TMOO")
+  SUPER.FTypes.Add("Original album/movie/show title", "TOAL")
+  SUPER.FTypes.Add("Original filename", "TOFN")
+  SUPER.FTypes.Add("Original lyricist(s) / text writer(s)", "TOLY")
+  SUPER.FTypes.Add("Original artist(s)/performer(s)", "TOPE")
+  SUPER.FTypes.Add("File owner/licensee", "TOWN")
+  SUPER.FTypes.Add("Lead performer(s)/Soloist(s)", "TPE1")
+  SUPER.FTypes.Add("Band/orchestra/accompaniment", "TPE2")
+  SUPER.FTypes.Add("Conductor/performer refinement", "TPE3")
+  SUPER.FTypes.Add("Interpreted, remixed, or otherwise modified by", "TPE4")
+  SUPER.FTypes.Add("Part of a set", "TPOS")
+  SUPER.FTypes.Add("Produced notice", "TPRO")
+  SUPER.FTypes.Add("Publisher", "TPUB")
+  SUPER.FTypes.Add("Track number / Position in set", "TRCK")
+  SUPER.FTypes.Add("Internet radio station name", "TRSN")
+  SUPER.FTypes.Add("Internet radio station owner", "TRSO")
+  SUPER.FTypes.Add("Album sort order", "TSOA")
+  SUPER.FTypes.Add("Performer sort order", "TSOP")
+  SUPER.FTypes.Add("Title sort order", "TSOT")
+  SUPER.FTypes.Add("ISRC (international standard recording code)", "TSRC")
+  SUPER.FTypes.Add("Software/Hardware and settings used for encoding", "TSSE")
+  SUPER.FTypes.Add("Set subtitle", "TSST")
+  SUPER.FTypes.Add("User defined text information frame", "TXXX")
   
 END

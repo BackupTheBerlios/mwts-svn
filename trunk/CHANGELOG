@@ -1,3 +1,12 @@
+* Mon Sep 04 2006 Franz Brauße <mike-nought@gmx.de>
+  - eased usage of Item-Class (Columns can be addressed directly in CFViewItem)
+  - fixed: now the header of always the first MPEG-frame is read and not accidentally skipped
+  - fixed: bitrate now is always shown as human readable string and year 0 doesn't exist anymore
+    (haven't ever seen any MP3- or ID3-encoder in Jesus' time)
+  - added missing ID3v2-frame types
+  - generalized frame-creation in first file-read-in (inclusive frame-header)
+  - began implementation of ID3v2-frames
+
 * Thu Aug 31 2006 Franz Brauße <mike-nought@gmx.de>
   - basic functionality for ID3v2-Tags added: Header and Extended Header parsing
   - fixed silly bug of wrong sorting of columns in file-display caused by non-documented behaviour when

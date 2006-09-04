@@ -38,6 +38,7 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   
   DIM begin AS Integer
   DIM size AS Integer
+  
   RETURN 
   IF IsNull(path) OR NOT Exist(path) THEN RETURN 
   
@@ -60,25 +61,14 @@ STATIC PUBLIC FUNCTION getFrames(data AS String) AS Collection
   DIM result AS NEW Collection
   DIM h AS CTagv2FrameHeader
   DIM f AS CTagv2Frame
-  DIM t AS CTagv2FrameText
-  DIM w AS CTagv2FrameURL
-  
   DIM s AS String
   
   DO
     IF Left(data) = Chr(0) THEN BREAK 
     h = NEW CTagv2FrameHeader(Left(data, 10))
     s = Mid(data, 1 + h.size, h.frameSize)
-    IF Left(h.id) = "T" AND h.id <> "TXXX" THEN 
-      t = NEW CTagv2FrameText(s, h)
-      result.Add(t, h.id)
-    ELSE IF Left(h.id) = "W" AND h.id <> "WXXX" THEN 
-      w = NEW CTagv2FrameURL(s, h)
-      result.Add(w, h.id)
-    ELSE 
-      f = NEW CTagv2Frame(s, h)
-      result.Add(f, h.id)
-    END IF
+    f = CTagv2Frame.getFrame(h, s)
+    result.Add(f, h.id)
     data = Mid(data, 1 + h.size + h.frameSize)
   LOOP 
   RETURN result
@@ -100,6 +90,31 @@ STATIC PUBLIC FUNCTION DeSynchsafe(s AS String) AS Long
       IF BTst(y, z MOD 7) THEN BSet(result, z)
       INC z
     LOOP UNTIL (z MOD 7) = 0
+  NEXT 
+  RETURN result
+  
+END
+
+STATIC PUBLIC FUNCTION Synchsafe(i AS Integer, OPTIONAL length AS Integer = 0) AS String
+  
+  DIM result AS String
+  DIM c AS Integer
+  DIM x AS Integer
+  DIM tmp AS Byte
+  DIM akt AS String
+  
+  IF length = 0 THEN length = Round((Len(Bin(i)) - 1) \ 7) ' byte-count
+  'result = String(length, Chr(0))
+  
+  FOR x = 1 TO length * 8
+    IF x MOD 8 = 0 THEN 
+      result = Chr(tmp) & result
+      tmp = 0
+      CONTINUE 
+    END IF
+    akt = Mid(Bin(i), Len(Bin(i)) - c, 1)
+    IF Val(akt) THEN tmp = BSet(tmp, c)
+    INC c
   NEXT 
   RETURN result
   
