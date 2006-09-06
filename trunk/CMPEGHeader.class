@@ -60,7 +60,6 @@ PUBLIC SUB _new(OPTIONAL rawdata AS String = NULL)
     END IF
   END IF
   IF IsNull(t) THEN
-  
     $vbr = TRUE
     $bitrate = -1
   ELSE  

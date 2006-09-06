@@ -68,7 +68,7 @@ STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
   
 
 ' single, faster than below (especially when reading for the first time (cache => wtf? (?))
-  f = OPEN path FOR READ 
+  f = OPEN path FOR INPUT  
   
   WHILE NOT Eof(f)
     READ #f, t, 1

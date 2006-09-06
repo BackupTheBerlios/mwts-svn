@@ -8,7 +8,8 @@
 
 - ID3v2-Tag
   - class itself
-    - Frames
+    - Header: seek-point in file
+    - Frame classes
     - Footer
   - read support
   - write support

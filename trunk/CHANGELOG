@@ -1,3 +1,14 @@
+* Wed Sep 06 2006 Franz Brauße <mike-nought@gmx.de>
+  - great speed-up of file-read-in by using Gambas' internal read-/write-buffer
+  - new file-seek and helper methods
+  - fixed wrong usage of a static variable in ID3v2-frame
+  - added missing string-termination data for different encodings used by ID3v2-Tag
+  - added status-code to Tag-readers
+  - began implementation of ID3v2-frames
+
+* Tue Sep 05 2006 Franz Brauße <mike-nought@gmx.de>
+  - better implementation of file-seek for a pattern (experimental)
+
 * Mon Sep 04 2006 Franz Brauße <mike-nought@gmx.de>
   - eased usage of Item-Class (Columns can be addressed directly in CFViewItem)
   - fixed: now the header of always the first MPEG-frame is read and not accidentally skipped

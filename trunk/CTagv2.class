@@ -1,12 +1,12 @@
 
 PUBLIC CONST trackNone AS Integer = 0
 
-PROPERTY artist AS String
-PROPERTY album AS String
-PROPERTY track AS Integer
-PROPERTY year AS Integer
-PROPERTY genre AS String
-PROPERTY title AS String
+PROPERTY artist AS String[] 
+PROPERTY album AS String[]
+PROPERTY track AS Integer[]
+PROPERTY year AS Integer[]
+PROPERTY genre AS String[]
+PROPERTY title AS String[]
 PROPERTY comment AS String
 
 PROPERTY READ isEmpty AS Boolean
@@ -14,21 +14,15 @@ PROPERTY version AS Float
 PROPERTY READ changed AS Boolean
 PROPERTY READ header AS CTagv2Header
 PROPERTY READ extHeader AS CTagv2ExtHeader
-
-PRIVATE $artist AS String
-PRIVATE $album AS String
-PRIVATE $track AS Integer
-PRIVATE $year AS Integer
-PRIVATE $genre AS String
-PRIVATE $title AS String
-PRIVATE $comment AS String
+PROPERTY READ statusOK AS Boolean
 
 PRIVATE $changed AS Boolean
+PRIVATE $status AS Boolean
 PRIVATE $version AS String
 PRIVATE $header AS CTagv2Header
 PRIVATE $extHeader AS CTagv2ExtHeader
 PRIVATE $body AS String ' contains all frames and the optional padding
-PRIVATE $frames AS Object[] ' contains all frames
+PRIVATE $frames AS Collection ' contains all frames
 
 PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   
@@ -53,7 +47,14 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   $body = Mid(s, begin + $header.size + $extHeader.size, $header.tagSize - $extHeader.size)
   
   $frames = getFrames($body)
+  $status = TRUE
   
+END
+
+PUBLIC FUNCTION _get(id AS String) AS Object
+  IF $frames.Exist(id) THEN RETURN $frames[id]
+  ' create new one and add it to $frames
+  RETURN NULL
 END
 
 STATIC PUBLIC FUNCTION getFrames(data AS String) AS Collection
@@ -120,6 +121,12 @@ STATIC PUBLIC FUNCTION Synchsafe(i AS Integer, OPTIONAL length AS Integer = 0) A
   
 END
 
+PUBLIC FUNCTION render() AS String
+  
+  DIM useFooter AS Boolean = Settings["ID3v2_UseFooter"]
+  DIM usePadding AS Boolean = Settings["ID3v2_UsePadding"]
+  
+END
 
 PUBLIC FUNCTION getNone(which AS String) AS Variant
   
@@ -132,47 +139,35 @@ PUBLIC FUNCTION getNone(which AS String) AS Variant
   
 END
 
-PRIVATE FUNCTION artist_Read() AS String
-  RETURN $artist
+
+PRIVATE FUNCTION artist_Read() AS String[]
+  RETURN ME["TOPE"].content
 END
-PRIVATE SUB artist_Write(Value AS String)
-  $artist = Value
-  $changed = TRUE
+PRIVATE SUB artist_Write(Value AS String[])
 END
-PRIVATE FUNCTION album_Read() AS String
-  RETURN $album
+PRIVATE FUNCTION album_Read() AS String[]
+  RETURN ME["TOAL"].content
 END
-PRIVATE SUB album_Write(Value AS String)
-  $album = Value
-  $changed = TRUE
+PRIVATE SUB album_Write(Value AS String[])
 END
-PRIVATE FUNCTION track_Read() AS Integer
-  RETURN $track
+PRIVATE FUNCTION track_Read() AS Integer[]
+  RETURN Val(ME["TRCK"].content)
 END
-PRIVATE SUB track_Write(Value AS Integer)
-  $track = Value
-  $changed = TRUE
+PRIVATE SUB track_Write(Value AS Integer[])
 END
-PRIVATE FUNCTION year_Read() AS Integer
-  RETURN $year
+PRIVATE FUNCTION year_Read() AS Integer[]
+  RETURN Val(ME["TDOR"].content)
 END
-PRIVATE SUB year_Write(Value AS Integer)
-  $year = Value
-  $changed = TRUE
+PRIVATE SUB year_Write(Value AS Integer[])
 END
-PRIVATE FUNCTION genre_Read() AS String
-  RETURN $genre
+PRIVATE FUNCTION genre_Read() AS String[]
+  RETURN ME["TCON"].content
 END
-PRIVATE SUB genre_Write(Value AS String)
-  $genre = Value
-  $changed = TRUE
+PRIVATE SUB genre_Write(Value AS String[])
 END
-PRIVATE FUNCTION title_Read() AS String
-  RETURN $title
+PRIVATE FUNCTION title_Read() AS String[]
 END
-PRIVATE SUB title_Write(Value AS String)
-  $title = Value
-  $changed = TRUE
+PRIVATE SUB title_Write(Value AS String[])
 END
 PRIVATE FUNCTION isEmpty_Read() AS Boolean
   IF Len(ME.album) > 0 THEN RETURN FALSE
@@ -185,11 +180,8 @@ PRIVATE FUNCTION isEmpty_Read() AS Boolean
   RETURN TRUE
 END 
 PRIVATE FUNCTION comment_Read() AS String
-  RETURN $comment
 END
 PRIVATE SUB comment_Write(Value AS String)
-  $comment = Value
-  $changed = TRUE
 END
 PRIVATE FUNCTION version_Read() AS Float
   RETURN Val($version)
@@ -205,4 +197,7 @@ PRIVATE FUNCTION header_Read() AS CTagv2Header
 END
 PRIVATE FUNCTION extHeader_Read() AS CTagv2ExtHeader
   RETURN $extHeader
+END
+PRIVATE FUNCTION statusOK_Read() AS Boolean
+  RETURN $status
 END

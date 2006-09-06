@@ -1,81 +1,120 @@
 
 INHERITS CTagv2Frame
 
-STATIC PUBLIC FTypes AS Collection
+STATIC PRIVATE ENC AS String[] = ["ISO-8859-1", "UTF-16", "UTF-16", "UTF-8"]
+STATIC PRIVATE ENC_Split AS NEW String[]
+
+PUBLIC CONST encISO AS Integer = &H00
+PUBLIC CONST encUTF16BOM AS Integer = &H01
+PUBLIC CONST encUTF16 AS Integer = &H02
+PUBLIC CONST encUTF8 AS Integer = &H03
+
+STATIC PROPERTY READ encString AS String[]
+STATIC PROPERTY READ encSplit AS String[]
+
+PROPERTY encoding AS Integer
+
+'STATIC PUBLIC FTypes AS Collection
 
 PROPERTY READ id AS String
-PROPERTY content AS String
+PROPERTY content AS String[]
 
-PRIVATE $content AS String
+PRIVATE $content AS String[]
+PRIVATE $encoding AS Integer
 
-PUBLIC SUB _new()
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  
+  DIM t AS String
+  DIM tmp2 AS String[]
+  
+  IF IsNull(rawData) THEN 
+    $encoding = CTagv2FrameText.encUTF8
+    tmp2 = [rawData]
+  ELSE
+    $encoding = CByte(Asc(rawData))
+    t = Conv(Mid(rawData, 2), System.Charset, Desktop.Charset)
+    tmp2 = Split(t, ME.encSplit[$encoding])
+  END IF
+  $content = tmp2
+  
 END 
 
-PUBLIC SUB setRawData(data AS String)
-  
-  
-  
-END
 
+STATIC PRIVATE FUNCTION encString_Read() AS String[]
+  RETURN ENC
+END
+STATIC PRIVATE FUNCTION encSplit_Read() AS String[]
+  RETURN ENC_Split
+END
 PRIVATE FUNCTION id_Read() AS String
   RETURN SUPER.header.id
 END
-PRIVATE FUNCTION content_Read() AS String
+PRIVATE FUNCTION content_Read() AS String[]
   RETURN $content
 END
-PRIVATE SUB content_Write(Value AS String)
+PRIVATE SUB content_Write(Value AS String[])
   $content = Value
-  SUPER.rawContent = Value
+END
+PRIVATE FUNCTION encoding_Read() AS Integer
+  RETURN $encoding
+END
+PRIVATE SUB encoding_Write(Value AS Integer)
+  $encoding = Value
 END
 
 
 STATIC PUBLIC SUB _init()
   
-  SUPER.FTypes.Add("Album/Movie/Show title", "TALB")
-  SUPER.FTypes.Add("BPM (beats per Minute)", "TBPM")
-  SUPER.FTypes.Add("Composer", "TCOM")
-  SUPER.FTypes.Add("Content type", "TCON")
-  SUPER.FTypes.Add("Copyright message", "TCOP")
-  SUPER.FTypes.Add("Encoding Time", "TDEN")
-  SUPER.FTypes.Add("Playlist delay", "TDLY")
-  SUPER.FTypes.Add("Original release Time", "TDOR")
-  SUPER.FTypes.Add("Recording Time", "TDRC")
-  SUPER.FTypes.Add("Release Time", "TDRL")
-  SUPER.FTypes.Add("Tagging Time", "TDTG")
-  SUPER.FTypes.Add("Encoded by", "TENC")
-  SUPER.FTypes.Add("Lyricist/Text writer", "TEXT")
-  SUPER.FTypes.Add("File type", "TFLT")
-  SUPER.FTypes.Add("Involved people list", "TIPL")
-  SUPER.FTypes.Add("Content group description", "TIT1")
-  SUPER.FTypes.Add("Title/songname/content description", "TIT2")
-  SUPER.FTypes.Add("Subtitle/Description refinement", "TIT3")
-  SUPER.FTypes.Add("Initial key", "TKEY")
-  SUPER.FTypes.Add("Language(s)", "TLAN")
-  SUPER.FTypes.Add("Length", "TLEN")
-  SUPER.FTypes.Add("Musician credits list", "TMCL")
-  SUPER.FTypes.Add("Media type", "TMED")
-  SUPER.FTypes.Add("Mood", "TMOO")
-  SUPER.FTypes.Add("Original album/movie/show title", "TOAL")
-  SUPER.FTypes.Add("Original filename", "TOFN")
-  SUPER.FTypes.Add("Original lyricist(s) / text writer(s)", "TOLY")
-  SUPER.FTypes.Add("Original artist(s)/performer(s)", "TOPE")
-  SUPER.FTypes.Add("File owner/licensee", "TOWN")
-  SUPER.FTypes.Add("Lead performer(s)/Soloist(s)", "TPE1")
-  SUPER.FTypes.Add("Band/orchestra/accompaniment", "TPE2")
-  SUPER.FTypes.Add("Conductor/performer refinement", "TPE3")
-  SUPER.FTypes.Add("Interpreted, remixed, or otherwise modified by", "TPE4")
-  SUPER.FTypes.Add("Part of a set", "TPOS")
-  SUPER.FTypes.Add("Produced notice", "TPRO")
-  SUPER.FTypes.Add("Publisher", "TPUB")
-  SUPER.FTypes.Add("Track number / Position in set", "TRCK")
-  SUPER.FTypes.Add("Internet radio station name", "TRSN")
-  SUPER.FTypes.Add("Internet radio station owner", "TRSO")
-  SUPER.FTypes.Add("Album sort order", "TSOA")
-  SUPER.FTypes.Add("Performer sort order", "TSOP")
-  SUPER.FTypes.Add("Title sort order", "TSOT")
-  SUPER.FTypes.Add("ISRC (international standard recording code)", "TSRC")
-  SUPER.FTypes.Add("Software/Hardware and settings used for encoding", "TSSE")
-  SUPER.FTypes.Add("Set subtitle", "TSST")
-  SUPER.FTypes.Add("User defined text information frame", "TXXX")
+  CTagv2Frame.FTypes.Add("Album/Movie/Show title", "TALB")
+  CTagv2Frame.FTypes.Add("BPM (beats per Minute)", "TBPM")
+  CTagv2Frame.FTypes.Add("Composer", "TCOM")
+  CTagv2Frame.FTypes.Add("Content type", "TCON")
+  CTagv2Frame.FTypes.Add("Copyright message", "TCOP")
+  CTagv2Frame.FTypes.Add("Encoding Time", "TDEN")
+  CTagv2Frame.FTypes.Add("Playlist delay", "TDLY")
+  CTagv2Frame.FTypes.Add("Original release Time", "TDOR")
+  CTagv2Frame.FTypes.Add("Recording Time", "TDRC")
+  CTagv2Frame.FTypes.Add("Release Time", "TDRL")
+  CTagv2Frame.FTypes.Add("Tagging Time", "TDTG")
+  CTagv2Frame.FTypes.Add("Encoded by", "TENC")
+  CTagv2Frame.FTypes.Add("Lyricist/Text writer", "TEXT")
+  CTagv2Frame.FTypes.Add("File type", "TFLT")
+  CTagv2Frame.FTypes.Add("Involved people list", "TIPL")
+  CTagv2Frame.FTypes.Add("Content group description", "TIT1")
+  CTagv2Frame.FTypes.Add("Title/songname/content description", "TIT2")
+  CTagv2Frame.FTypes.Add("Subtitle/Description refinement", "TIT3")
+  CTagv2Frame.FTypes.Add("Initial key", "TKEY")
+  CTagv2Frame.FTypes.Add("Language(s)", "TLAN")
+  CTagv2Frame.FTypes.Add("Length", "TLEN")
+  CTagv2Frame.FTypes.Add("Musician credits list", "TMCL")
+  CTagv2Frame.FTypes.Add("Media type", "TMED")
+  CTagv2Frame.FTypes.Add("Mood", "TMOO")
+  CTagv2Frame.FTypes.Add("Original album/movie/show title", "TOAL")
+  CTagv2Frame.FTypes.Add("Original filename", "TOFN")
+  CTagv2Frame.FTypes.Add("Original lyricist(s) / text writer(s)", "TOLY")
+  CTagv2Frame.FTypes.Add("Original artist(s)/performer(s)", "TOPE")
+  CTagv2Frame.FTypes.Add("File owner/licensee", "TOWN")
+  CTagv2Frame.FTypes.Add("Lead performer(s)/Soloist(s)", "TPE1")
+  CTagv2Frame.FTypes.Add("Band/orchestra/accompaniment", "TPE2")
+  CTagv2Frame.FTypes.Add("Conductor/performer refinement", "TPE3")
+  CTagv2Frame.FTypes.Add("Interpreted, remixed, or otherwise modified by", "TPE4")
+  CTagv2Frame.FTypes.Add("Part of a set", "TPOS")
+  CTagv2Frame.FTypes.Add("Produced notice", "TPRO")
+  CTagv2Frame.FTypes.Add("Publisher", "TPUB")
+  CTagv2Frame.FTypes.Add("Track number / Position in set", "TRCK")
+  CTagv2Frame.FTypes.Add("Internet radio station name", "TRSN")
+  CTagv2Frame.FTypes.Add("Internet radio station owner", "TRSO")
+  CTagv2Frame.FTypes.Add("Album sort order", "TSOA")
+  CTagv2Frame.FTypes.Add("Performer sort order", "TSOP")
+  CTagv2Frame.FTypes.Add("Title sort order", "TSOT")
+  CTagv2Frame.FTypes.Add("ISRC (international standard recording code)", "TSRC")
+  CTagv2Frame.FTypes.Add("Software/Hardware and settings used for encoding", "TSSE")
+  CTagv2Frame.FTypes.Add("Set subtitle", "TSST")
+  CTagv2Frame.FTypes.Add("User defined text information frame", "TXXX")
+  
+  ENC_Split.Add(Conv(Chr(0), Desktop.Charset, ENC[encISO]))
+  ENC_Split.Add(Conv(Chr(0), Desktop.Charset, ENC[encUTF16BOM]))
+  ENC_Split.Add(Conv(Chr(0), Desktop.Charset, ENC[encUTF16]))
+  ENC_Split.Add(Conv(Chr(0), Desktop.Charset, ENC[encUTF8]))
   
 END

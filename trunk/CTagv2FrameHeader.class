@@ -1,6 +1,7 @@
 
 PROPERTY READ id AS String
 PROPERTY READ size AS Integer
+PROPERTY READ fStart AS Integer
 
 PROPERTY READ frameSize AS Integer
 PROPERTY READ tagAlterPreservation AS Boolean
@@ -13,13 +14,14 @@ PROPERTY READ unsynchronised AS Boolean
 PROPERTY READ existsDataLengthIndicator AS Boolean
 
 PRIVATE $data AS String
+PRIVATE $fstart AS Integer
 PRIVATE $statusFlags AS Byte
 PRIVATE $formatFlags AS Byte
 
 ' creates a new frame-header:
 ' s = NULL: a standard frame header is created
 ' s = NULL, id = NULL: a standard X000-frame-header is created
-PUBLIC SUB _new(s AS String, OPTIONAL id AS String = NULL, OPTIONAL size AS Integer = 1)
+PUBLIC SUB _new(s AS String, OPTIONAL fStart AS Integer = 0, OPTIONAL id AS String = NULL, OPTIONAL size AS Integer = 1)
   
   IF IsNull(s) THEN 
     IF IsNull(id) THEN id = "X000"
@@ -32,6 +34,7 @@ PUBLIC SUB _new(s AS String, OPTIONAL id AS String = NULL, OPTIONAL size AS Inte
     $data = s
   END IF
   
+  $fstart = fStart
   $statusFlags = CByte(Asc(Mid($data, 9, 1)))
   $formatFlags = CByte(Asc(Right($data, 1)))
   
@@ -73,4 +76,7 @@ PRIVATE FUNCTION existsDataLengthIndicator_Read() AS Boolean
 END
 PRIVATE FUNCTION size_Read() AS Integer
   RETURN 10
+END
+PRIVATE FUNCTION fStart_Read() AS Integer
+  RETURN $fstart
 END

@@ -17,6 +17,100 @@ PUBLIC SUB _init()
   
 END
 
+PUBLIC FUNCTION pat2str(pattern AS Boolean[], OPTIONAL littleEndian AS Boolean = FALSE) AS String
+  
+  DIM result AS String
+  DIM x AS Integer
+  DIM y AS Integer
+  DIM u AS Integer = Choose(littleEndian, 0, 7)
+  DIM v AS Integer = Choose(littleEndian, 7, 0)
+  DIM t AS Byte
+  
+  'IF (pattern.Count MOD 8) <> 0 THEN STOP 
+  
+  FOR x = 0 TO (pattern.Count - 1) \ 8 + 1
+    FOR y = u TO v
+      IF (x * 8 + y) > pattern.Count THEN BREAK 
+      IF pattern[x * 8 + y] THEN BSet(t, y)
+    NEXT 
+    IF NOT littleEndian THEN 
+      result &= Chr(t)
+    ELSE 
+      result = Chr(t) & result
+    END IF
+    IF (x * 8 + y) > pattern.Count THEN BREAK 
+    t = 0
+  NEXT 
+  
+  RETURN result
+  
+END
+
+PUBLIC FUNCTION str2pat(value AS String, OPTIONAL littleEndian AS Boolean = FALSE) AS Boolean[]
+  
+  DIM result AS NEW Boolean[]
+  DIM x AS Integer
+  DIM y AS Integer
+  DIM u AS Integer = Choose(littleEndian, 0, 7)
+  DIM v AS Integer = Choose(littleEndian, 7, 0)
+  
+  FOR x = 1 TO Len(value)
+    FOR y = u TO v
+      result.Add(BTst(Asc(value, x), y))
+    NEXT 
+  NEXT 
+  
+  RETURN result
+  
+END
+
+PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[], bytes2return AS Integer) AS String
+  
+  DIM f AS File
+  DIM b AS String
+  DIM x AS Integer
+  DIM y AS Integer
+  DIM z AS Integer
+  DIM result AS String
+  
+  IF NOT Exist(path) THEN RETURN NULL
+  IF Stat(path).Size = 0 THEN RETURN NULL
+  IF pattern.Count = 0 THEN RETURN NULL
+  IF bytes2return = 0 THEN RETURN NULL
+  
+  f = OPEN path FOR INPUT 
+  x = 0
+  y = 0
+  z = 0
+  
+  DO
+    IF Seek(f) <> x THEN SEEK #f, x
+    'IF (z < 8 AND y >= 8) OR y = 0 THEN READ #f, b, 1
+    READ #f, b, 1
+    FOR z = 0 TO 7
+      IF NOT (BTst(Asc(b), z) XOR pattern[y]) THEN
+        IF y = pattern.Max THEN 
+          SEEK #f, x - (pattern.Max \ 8 + 1)
+          READ #f, b, bytes2return
+          CLOSE #f
+          RETURN b
+        END IF
+        INC y
+      ELSE 
+        y = 0
+        BREAK 
+      END IF
+    NEXT 
+    ' Wenn mind. 2. Byte von pattern aber Schleife nicht ganz durchgelaufen (also nicht gleich) ist,
+    ' darf nächstes Byte nicht gelesen werden => Kontrolle ob es mit dem ersten Byte von patter übereinstimmt
+    IF NOT (y >= 8 AND z < 8) THEN INC x
+  LOOP UNTIL Eof(f)
+  
+  CLOSE #f
+  RETURN NULL
+  
+END
+
 PUBLIC FUNCTION replaceByPattern(text AS String, f AS CFile) AS String
   
   DIM p AS String

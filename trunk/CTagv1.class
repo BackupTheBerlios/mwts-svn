@@ -17,6 +17,7 @@ PROPERTY comment AS String
 PROPERTY READ isEmpty AS Boolean ' returns if no properties of the Tag are set
 PROPERTY READ version AS Integer ' returns either 0 or 1 according to the setting of the track-property
 PROPERTY READ changed AS Boolean ' returns if any external changes were made
+PROPERTY READ statusOK AS Boolean
 
 PRIVATE $artist AS String
 PRIVATE $album AS String
@@ -27,6 +28,7 @@ PRIVATE $title AS String
 PRIVATE $comment AS String
 
 PRIVATE $changed AS Boolean
+PRIVATE $status AS Boolean
 
 ' needed for MHelp.merge()
 PUBLIC FUNCTION getNone(which AS String) AS Variant
@@ -48,14 +50,11 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   DIM f AS File
   DIM t AS String
   
-  IF IsNull(path) THEN
-    
-    RETURN 
-  END IF
+  IF IsNull(path) THEN RETURN 
   
   IF Stat(path).Size < 128 THEN RETURN
   
-  f = OPEN path FOR READ
+  f = OPEN path FOR INPUT 
   
   SEEK #f, -128
   READ #f, t, 3
@@ -83,6 +82,8 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   END IF
   
   CLOSE #f
+  
+  $status = TRUE
   
 END
 
@@ -189,6 +190,10 @@ END
 PRIVATE FUNCTION changed_Read() AS Boolean
   RETURN $changed
 END
+PRIVATE FUNCTION statusOK_Read() AS Boolean
+  RETURN $status
+END
+
 
 STATIC PUBLIC SUB _init()
   
@@ -344,3 +349,5 @@ STATIC PUBLIC SUB _init()
   genreDef.Add("SynthPop")
   
 END
+
+
