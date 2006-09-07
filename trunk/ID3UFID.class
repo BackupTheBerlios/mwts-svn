@@ -1,0 +1,26 @@
+
+INHERITS CTagv2Frame
+
+PROPERTY OwnerIdentifier AS String
+PROPERTY FileIdenifier AS String
+
+PRIVATE $ownerIdentifier AS String
+PRIVATE $fileIdentifier AS String
+
+PUBLIC FUNCTION render() AS String
+  RETURN SUPER.header.render() & $ownerIdentifier & CTagv2FrameText.encSplit[$encoding] & $fileIdentifier
+END
+
+
+PRIVATE FUNCTION OwnerIdentifier_Read() AS String
+  RETURN $ownerIdentifier
+END
+PRIVATE SUB OwnerIdentifier_Write(Value AS String)
+  $ownerIdentifier = Value
+END
+PRIVATE FUNCTION FileIdenifier_Read() AS String
+  RETURN $fileIdentifier
+END
+PRIVATE SUB FileIdenifier_Write(Value AS String)
+  IF Len(Value) <= 64 THEN $fileIdentifier = Value
+END

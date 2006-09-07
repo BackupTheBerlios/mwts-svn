@@ -15,6 +15,7 @@ PROPERTY READ changed AS Boolean
 PROPERTY READ header AS CTagv2Header
 PROPERTY READ extHeader AS CTagv2ExtHeader
 PROPERTY READ statusOK AS Boolean
+PROPERTY READ parent AS CTag
 
 PRIVATE $changed AS Boolean
 PRIVATE $status AS Boolean
@@ -23,8 +24,9 @@ PRIVATE $header AS CTagv2Header
 PRIVATE $extHeader AS CTagv2ExtHeader
 PRIVATE $body AS String ' contains all frames and the optional padding
 PRIVATE $frames AS Collection ' contains all frames
+PRIVATE $parent AS CTag
 
-PUBLIC SUB _new(OPTIONAL path AS String = NULL)
+PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   
   DIM s AS String
   DIM x AS Integer
@@ -34,13 +36,16 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   DIM size AS Integer
   
   RETURN 
+  
+  $parent = parent
+  
   IF IsNull(path) OR NOT Exist(path) THEN RETURN 
   
   s = File.Load(path)
   begin = InStr(s, "ID3")
   IF begin = 0 THEN RETURN 
   
-  $header = NEW CTagv2Header(Mid(s, begin, 10))
+  $header = NEW CTagv2Header(Mid(s, begin, 10), begin)
   $version = $header.version
   
   $extHeader = NEW CTagv2ExtHeader(Mid(s, begin + $header.size))
@@ -63,11 +68,13 @@ STATIC PUBLIC FUNCTION getFrames(data AS String) AS Collection
   DIM h AS CTagv2FrameHeader
   DIM f AS CTagv2Frame
   DIM s AS String
+  DIM x AS Integer
   
   DO
     IF Left(data) = Chr(0) THEN BREAK 
-    h = NEW CTagv2FrameHeader(Left(data, 10))
-    s = Mid(data, 1 + h.size, h.frameSize)
+    h = NEW CTagv2FrameHeader(Left(data, 10), x)
+    s = Mid(data, h.size + 1, h.frameSize)
+    x += h.size
     f = CTagv2Frame.getFrame(h, s)
     result.Add(f, h.id)
     data = Mid(data, 1 + h.size + h.frameSize)

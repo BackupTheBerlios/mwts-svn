@@ -1,7 +1,7 @@
 
 PROPERTY READ id AS String
 PROPERTY READ size AS Integer
-PROPERTY READ fStart AS Integer
+PROPERTY READ tStart AS Integer
 
 PROPERTY READ frameSize AS Integer
 PROPERTY READ tagAlterPreservation AS Boolean
@@ -14,16 +14,16 @@ PROPERTY READ unsynchronised AS Boolean
 PROPERTY READ existsDataLengthIndicator AS Boolean
 
 PRIVATE $data AS String
-PRIVATE $fstart AS Integer
+PRIVATE $tStart AS Integer
 PRIVATE $statusFlags AS Byte
 PRIVATE $formatFlags AS Byte
 
 ' creates a new frame-header:
 ' s = NULL: a standard frame header is created
 ' s = NULL, id = NULL: a standard X000-frame-header is created
-PUBLIC SUB _new(s AS String, OPTIONAL fStart AS Integer = 0, OPTIONAL id AS String = NULL, OPTIONAL size AS Integer = 1)
+PUBLIC SUB _new(rawData AS String, tStart AS Integer, OPTIONAL id AS String = NULL, OPTIONAL size AS Integer = 1)
   
-  IF IsNull(s) THEN 
+  IF IsNull(rawData) THEN 
     IF IsNull(id) THEN id = "X000"
     IF Len(id) <> 4 THEN STOP 
     IF size = 0 THEN STOP
@@ -31,12 +31,12 @@ PUBLIC SUB _new(s AS String, OPTIONAL fStart AS Integer = 0, OPTIONAL id AS Stri
     $data &= CTagv2.Synchsafe(size, 4)
     $data &= Chr(0) & Chr(0)
   ELSE 
-    $data = s
+    $data = rawData
   END IF
   
-  $fstart = fStart
-  $statusFlags = CByte(Asc(Mid($data, 9, 1)))
-  $formatFlags = CByte(Asc(Right($data, 1)))
+  $tStart = tStart
+  $statusFlags = CByte(Asc($data, 9))
+  $formatFlags = CByte(Asc($data, 10))
   
 END
 
@@ -77,6 +77,6 @@ END
 PRIVATE FUNCTION size_Read() AS Integer
   RETURN 10
 END
-PRIVATE FUNCTION fStart_Read() AS Integer
-  RETURN $fstart
+PRIVATE FUNCTION tStart_Read() AS Integer
+  RETURN $tStart
 END

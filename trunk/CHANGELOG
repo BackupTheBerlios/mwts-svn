@@ -1,3 +1,8 @@
+* Thu Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
+  - added back-references to ID3v2-classes and file-seek-points for dynamic load of large contents
+  - some code-cleanup
+  - added 7 frame-types (APIC, GEOB, UFID, USLT, ETCO, COMM and MCDI)
+
 * Wed Sep 06 2006 Franz Brauße <mike-nought@gmx.de>
   - great speed-up of file-read-in by using Gambas' internal read-/write-buffer
   - new file-seek and helper methods

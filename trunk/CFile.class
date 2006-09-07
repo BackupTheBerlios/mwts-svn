@@ -52,6 +52,18 @@ PUBLIC SUB save()
   
 END
 
+PUBLIC FUNCTION getFromFile(start AS Integer, size AS Integer) AS String
+  
+  DIM f AS File
+  DIM s AS String
+  
+  f = OPEN $path FOR INPUT 
+  SEEK #f, start
+  READ #f, s, size
+  CLOSE #f
+  RETURN s
+  
+END
 
 
 ' returns the first MPEG-header in file

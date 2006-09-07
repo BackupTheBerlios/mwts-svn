@@ -7,12 +7,16 @@ PROPERTY READ useExtHeader AS Boolean
 PROPERTY READ useExperimental AS Boolean
 PROPERTY READ useFooter AS Boolean
 
-PRIVATE $data AS String
+PROPERTY READ fStart AS Integer
 
-PUBLIC SUB _new(data AS String)
+PRIVATE $data AS String
+PRIVATE $fStart AS Integer
+
+PUBLIC SUB _new(data AS String, fStart AS Integer)
   
   IF Left(data, 3) <> "ID3" THEN RETURN 
   $data = data
+  $fStart = fStart
   
 END
 
@@ -36,4 +40,7 @@ PRIVATE FUNCTION useExperimental_Read() AS Boolean
 END
 PRIVATE FUNCTION useFooter_Read() AS Boolean
   RETURN BTst(Asc(Mid($data, 6, 1)), 4)
+END
+PRIVATE FUNCTION fStart_Read() AS Integer
+  RETURN $fStart
 END

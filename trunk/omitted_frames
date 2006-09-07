@@ -1,0 +1,10 @@
+Tag-specific data which will (probably) never be part of MWTS
+
+ID3v2:
+~~~~~
+ - MLLT: audio-parsing needed
+ - SYCT:   "      "      "
+ - SYLT:   "      "      "
+ - RVA2:   "      "      "
+ - EQU2:   "      "      "
+ - RVRB:   "      "      "

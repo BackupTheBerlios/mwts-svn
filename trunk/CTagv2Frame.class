@@ -4,10 +4,12 @@ STATIC PRIVATE $FTypes AS NEW Collection
 STATIC PROPERTY READ FTypes AS Collection
 PROPERTY READ header AS CTagv2FrameHeader
 PROPERTY READ description AS String
+PROPERTY READ parent AS CTagv2
 
 PRIVATE $header AS CTagv2FrameHeader
+PRIVATE $parent AS CTagv2
 
-PUBLIC SUB _new(OPTIONAL header AS CTagv2FrameHeader = NULL)
+PUBLIC SUB _new(parent AS Object, OPTIONAL header AS CTagv2FrameHeader = NULL)
   
   IF IsNull(header) THEN header = NEW CTagv2FrameHeader(NULL)
   $header = header

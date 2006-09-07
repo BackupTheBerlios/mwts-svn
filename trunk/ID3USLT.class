@@ -1,0 +1,34 @@
+
+INHERITS CTagv2FrameText
+
+PROPERTY language AS String
+PROPERTY contentDescription AS String
+
+PRIVATE $language AS String
+PRIVATE $cDesc AS String
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM result AS String = SUPER.header.render()
+  
+  result &= Chr(SUPER.encoding)
+  result &= $language
+  result &= $cDesc & CTagv2FrameText.encSplit[SUPER.encoding]
+  result &= SUPER.content
+  RETURN result
+  
+END
+
+
+PRIVATE FUNCTION language_Read() AS String
+  RETURN $language
+END
+PRIVATE SUB language_Write(Value AS String)
+  IF Len(Value) = 3 THEN $language = Value
+END
+PRIVATE FUNCTION contentDescription_Read() AS String
+  RETURN $cDesc
+END
+PRIVATE SUB contentDescription_Write(Value AS String)
+  $cDesc = Value
+END

@@ -1,0 +1,125 @@
+
+INHERITS CTagv2Frame
+
+CONST Other AS Byte = &H00
+CONST Icon32x32PNG AS Byte = &H01
+CONST IconOther AS Byte = &H02
+CONST CoverFront AS Byte = &H03
+CONST CoverBack AS Byte = &H04
+CONST Leaflet AS Byte = &H05
+CONST Media AS Byte = &H06
+CONST LeadArtist AS Byte = &H07
+CONST Artist AS Byte = &H08
+CONST Conductor AS Byte = &H09
+CONST BandOrOrchestra AS Byte = &H0A
+CONST Composer AS Byte = &H0B
+CONST TextWriter AS Byte = &H0C
+CONST RecordingLocation AS Byte = &H0D
+CONST DuringRecording AS Byte = &H0E
+CONST DuringPerformance AS Byte = &H0F
+CONST VideoScreenCapture AS Byte = &H10
+CONST ABrightColouredFish AS Byte = &H11
+CONST Illustration AS Byte = &H12
+CONST ArtistLogo AS Byte = &H13
+CONST StudioLogo AS Byte = &H14
+
+PROPERTY path AS String
+PROPERTY encoding AS Byte
+PROPERTY PictureType AS Byte
+PROPERTY READ MIMEType AS String
+PROPERTY description AS String
+PROPERTY READ AttachedPicture AS Picture
+
+PRIVATE $path AS String
+PRIVATE $encoding AS Byte
+PRIVATE $mime AS String
+PRIVATE $picType AS Byte
+PRIVATE $desc AS String
+PRIVATE $frameSeek AS Integer
+
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL, OPTIONAL path AS String = NULL)
+  
+  DIM x AS Integer = Len(rawData)
+  
+  IF IsNull(rawData) THEN
+    IF Exist(path) THEN $path = path
+  ELSE 
+    $encoding = Asc(rawData)
+    rawData = Mid(rawData, 2)
+    
+    WHILE Asc(rawData) > 0
+      $mime = Left(rawData)
+      rawData &= Mid(rawData, 2)
+    WEND 
+    rawData = Mid(rawData, 2)
+    
+    $picType = Asc(rawData)
+    rawData = Mid(rawData, 2)
+    
+    WHILE Asc(rawData) > 0
+      $desc &= Left(rawData)
+      rawData = Mid(rawData, 2)
+    WEND 
+    rawData = Mid(rawData, 2)
+    
+    $frameSeek = x - Len(rawData)
+  END IF
+  
+END
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM result AS String = SUPER.header.render()
+  
+  result &= Chr($encoding)
+  result &= ME.MIMEType & CTagv2FrameText.encSplit[$encoding]
+  result &= Chr($picType)
+  result &= $desc & CTagv2FrameText.encSplit[$encoding]
+  result &= pic2string()
+  RETURN result
+  
+END
+
+PRIVATE FUNCTION pic2string() AS String
+  
+  IF Len($path) > 0 THEN RETURN File.Load($path)
+  RETURN SUPER.parent.parent.parent.getFromFile(SUPER.parent.header.fStart + SUPER.header.tStart + $frameSeek, SUPER.header.size - $frameSeek)
+  
+END
+
+
+PRIVATE FUNCTION path_Read() AS String
+  RETURN $path
+END
+PRIVATE SUB path_Write(Value AS String)
+  IF Exist(Value) THEN $path = Value
+END
+PRIVATE FUNCTION encoding_Read() AS Byte
+  RETURN $encoding
+END
+PRIVATE SUB encoding_Write(Value AS Byte)
+  $encoding = Value
+END
+PRIVATE FUNCTION PictureType_Read() AS Byte
+  RETURN $picType
+END
+PRIVATE SUB PictureType_Write(Value AS Byte)
+  IF Value >= &H00 AND Value <= &H14 THEN $picType = Value
+END
+PRIVATE FUNCTION MIMEType_Read() AS String
+  
+END
+PRIVATE FUNCTION description_Read() AS String
+  RETURN $desc
+END
+PRIVATE SUB description_Write(Value AS String)
+  $desc = Value
+END
+PRIVATE FUNCTION AttachedPicture_Read() AS Picture
+  DIM tmp AS String
+  IF Len($path) > 0 THEN RETURN Picture.Load($path)
+  tmp = Temp()
+  ' TODO: better return of this shidd without saving in FS (temp-file in memory? create picture somehow else?)
+  File.Save(tmp, pic2string())
+  RETURN Picture.Load(tmp)
+END

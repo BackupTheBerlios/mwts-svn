@@ -1,0 +1,110 @@
+
+INHERITS CTagv2Frame
+
+CONST TimeMPEGFrames AS Byte = &H01
+CONST TimeMilliSeconds AS Byte = &H02
+
+CONST EventPadding AS Byte = &H00
+CONST EventEndOfInitialSilence AS Byte = &H01
+CONST EventIntroStart AS Byte = &H02
+CONST EventMainPartStart AS Byte = &H03
+CONST EventOutroStart AS Byte = &H04
+CONST EventOutroEnd AS Byte = &H05
+CONST EventVerseStart AS Byte = &H06
+CONST EventRefrainStart AS Byte = &H07
+CONST EventInterludeStart AS Byte = &H08
+CONST EventThemeStart AS Byte = &H09
+CONST EventVariationStart AS Byte = &H0A
+CONST EventKeyChange AS Byte = &H0B
+CONST EventTimeChange AS Byte = &H0C
+CONST EventMomentaryUnwantedNoise AS Byte = &H0D
+CONST EventSustainedNoise AS Byte = &H0E
+CONST EventSustainedNoiseEnd AS Byte = &H0F
+CONST EventIntroEnd AS Byte = &H10
+CONST EventMainPartEnd AS Byte = &H11
+CONST EventVerseEnd AS Byte = &H12
+CONST EventRefrainEnd AS Byte = &H13
+CONST EventThemeEnd AS Byte = &H14
+CONST EventProfanity AS Byte = &H15
+CONST EventProfanityEnd AS Byte = &H16
+CONST EventAudioEnd AS Byte = &HFD
+CONST EventAudioFileEnds AS Byte = &HFE
+
+PROPERTY TimeStampFormat AS Byte
+PROPERTY READ EventTimeStamps AS Long[]
+
+PRIVATE $tsFormat AS Byte
+PRIVATE $ev AS Collection
+
+PUBLIC SUB _new()
+  $ev = NEW Collection
+END
+
+PUBLIC FUNCTION _get(TimeStamp AS Long) AS Byte[]
+  IF $ev.Exist(TimeStamp) THEN RETURN $ev[TimeStamp]
+  RETURN NULL
+END
+
+PUBLIC SUB _put(Value AS Byte[], TimeStamp AS Long)
+  IF $ev.Exist(TimeStamp) THEN $ev.Remove(TimeStamp)
+  $ev.Add(Value, TimeStamp)
+END
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM x AS Integer
+  DIM tmp AS Long[]
+  DIM result AS String
+  
+  tmp = ME.EventTimeStamps.Sort()
+  
+  result = SUPER.header.render() & Chr($tsFormat)
+  FOR x = 0 TO tmp.Max
+    result &= renderOne(x)
+  NEXT 
+  RETURN result
+  
+END
+
+PRIVATE FUNCTION renderOne(ts AS Long) AS String
+  
+  DIM result AS String
+  DIM b AS Byte
+  
+  FOR EACH b IN $ev[ts]
+    result &= Chr(b) & renderTS(ts) & Chr(&HFF)
+  NEXT 
+  RETURN result
+  
+END
+
+PRIVATE FUNCTION renderTS(ts AS Long) AS String
+  
+  DIM result AS String = ""
+  
+  result &= Chr(Ror(ts AND &HFF000000, 24))
+  result &= Chr(Ror(ts AND &H00FF0000, 16))
+  result &= Chr(Ror(ts AND &H0000FF00, 8))
+  result &= Chr(ts AND &H000000FF)
+  RETURN result
+  
+END
+
+PUBLIC SUB Clear()
+  $ev.Clear
+END
+
+PRIVATE FUNCTION TimeStampFormat_Read() AS Byte
+  RETURN $tsFormat
+END
+PRIVATE SUB TimeStampFormat_Write(Value AS Byte)
+  $tsFormat = Value
+END
+PRIVATE FUNCTION EventTimeStamps_Read() AS Long[]
+  DIM result AS NEW Long[]
+  DIM x AS Byte[]
+  FOR EACH x IN $ev
+    result.Add(CInt($ev.Key))
+  NEXT 
+  RETURN result
+END

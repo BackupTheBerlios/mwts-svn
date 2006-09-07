@@ -1,0 +1,17 @@
+
+INHERITS CTagv2Frame
+
+PROPERTY CDTOC AS String
+
+PRIVATE $cdtoc AS String
+
+PUBLIC FUNCTION render() AS String
+  RETURN SUPER.header.render() & $cdtoc
+END
+
+PRIVATE FUNCTION CDTOC_Read() AS String
+  RETURN $cdtoc
+END
+PRIVATE SUB CDTOC_Write(Value AS String)
+  IF Len(Value) <= 804 THEN $cdtoc = Value
+END
