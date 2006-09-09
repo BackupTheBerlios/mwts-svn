@@ -1,13 +1,13 @@
 
-PROPERTY READ AFile AS CFile
-PROPERTY READ Children AS Integer
-PROPERTY READ Count AS Integer
-PROPERTY Editable AS Boolean
-PROPERTY Expanded AS Boolean
-PROPERTY READ Key AS String
-PROPERTY Picture AS Picture
-PROPERTY Selected AS Boolean
-PROPERTY Text AS String
+PROPERTY READ AFile AS CFile ' returns the associated CFile-object to this CFView-item
+PROPERTY READ Children AS Integer ' returns the number of child-items
+PROPERTY READ Count AS Integer ' returns the number of child-items
+PROPERTY Editable AS Boolean ' returns/sets whether the text of this item can be changed by the user
+PROPERTY Expanded AS Boolean ' returns/sets whether child-items shall are shown or not
+PROPERTY READ Key AS String ' returns the key of the ColumnView, this CFView-item belongs to, should be a valid file-path
+PROPERTY Picture AS Picture ' returns/sets the picture shown in front of the first text-string of this item
+PROPERTY Selected AS Boolean ' returns/sets whether this item is selected or not
+PROPERTY Text AS String ' returns/sets the text-string of column 0 of this item
 
 PRIVATE $key AS String
 PRIVATE $parent AS ColumnView

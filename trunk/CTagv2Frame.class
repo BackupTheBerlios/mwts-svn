@@ -1,10 +1,10 @@
 
 STATIC PRIVATE $FTypes AS NEW Collection
 
-STATIC PROPERTY READ FTypes AS Collection
-PROPERTY READ header AS CTagv2FrameHeader
-PROPERTY READ description AS String
-PROPERTY READ parent AS CTagv2
+STATIC PROPERTY READ FTypes AS Collection ' contains a collection of every possible frame-type
+PROPERTY READ header AS CTagv2FrameHeader ' returns the frame-header
+PROPERTY READ description AS String ' returns the english description of the purpose of this frame, see FTypes
+PROPERTY READ parent AS CTagv2 ' needed for dynamic reload of content by frames dealing with binary data
 
 PRIVATE $header AS CTagv2FrameHeader
 PRIVATE $parent AS CTagv2
@@ -15,6 +15,11 @@ PUBLIC SUB _new(parent AS Object, OPTIONAL header AS CTagv2FrameHeader = NULL)
   $header = header
   
 END
+
+PUBLIC SUB _free()
+  $parent = NULL
+END
+
 
 STATIC PUBLIC FUNCTION getFrame(header AS CTagv2FrameHeader, OPTIONAL rawData AS String = NULL) AS Object  
 
@@ -42,6 +47,13 @@ END
 PRIVATE FUNCTION description_Read() AS String
   IF $FTypes.Exist($header.id) THEN RETURN $FTypes[$header.id]
   RETURN NULL
+END
+PRIVATE FUNCTION parent_Read() AS CTagv2
+  RETURN $parent
+END
+
+STATIC PUBLIC SUB _exit()
+  $FTypes = NULL  
 END
 
 STATIC PUBLIC SUB _init()
@@ -76,3 +88,5 @@ STATIC PUBLIC SUB _init()
   $FTypes.Add("Unsynchronised lyric/text transcription", "USLT")
   
 END
+
+

@@ -8,6 +8,8 @@
        |         |           \--> CTagv2Frame      ---> CTagv2FrameHeader
        |                         {CTagv2FrameText}
        |         |               {CTagv2FrameURL}
+       |                         {ID3*}
+       |         |
        |          
        |         \ -> OGG und FLAC
        |

@@ -8,3 +8,13 @@ ID3v2:
  - RVA2:   "      "      "
  - EQU2:   "      "      "
  - RVRB:   "      "      "
+ - RBUF: multiple tags per file required (perhaps later, not needed now)
+ - LINK: not needed now
+ - POSS
+ - OWNE
+ - COMR
+ - ENCR
+ - GRID
+ - SIGN
+ - SEEK
+ - ASPI

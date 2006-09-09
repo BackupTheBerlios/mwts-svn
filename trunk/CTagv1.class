@@ -30,20 +30,6 @@ PRIVATE $comment AS String
 PRIVATE $changed AS Boolean
 PRIVATE $status AS Boolean
 
-' needed for MHelp.merge()
-PUBLIC FUNCTION getNone(which AS String) AS Variant
-  
-  SELECT CASE which
-    CASE "genre"
-      RETURN genreNone
-    CASE "track"
-      RETURN trackNone
-    CASE ELSE  
-      RETURN ""
-  END SELECT 
-  
-END
-
 ' if path is specified, the ID3-Tag of this file will be parsed (ISO-8859-1 is the standard charset vor v1)
 PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   
@@ -84,6 +70,20 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   CLOSE #f
   
   $status = TRUE
+  
+END
+
+' needed for MHelp.merge()
+PUBLIC FUNCTION getNone(which AS String) AS Variant
+  
+  SELECT CASE which
+    CASE "genre"
+      RETURN genreNone
+    CASE "track"
+      RETURN trackNone
+    CASE ELSE  
+      RETURN ""
+  END SELECT 
   
 END
 
@@ -192,6 +192,10 @@ PRIVATE FUNCTION changed_Read() AS Boolean
 END
 PRIVATE FUNCTION statusOK_Read() AS Boolean
   RETURN $status
+END
+
+STATIC PUBLIC SUB _exit()
+  genreDef = NULL  
 END
 
 

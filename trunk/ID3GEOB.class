@@ -11,6 +11,7 @@ PRIVATE $encoding AS Byte = &H03
 PRIVATE $mime AS String
 PRIVATE $path AS String
 PRIVATE $desc AS String
+PRIVATE $frameSeek AS Integer
 
 PUBLIC SUB _new(OPTIONAL rawData AS String = NULL, OPTIONAL path AS String = NULL)
   

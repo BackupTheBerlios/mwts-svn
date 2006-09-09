@@ -1,7 +1,6 @@
 
 INHERITS CTagv2Frame
 
-
 STATIC PUBLIC SUB _init()
   
   CTagv2Frame.FTypes.Add("Commercial information", "WCOM")

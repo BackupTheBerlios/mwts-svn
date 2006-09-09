@@ -69,6 +69,15 @@ PUBLIC SUB _new()
   
 END
 
+PUBLIC SUB _free()
+  Flist = NULL
+  $tim = NULL
+  $cols.Clear
+  $cols = NULL
+  $fall.Clear
+  $fall = NULL
+END
+
 PUBLIC FUNCTION _get(Key AS String) AS CFViewItem
   DIM result AS CFViewItem
   IF IsNull(Flist[Key]) THEN RETURN NULL

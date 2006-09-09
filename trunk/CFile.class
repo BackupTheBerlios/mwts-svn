@@ -11,6 +11,25 @@ PRIVATE $changed AS Boolean
 PRIVATE $newpath AS String
 PRIVATE $header AS CMPEGHeader
 
+' reading all "knowable" information: tags and headers
+PUBLIC SUB _new(OPTIONAL filepath AS String = "")
+  
+  DIM t AS CMPEGHeader
+  
+  IF NOT Exist(filepath) THEN RETURN 
+  $tag = NEW CTag(ME, filepath)
+  $path = filepath
+  $newpath = filepath
+  $header = getFileHeader(filepath)
+  
+END
+
+PUBLIC SUB _free()
+  $tag = NULL
+  $header = NULL
+END
+
+
 ' this function is needed in every class which shall be mergable
 ' it is used by MHelp.merge() to determine the "None"-value for each item, because this might differ
 PUBLIC FUNCTION getNone(which AS String) AS Variant
@@ -27,19 +46,6 @@ PUBLIC FUNCTION getNone(which AS String) AS Variant
     CASE "newpath"
       RETURN ""
   END SELECT 
-  
-END
-
-' reading all "knowable" information: tags and headers
-PUBLIC SUB _new(OPTIONAL filepath AS String = "")
-  
-  DIM t AS CMPEGHeader
-  
-  IF NOT Exist(filepath) THEN RETURN 
-  $tag = NEW CTag(filepath)
-  $path = filepath
-  $newpath = filepath
-  $header = getFileHeader(filepath)
   
 END
 

@@ -1,13 +1,13 @@
 
-PROPERTY READ size AS Integer
-PROPERTY READ tagSize AS Integer
-PROPERTY READ version AS Float
-PROPERTY READ useUnsync AS Boolean
-PROPERTY READ useExtHeader AS Boolean
+PROPERTY READ size AS Integer ' returns the size of the tag-header (always 10 bytes per definition)
+PROPERTY READ tagSize AS Integer ' returns the size of the complete tag (after compression/encryption/unsynchronisation/etc.)
+PROPERTY READ version AS Float ' returns the version of the tag
+PROPERTY READ useUnsync AS Boolean ' returns whether the tag explicitely uses unsynchronisation
+PROPERTY READ useExtHeader AS Boolean ' returns whether an extended header is used to further describe the tag
 PROPERTY READ useExperimental AS Boolean
-PROPERTY READ useFooter AS Boolean
+PROPERTY READ useFooter AS Boolean ' returns whether a footer is used
 
-PROPERTY READ fStart AS Integer
+PROPERTY READ fStart AS Integer ' returns the location of the beginning of the tag-header in the file
 
 PRIVATE $data AS String
 PRIVATE $fStart AS Integer

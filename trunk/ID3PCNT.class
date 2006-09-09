@@ -1,0 +1,39 @@
+
+INHERITS CTagv2Frame
+
+PROPERTY READ counter AS Long
+
+PRIVATE $counter AS Long
+
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  
+  DIM x AS Integer
+  
+  FOR x = 1 TO Len(rawData)
+    $counter += Asc(rawData, x) * 256 ^ (x - 1)
+  NEXT 
+  
+END
+
+PUBLIC SUB Clear()
+  $counter = 0
+END
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM result AS String
+  DIM tmp AS Long = $counter
+  
+  DO
+    result = Chr(tmp AND &HFF) & result
+    tmp = Shr(tmp, 8)
+  LOOP WHILE tmp > 0
+  result = String(4 - Len(result), Chr(0)) & result
+  RETURN SUPER.header.render() & result
+  
+END
+
+
+PRIVATE FUNCTION counter_Read() AS Long
+  RETURN $counter
+END

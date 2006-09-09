@@ -107,7 +107,7 @@ PRIVATE SUB PictureType_Write(Value AS Byte)
   IF Value >= &H00 AND Value <= &H14 THEN $picType = Value
 END
 PRIVATE FUNCTION MIMEType_Read() AS String
-  
+  RETURN $mime
 END
 PRIVATE FUNCTION description_Read() AS String
   RETURN $desc

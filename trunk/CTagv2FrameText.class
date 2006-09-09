@@ -4,20 +4,18 @@ INHERITS CTagv2Frame
 STATIC PRIVATE ENC AS String[] = ["ISO-8859-1", "UTF-16", "UTF-16", "UTF-8"]
 STATIC PRIVATE ENC_Split AS NEW String[]
 
-PUBLIC CONST encISO AS Integer = &H00
-PUBLIC CONST encUTF16BOM AS Integer = &H01
-PUBLIC CONST encUTF16 AS Integer = &H02
-PUBLIC CONST encUTF8 AS Integer = &H03
+PUBLIC CONST encISO AS Integer = &H00 ' text-encoding ISO-8859-1 is used
+PUBLIC CONST encUTF16BOM AS Integer = &H01 ' text-encoding UTF-16-BOM is used
+PUBLIC CONST encUTF16 AS Integer = &H02 ' text-encoding UTF-16 is used
+PUBLIC CONST encUTF8 AS Integer = &H03 ' text-encoding UTF-8 is used
 
-STATIC PROPERTY READ encString AS String[]
-STATIC PROPERTY READ encSplit AS String[]
+STATIC PROPERTY READ encString AS String[] ' returns the identifier of the text-encoding
+STATIC PROPERTY READ encSplit AS String[] ' returns the character needed for string-separation
 
-PROPERTY encoding AS Integer
+PROPERTY encoding AS Integer ' returns the text-encoding used in the frame
 
-'STATIC PUBLIC FTypes AS Collection
-
-PROPERTY READ id AS String
-PROPERTY content AS String[]
+PROPERTY READ id AS String ' returns the frame-ID
+PROPERTY content AS String[] ' returns the content of the text-frame, description first
 
 PRIVATE $content AS String[]
 PRIVATE $encoding AS Integer
@@ -39,6 +37,14 @@ PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
   
 END 
 
+PUBLIC SUB _free()
+  $content = NULL
+END
+
+STATIC PUBLIC SUB _exit()
+  ENC = NULL
+  ENC_Split = NULL
+END
 
 STATIC PRIVATE FUNCTION encString_Read() AS String[]
   RETURN ENC

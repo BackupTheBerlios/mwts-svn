@@ -1,0 +1,36 @@
+
+INHERITS CTagv2Frame
+
+PROPERTY READ OwnerIdentifier AS String
+PROPERTY READ PrivateData AS String
+
+PRIVATE $owner AS String
+PRIVATE $data AS String
+
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  
+  IF IsNull(rawData) THEN 
+    reset
+  ELSE 
+    $owner = Left(rawData, InStr(rawData, Chr(0)) - 1)
+    $data = Mid(rawData, InStr(rawData, Chr(0)) - 1)
+  END IF
+  
+END
+
+PUBLIC SUB reset()
+  $owner = "http://developer.berlios.de/projects/mwts/"
+  $data = "MWTS - Music without Tags is Shit v" & Application.Version
+END
+
+PUBLIC FUNCTION render() AS String
+  RETURN $owner & Chr(0) & $data
+END
+
+
+PRIVATE FUNCTION OwnerIdentifier_Read() AS String
+  RETURN $owner
+END
+PRIVATE FUNCTION PrivateData_Read() AS String
+  RETURN $data
+END

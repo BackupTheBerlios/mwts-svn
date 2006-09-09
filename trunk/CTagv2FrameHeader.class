@@ -1,16 +1,16 @@
 
-PROPERTY READ id AS String
-PROPERTY READ size AS Integer
-PROPERTY READ tStart AS Integer
+PROPERTY READ id AS String ' returns the frame-id such as TXXX, see CTagv2Frame.FTypes
+PROPERTY READ size AS Integer ' returns the size of the header (always 10 bytes)
+PROPERTY READ tStart AS Integer ' returns the location of the beginning of the frame-header in the tag
 
-PROPERTY READ frameSize AS Integer
+PROPERTY READ frameSize AS Integer ' returns the size of the frame exclusive it's header
 PROPERTY READ tagAlterPreservation AS Boolean
 PROPERTY READ fileAlterPreservation AS Boolean
-PROPERTY READ readOnly AS Boolean
-PROPERTY READ frameGroup AS Boolean
+PROPERTY READ readOnly AS Boolean ' the frame is read-only
+PROPERTY READ frameGroup AS Boolean ' the frame is member of a frame-group, see GRID-frame
 PROPERTY READ compressed AS Boolean
 PROPERTY READ encrypted AS Boolean
-PROPERTY READ unsynchronised AS Boolean
+PROPERTY READ unsynchronised AS Boolean ' the frame uses unsynchronisation
 PROPERTY READ existsDataLengthIndicator AS Boolean
 
 PRIVATE $data AS String

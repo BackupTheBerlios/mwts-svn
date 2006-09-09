@@ -15,7 +15,7 @@ PROPERTY comment AS String ' returns the comment-field, subjected to aktTag
 ' if set to 0, both tags are edited simultaneously and returned merged on reading
 PROPERTY aktTag AS Integer 
 PROPERTY READ changed AS Boolean ' returns whether any of the tags has been modified
-PROPERTY READ parent AS CFile
+PROPERTY READ parent AS CFile ' needed for communication between tags and the file for dynamic reload of content
 
 PUBLIC CONST trackNone AS Integer = 0 ' value to set for the track-field if information is unknown
 
@@ -42,9 +42,15 @@ PUBLIC SUB _new(parent AS CFile, OPTIONAL path AS String = NULL)
   $v1 = NEW CTagv1(path)
   IF NOT $v1.statusOK THEN $v1 = NULL
   
-  $v2 = NEW CTagv2(path)
-  IF NOT $v2.statusOK THEN $v2 = NULL
+  $v2 = NEW CTagv2(ME, path)
+  'IF NOT $v2.statusOK THEN $v2 = NULL
   
+END
+
+PUBLIC SUB _free()
+  $v1 = NULL
+  $v2 = NULL
+  $parent = NULL
 END
 
 ' needed for MHelp.merge()
@@ -159,4 +165,7 @@ PRIVATE SUB aktTag_Write(Value AS Integer)
 END
 PRIVATE FUNCTION changed_Read() AS Boolean
   RETURN $changed OR ($akt = 0 AND ($v1.changed OR $v2.changed)) OR ($akt = 1 AND $v1.changed) OR ($akt = 2 AND $v2.changed)
+END
+PRIVATE FUNCTION parent_Read() AS CFile
+  RETURN $parent
 END

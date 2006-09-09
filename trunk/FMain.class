@@ -1,4 +1,3 @@
-' Gambas class file
 
 PRIVATE $aktTag AS Integer = 1 ' tag-version to use
 PRIVATE $recursive AS Boolean = FALSE ' list files recursively
@@ -13,6 +12,11 @@ PROPERTY READ changed AS Boolean ' if something was changed on the displayed fil
 PRIVATE halt AS Boolean = FALSE ' during scanning the directories this will stop the read-in process
 
 STATIC PUBLIC Flist AS CFView
+
+STATIC PUBLIC SUB _exit()
+  FMain.Flist = NULL
+  FMain.cols = NULL
+END
 
 PUBLIC SUB _new()
   

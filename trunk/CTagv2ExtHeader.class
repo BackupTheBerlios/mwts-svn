@@ -1,28 +1,28 @@
 
-CONST max128F1MB AS Integer = 0
-CONST max64F128KB AS Integer = 64
-CONST max32F40KB AS Integer = 128
-CONST max32F4KB AS Integer = 192
+CONST max128F1MB AS Integer = 0 ' maximal 128 frames with a maximum size of 1MB of the tag in total
+CONST max64F128KB AS Integer = 64 ' maximal 64 frames with a maximum size of 128KB of the tag in total
+CONST max32F40KB AS Integer = 128 ' maximal 32 frames with a maximum size of 40KB of the tag in total
+CONST max32F4KB AS Integer = 192 ' maximal 32 frames with a maximum size of 4KB of the tag in total
 
 CONST noRestriction AS Integer = 0
-CONST shorter1024C AS Integer = 8
-CONST shorter128C AS Integer = 16
-CONST shorter30C AS Integer = 24
+CONST shorter1024C AS Integer = 8 ' text-fields are shorter than 1024 characters
+CONST shorter128C AS Integer = 16 ' text-fields are shorter than 128 characters
+CONST shorter30C AS Integer = 24 ' text-fields are shorter than 30 characters
 
-CONST lessOrEqual256px AS Integer = 1
-CONST lessOrEqual64px AS Integer = 2
-CONST exactly64px AS Integer = 3
+CONST lessOrEqual256px AS Integer = 1 ' image-dimensions are less or equal to 256x256 px
+CONST lessOrEqual64px AS Integer = 2 ' image-dimensions are less or equal to 64x64 px
+CONST exactly64px AS Integer = 3 ' image-dimensions are exactly 64x64 px
 
-PROPERTY READ size AS Integer
-PROPERTY READ tagIsUpdate AS Boolean
-PROPERTY READ hasCRC AS Boolean
-PROPERTY READ CRC AS Integer
-PROPERTY READ isRestricted AS Boolean
-PROPERTY READ resTSize AS Integer
-PROPERTY READ resTextEnc AS Boolean
-PROPERTY READ resTFSize AS Integer
+PROPERTY READ size AS Integer ' returns the size of the extended header
+PROPERTY READ tagIsUpdate AS Boolean ' returns whether this tag only is an update for an already existing tag
+PROPERTY READ hasCRC AS Boolean ' returns whether the extended header includes a CRC-checksum for the tag
+PROPERTY READ CRC AS Integer ' returns a possibly included CRC-checksum of the body of the tag
+PROPERTY READ isRestricted AS Boolean ' returns whether any of the possible restrictions apply
+PROPERTY READ resTSize AS Integer ' returns what restriction applies to the size of the tag
+PROPERTY READ resTextEnc AS Boolean ' returns if text-encoding is restricted to either ISO/UTF-8 or not at all
+PROPERTY READ resTFSize AS Integer ' returns what restriction applies to the size of text-fields
 PROPERTY READ resImgEnc AS Boolean
-PROPERTY READ resImgSize AS Integer
+PROPERTY READ resImgSize AS Integer ' returns what restriction applies to the size of images used in the tag
 
 PRIVATE $data AS String
 PRIVATE $flags AS NEW Byte[]

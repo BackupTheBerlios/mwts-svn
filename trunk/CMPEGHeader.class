@@ -1,8 +1,8 @@
 
-PUBLIC CONST chanStereo AS Integer = 0
-PUBLIC CONST chanJStereo AS Integer = 1
-PUBLIC CONST chanDual AS Integer = 2
-PUBLIC CONST chanMono AS Integer = 3
+PUBLIC CONST chanStereo AS Integer = 0 ' stereo
+PUBLIC CONST chanJStereo AS Integer = 1 ' joined-stereo
+PUBLIC CONST chanDual AS Integer = 2 ' dual channel
+PUBLIC CONST chanMono AS Integer = 3 ' mono channel
 
 PROPERTY READ bitrate AS Integer ' returns bitrate of this frame-header in KBit/s
 PROPERTY READ vbr AS Boolean ' returns whether this frame uses VBR

@@ -9,13 +9,13 @@ PROPERTY genre AS String[]
 PROPERTY title AS String[]
 PROPERTY comment AS String
 
-PROPERTY READ isEmpty AS Boolean
-PROPERTY version AS Float
-PROPERTY READ changed AS Boolean
-PROPERTY READ header AS CTagv2Header
-PROPERTY READ extHeader AS CTagv2ExtHeader
-PROPERTY READ statusOK AS Boolean
-PROPERTY READ parent AS CTag
+PROPERTY READ isEmpty AS Boolean ' returns whether a new and empty tag was created or has already been changed
+PROPERTY version AS Float ' the version of this ID3-Tag; currently only 2.4 is handled
+PROPERTY READ changed AS Boolean ' returns whether the tag has been changed since creation
+PROPERTY READ header AS CTagv2Header ' the header of this tag
+PROPERTY READ extHeader AS CTagv2ExtHeader ' the extended header of this tag; might be NULL
+PROPERTY READ statusOK AS Boolean ' returns whether the tag has been parsed completely without any errors
+PROPERTY READ parent AS CTag ' needed for dynamic reload of content by some frames containing binary data
 
 PRIVATE $changed AS Boolean
 PRIVATE $status AS Boolean
@@ -54,6 +54,13 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   $frames = getFrames($body)
   $status = TRUE
   
+END
+
+PUBLIC SUB _free()
+  $parent = NULL
+  $header = NULL
+  $extHeader = NULL
+  $frames = NULL
 END
 
 PUBLIC FUNCTION _get(id AS String) AS Object
@@ -207,4 +214,7 @@ PRIVATE FUNCTION extHeader_Read() AS CTagv2ExtHeader
 END
 PRIVATE FUNCTION statusOK_Read() AS Boolean
   RETURN $status
+END
+PRIVATE FUNCTION parent_Read() AS CTag
+  RETURN $parent
 END

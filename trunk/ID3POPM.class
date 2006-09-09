@@ -1,0 +1,63 @@
+
+INHERITS CTagv2Frame
+
+PROPERTY READ email AS String
+PROPERTY rating AS Byte
+PROPERTY READ counter AS Long
+
+PRIVATE $mail AS String
+PRIVATE $rating AS Byte
+PRIVATE $counter AS Long
+
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  
+  DIM x AS Integer
+  
+  IF Len(rawData) > 0 THEN
+    x = InStr(rawData, Chr(0))
+    $mail = Left(rawData, x - 1)
+    $rating = Asc(rawData, x + 1)
+    rawData = Mid(rawData, x + 2)
+    FOR x = 1 TO Len(rawData)
+      $counter += Asc(rawData, x) * 256 ^ (x - 1)
+    NEXT 
+  END IF
+  
+END
+
+PUBLIC SUB resetCounter()
+  $counter = 0
+END
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM tmp AS Long = $counter
+  DIM t AS String
+  DIM result AS String = SUPER.header.render()
+  
+  result &= $mail & Chr(0)
+  result &= Chr($rating)
+  IF tmp > 0 THEN 
+    DO
+      t = Chr(tmp AND &HFF) & t
+      tmp = Shr(tmp, 8)
+    LOOP WHILE tmp > 0
+    t = String(4 - Len(t), Chr(0)) & t
+  END IF
+  RETURN result & t
+  
+END
+
+
+PRIVATE FUNCTION email_Read() AS String
+  RETURN $mail
+END
+PRIVATE FUNCTION rating_Read() AS Byte
+  RETURN $rating
+END
+PRIVATE SUB rating_Write(Value AS Byte)
+  $rating = Value
+END
+PRIVATE FUNCTION counter_Read() AS Long
+  RETURN $counter
+END

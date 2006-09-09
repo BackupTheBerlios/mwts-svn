@@ -17,6 +17,11 @@ PUBLIC SUB _init()
   
 END
 
+PUBLIC SUB _exit()
+  desc = NULL
+END
+
+
 PUBLIC FUNCTION pat2str(pattern AS Boolean[], OPTIONAL littleEndian AS Boolean = FALSE) AS String
   
   DIM result AS String

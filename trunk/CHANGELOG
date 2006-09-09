@@ -1,3 +1,9 @@
+* Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
+  - added many comments to code
+  - fixed some possible memory leaks
+  - added 3 frame-types (PRIV, PCNT and POPM)
+  - fixed some properties not returning anything
+
 * Thu Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
   - added back-references to ID3v2-classes and file-seek-points for dynamic load of large contents
   - some code-cleanup
