@@ -56,12 +56,14 @@ PUBLIC FUNCTION str2pat(value AS String, OPTIONAL littleEndian AS Boolean = FALS
   DIM result AS NEW Boolean[]
   DIM x AS Integer
   DIM y AS Integer
-  DIM u AS Integer = Choose(littleEndian, 0, 7)
-  DIM v AS Integer = Choose(littleEndian, 7, 0)
+  DIM u AS Integer = If(littleEndian, 0, 7)
+  DIM v AS Integer = If(littleEndian, 7, 0)
+  DIM z AS Byte
   
   FOR x = 1 TO Len(value)
-    FOR y = u TO v
-      result.Add(BTst(Asc(value, x), y))
+    FOR y = u TO v STEP If(littleEndian, 1, -1)
+      z = Asc(value, x)
+      result.Add(BTst(z, y))
     NEXT 
   NEXT 
   
@@ -69,8 +71,7 @@ PUBLIC FUNCTION str2pat(value AS String, OPTIONAL littleEndian AS Boolean = FALS
   
 END
 
-PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[], bytes2return AS Integer) AS String
-  
+PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[]) AS Integer  
   DIM f AS File
   DIM b AS String
   DIM x AS Integer
@@ -78,10 +79,10 @@ PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[], bytes2return AS Inte
   DIM z AS Integer
   DIM result AS String
   
-  IF NOT Exist(path) THEN RETURN NULL
-  IF Stat(path).Size = 0 THEN RETURN NULL
-  IF pattern.Count = 0 THEN RETURN NULL
-  IF bytes2return = 0 THEN RETURN NULL
+  IF NOT Exist(path) THEN STOP
+  IF Stat(path).Size = 0 THEN STOP
+  IF pattern.Count = 0 THEN STOP
+  'IF bytes2return = 0 THEN RETURN NULL
   
   f = OPEN path FOR INPUT 
   x = 0
@@ -93,12 +94,10 @@ PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[], bytes2return AS Inte
     'IF (z < 8 AND y >= 8) OR y = 0 THEN READ #f, b, 1
     READ #f, b, 1
     FOR z = 0 TO 7
-      IF NOT (BTst(Asc(b), z) XOR pattern[y]) THEN
+      IF NOT (BTst(Asc(b), 7 - z) XOR pattern[y]) THEN
         IF y = pattern.Max THEN 
-          SEEK #f, x - (pattern.Max \ 8 + 1)
-          READ #f, b, bytes2return
           CLOSE #f
-          RETURN b
+          RETURN x - (pattern.Max \ 8)
         END IF
         INC y
       ELSE 
@@ -112,7 +111,7 @@ PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[], bytes2return AS Inte
   LOOP UNTIL Eof(f)
   
   CLOSE #f
-  RETURN NULL
+  RETURN -1
   
 END
 

@@ -40,7 +40,7 @@ PUBLIC SUB _new(parent AS CFile, OPTIONAL path AS String = NULL)
   $parent = parent
   
   $v1 = NEW CTagv1(path)
-  IF NOT $v1.statusOK THEN $v1 = NULL
+  'IF NOT $v1.statusOK THEN $v1 = NULL
   
   $v2 = NEW CTagv2(ME, path)
   'IF NOT $v2.statusOK THEN $v2 = NULL

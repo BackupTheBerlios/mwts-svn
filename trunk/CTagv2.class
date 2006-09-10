@@ -31,28 +31,60 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   DIM s AS String
   DIM x AS Integer
   DIM y AS Integer
+  DIM f AS File
+  DIM bsize AS Integer
   
   DIM begin AS Integer
   DIM size AS Integer
   
-  RETURN 
+  'RETURN 
   
   $parent = parent
   
-  IF IsNull(path) OR NOT Exist(path) THEN RETURN 
+  IF IsNull(path) OR NOT Exist(path) THEN
+    $header = NEW CTagv2Header
+    $extHeader = NEW CTagv2ExtHeader
+    $frames = NEW Collection
+    $status = TRUE
+    RETURN 
+  END IF
   
-  s = File.Load(path)
-  begin = InStr(s, "ID3")
-  IF begin = 0 THEN RETURN 
+  f = OPEN path FOR INPUT 
+  begin = MHelp.fseek(path, MHelp.str2pat("ID3")) 
+  IF begin = -1 THEN RETURN 
   
-  $header = NEW CTagv2Header(Mid(s, begin, 10), begin)
+  SEEK #f, begin
+  READ #f, s, 10
+  $header = NEW CTagv2Header(s, begin)
   $version = $header.version
+  IF $header.useExtHeader THEN 
+    READ #f, s, 4
+    SEEK #f, begin + $header.size
+    READ #f, s, DeSynchsafe(s)
+    $extHeader = NEW CTagv2ExtHeader(s, begin + $header.size)
+    y = $extHeader.size
+  END IF
   
-  $extHeader = NEW CTagv2ExtHeader(Mid(s, begin + $header.size))
-  $body = Mid(s, begin + $header.size + $extHeader.size, $header.tagSize - $extHeader.size)
+  bsize = $header.tagSize - y - CInt(If($header.useFooter, 10, 0))
+  READ #f, $body, bsize
+  CLOSE #f
   
   $frames = getFrames($body)
   $status = TRUE
+  
+'   s = File.Load(path)
+'   begin = InStr(s, "ID3")
+'   IF begin = 0 THEN RETURN
+'   $header = NEW CTagv2Header(Mid(s, begin, 10), begin)
+'   $version = $header.version
+'   IF header.useExtHeader THEN 
+'     $extHeader = NEW CTagv2ExtHeader(Mid(s, begin + $header.size))
+'     y = $extHeader.size
+'   END IF
+'   $body = Mid(s, begin + $header.size + y, $header.tagSize - y)
+'   
+'   $frames = getFrames($body)
+'   $status = TRUE
   
 END
 
@@ -69,22 +101,58 @@ PUBLIC FUNCTION _get(id AS String) AS Object
   RETURN NULL
 END
 
-STATIC PUBLIC FUNCTION getFrames(data AS String) AS Collection
+PUBLIC FUNCTION getFrames(OPTIONAL body AS String = $body) AS Collection
   
   DIM result AS NEW Collection
   DIM h AS CTagv2FrameHeader
   DIM f AS CTagv2Frame
-  DIM s AS String
+  DIM fbody AS String
   DIM x AS Integer
   
   DO
-    IF Left(data) = Chr(0) THEN BREAK 
-    h = NEW CTagv2FrameHeader(Left(data, 10), x)
-    s = Mid(data, h.size + 1, h.frameSize)
+    IF Left(body) = Chr(0) THEN BREAK 
+    h = NEW CTagv2FrameHeader(Left(body, 10), x)
+    fbody = Mid(body, h.size + 1, h.frameSize)
     x += h.size
-    f = CTagv2Frame.getFrame(h, s)
+    
+    IF h.id = "TXXX" THEN ' user-defined text-frame
+      f = NEW CTagv2FrameText
+    ELSE IF h.id = "WXXX" THEN ' user-defined url-frame
+      f = NEW CTagv2FrameURL
+    ELSE 
+      IF Left(h.id) = "T" THEN ' text-frame
+        f = NEW CTagv2FrameText(fbody, ME, h)
+      ELSE IF Left(h.id) = "W" THEN ' url-frame
+        f = NEW CTagv2FrameURL(fbody, ME, h)
+      ELSE 
+        SELECT CASE h.id
+          CASE "APIC"
+            f = NEW ID3APIC(fbody, NULL, ME, h)
+          CASE "COMM"
+            f = NEW ID3COMM(fbody, ME, h)
+          CASE "ETCO"
+            f = NEW ID3ETCO(fbody, ME, h)
+          CASE "GEOB"
+            f = NEW ID3GEOB(fbody, NULL, ME, h)
+          CASE "MCDI"
+            f = NEW ID3MCDI(fbody, ME, h)
+          CASE "PCNT"
+            f = NEW ID3PCNT(fbody, ME, h)
+          CASE "POPM"
+            f = NEW ID3POPM(fbody, ME, h)
+          CASE "PRIV"
+            f = NEW ID3PRIV(fbody, ME, h)
+          CASE "UFID"
+            f = NEW ID3UFID(fbody, ME, h)
+          CASE "USLT"
+            f = NEW ID3USLT(fbody, ME, h)
+        END SELECT 
+      END IF
+    END IF
+    'f = NEW CTagv2Frame(ME, h)
+    
     result.Add(f, h.id)
-    data = Mid(data, 1 + h.size + h.frameSize)
+    data = Mid(body, 1 + h.size + h.frameSize)
   LOOP 
   RETURN result
   
@@ -99,10 +167,10 @@ STATIC PUBLIC FUNCTION DeSynchsafe(s AS String) AS Long
   DIM z AS Integer = 0
   
   FOR x = Len(s) TO 1 STEP -1
-    y = CByte(Asc(Mid(s, x, 1)))
+    y = CByte(Asc(s, x))
     IF BTst(y, 7) THEN STOP 
     DO
-      IF BTst(y, z MOD 7) THEN BSet(result, z)
+      IF BTst(y, z MOD 7) THEN result = BSet(result, z)
       INC z
     LOOP UNTIL (z MOD 7) = 0
   NEXT 

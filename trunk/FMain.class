@@ -13,11 +13,6 @@ PRIVATE halt AS Boolean = FALSE ' during scanning the directories this will stop
 
 STATIC PUBLIC Flist AS CFView
 
-STATIC PUBLIC SUB _exit()
-  FMain.Flist = NULL
-  FMain.cols = NULL
-END
-
 PUBLIC SUB _new()
   
   Flist = NEW CFView(VBox3) AS "Flist"
@@ -85,7 +80,7 @@ PUBLIC SUB UpdFlist()
     IF CInt((z - Timer()) * 10) MOD 5 = 0 THEN
       Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(pass.Max) & ")"
       ProgressBar1.Value = x / pass.Count
-      WAIT 0.001
+      WAIT 0.001 
       IF halt THEN  
         halt = FALSE
         'ToggleButton2.Value = FALSE

@@ -1,4 +1,17 @@
 * Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
+  - first (still unsuccessful) tests for ID3v2.4.0-support
+  - fixed many errors in class-structure (constructors, properties, etc.)
+  - fixed bug in new file-seek function:
+    - now returns the position of the pattern
+    - enummerates bits in correct order
+  - flags in tag-header are used now
+  - read-in of complete file is not necessary anymore for ID3v2-tag-parsing
+  - implementation of frame-parsers for APIC, GEOB, UFID, USLT, ETCO, COMM, MCDI, PRIV, PCNT and POPM
+    as well as text- and URL-frames
+  - fixed bug in DeSynchronise-function which made it always return 0
+  - fixed bug in tag-header parser: version was converted wrongly
+
+* Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
   - added many comments to code
   - fixed some possible memory leaks
   - added 3 frame-types (PRIV, PCNT and POPM)

@@ -21,22 +21,22 @@ PUBLIC SUB _free()
 END
 
 
-STATIC PUBLIC FUNCTION getFrame(header AS CTagv2FrameHeader, OPTIONAL rawData AS String = NULL) AS Object  
-
-  DIM result AS Object
-  
-  IF Left(header.id) = "T" AND header.id <> "TXXX" THEN
-    result = NEW CTagv2FrameText(header)
-  ELSE IF Left(header.id) = "W" AND header.id <> "WXXX" THEN
-    result = NEW CTagv2FrameURL(header)
-  ELSE 
-'     SELECT CASE header.id
-'     END SELECT 
-    result = NEW CTagv2Frame(header)
-  END IF
-  RETURN result
-  
-END
+' STATIC PUBLIC FUNCTION getFrame(header AS CTagv2FrameHeader, OPTIONAL rawData AS String = NULL) AS Object  
+' 
+'   DIM result AS Object
+'   
+'   IF Left(header.id) = "T" AND header.id <> "TXXX" THEN
+'     result = NEW CTagv2FrameText(header, rawData)
+'   ELSE IF Left(header.id) = "W" AND header.id <> "WXXX" THEN
+'     result = NEW CTagv2FrameURL(header, rawData)
+'   ELSE 
+' '     SELECT CASE header.id
+' '     END SELECT 
+'     result = NEW CTagv2Frame(header, rawData)
+'   END IF
+'   RETURN result
+'   
+' END
 
 STATIC PRIVATE FUNCTION FTypes_Read() AS Collection
   RETURN $FTypes

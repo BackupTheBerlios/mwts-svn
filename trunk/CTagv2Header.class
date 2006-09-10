@@ -1,7 +1,7 @@
 
 PROPERTY READ size AS Integer ' returns the size of the tag-header (always 10 bytes per definition)
 PROPERTY READ tagSize AS Integer ' returns the size of the complete tag (after compression/encryption/unsynchronisation/etc.)
-PROPERTY READ version AS Float ' returns the version of the tag
+PROPERTY READ version AS String ' returns the version of the tag
 PROPERTY READ useUnsync AS Boolean ' returns whether the tag explicitely uses unsynchronisation
 PROPERTY READ useExtHeader AS Boolean ' returns whether an extended header is used to further describe the tag
 PROPERTY READ useExperimental AS Boolean
@@ -12,7 +12,7 @@ PROPERTY READ fStart AS Integer ' returns the location of the beginning of the t
 PRIVATE $data AS String
 PRIVATE $fStart AS Integer
 
-PUBLIC SUB _new(data AS String, fStart AS Integer)
+PUBLIC SUB _new(OPTIONAL data AS String = NULL, OPTIONAL fStart AS Integer = -1)
   
   IF Left(data, 3) <> "ID3" THEN RETURN 
   $data = data
@@ -26,8 +26,8 @@ END
 PRIVATE FUNCTION tagSize_Read() AS Integer
   RETURN CInt(CTagv2.DeSynchsafe(Right($data, 4)))
 END
-PRIVATE FUNCTION version_Read() AS Float
-  RETURN Val(Str(Asc(Mid($data, 4, 1))) & "." & Str(Asc(Mid($data, 5, 1))))
+PRIVATE FUNCTION version_Read() AS String
+  RETURN "2." & Str(Asc($data, 4)) & "." & Str(Asc($data, 5))
 END
 PRIVATE FUNCTION useUnsync_Read() AS Boolean
   RETURN BTst(Asc(Mid($data, 6, 1)), 7)

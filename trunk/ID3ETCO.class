@@ -36,7 +36,9 @@ PROPERTY READ EventTimeStamps AS Long[]
 PRIVATE $tsFormat AS Byte
 PRIVATE $ev AS Collection
 
-PUBLIC SUB _new()
+' TODO: render(), renderOne(), _new()
+
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
   $ev = NEW Collection
 END
 

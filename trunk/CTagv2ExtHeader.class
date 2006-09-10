@@ -28,14 +28,16 @@ PRIVATE $data AS String
 PRIVATE $flags AS NEW Byte[]
 PRIVATE $CRC AS Integer
 PRIVATE $restrictions AS Byte
+PRIVATE $fseek AS Integer
 
-PUBLIC SUB _new(data AS String)
+PUBLIC SUB _new(OPTIONAL data AS String = NULL, OPTIONAL begin AS Integer = -1)
   
   DIM tmp AS String
   DIM x AS Integer
   DIM y AS Integer
   
   $data = data
+  $fseek = begin
   
   tmp = Mid(data, 6, Asc(Mid(data, 5, 1)))
   FOR x = 1 TO Len(tmp)

@@ -155,7 +155,7 @@
           MoveScaled(1,5,30,63)
           'Move(7,35,210,441)
           Expand = True
-          Root = "/music"
+          Root = "/home/kane/atmp"
         }
       }
       { VBox3 VBox

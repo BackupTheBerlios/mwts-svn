@@ -7,6 +7,11 @@ PROPERTY FileIdenifier AS String
 PRIVATE $ownerIdentifier AS String
 PRIVATE $fileIdentifier AS String
 
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  $ownerIdentifier = Left(rawData, InStr(rawData, Chr(0)) - 1)
+  $fileIdentifier = Mid(rawData, InStr(rawData, Chr(0)) + 1)
+END
+
 PUBLIC FUNCTION render() AS String
   RETURN SUPER.header.render() & $ownerIdentifier & CTagv2FrameText.encSplit[SUPER.$encoding] & $fileIdentifier
 END

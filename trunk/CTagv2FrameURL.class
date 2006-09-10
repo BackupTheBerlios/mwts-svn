@@ -1,6 +1,13 @@
 
 INHERITS CTagv2Frame
 
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  
+  
+  
+END
+
+
 STATIC PUBLIC SUB _init()
   
   CTagv2Frame.FTypes.Add("Commercial information", "WCOM")

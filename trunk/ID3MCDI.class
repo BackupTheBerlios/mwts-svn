@@ -5,6 +5,10 @@ PROPERTY CDTOC AS String
 
 PRIVATE $cdtoc AS String
 
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  $cdtoc = rawData
+END
+
 PUBLIC FUNCTION render() AS String
   RETURN SUPER.header.render() & $cdtoc
 END
