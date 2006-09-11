@@ -1,3 +1,9 @@
+* Sun Sep 08 2006 Franz Brauße <mike-nought@gmx.de>
+  - fixed bug preventing compiling caused by usage of a global variable in function parameter
+  - eased usage of file-view-class a bit
+  - read-in of ID3v2-tag works now (as far as implemented)
+  - showing of ID3v2-tag-data works now
+
 * Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
   - first (still unsuccessful) tests for ID3v2.4.0-support
   - fixed many errors in class-structure (constructors, properties, etc.)

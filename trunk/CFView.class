@@ -78,11 +78,32 @@ PUBLIC SUB _free()
   $fall = NULL
 END
 
-PUBLIC FUNCTION _get(Key AS String) AS CFViewItem
+PUBLIC FUNCTION _get(Item AS Variant) AS CFViewItem
+  
   DIM result AS CFViewItem
-  IF IsNull(Flist[Key]) THEN RETURN NULL
-  result = NEW CFViewItem(ME, Flist, Key)
-  RETURN result
+  DIM x AS Integer
+  DIM e AS CFile
+  
+  IF IsString(Item) THEN 
+    IF IsNull(Flist[Key]) THEN RETURN NULL
+    result = NEW CFViewItem(ME, Flist, Item)
+    RETURN result
+    
+  ELSE IF IsNumber(Item) THEN 
+    IF Item >= Flist.Count OR Item < 0 THEN RETURN NULL
+    FOR EACH e IN $fall
+      IF x = Item THEN 
+        result = NEW CFViewItem(ME, Flist, e.path)
+        RETURN result
+      END IF
+      INC x
+    NEXT 
+    
+  ELSE 
+    RETURN NULL
+    
+  END IF
+  
 END
 
 PUBLIC FUNCTION _next() AS CFViewItem
@@ -421,6 +442,7 @@ PRIVATE SUB tag2Display_Write(Value AS Integer)
   FOR EACH e IN $fall
     e.tag.aktTag = $tag
   NEXT 
+  refresh
 END
 PRIVATE FUNCTION Compare_Read() AS Integer
   RETURN Flist.Compare

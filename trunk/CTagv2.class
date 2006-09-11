@@ -3,8 +3,8 @@ PUBLIC CONST trackNone AS Integer = 0
 
 PROPERTY artist AS String[] 
 PROPERTY album AS String[]
-PROPERTY track AS Integer[]
-PROPERTY year AS Integer[]
+PROPERTY track AS String[]
+PROPERTY year AS String[]
 PROPERTY genre AS String[]
 PROPERTY title AS String[]
 PROPERTY comment AS String
@@ -101,13 +101,15 @@ PUBLIC FUNCTION _get(id AS String) AS Object
   RETURN NULL
 END
 
-PUBLIC FUNCTION getFrames(OPTIONAL body AS String = $body) AS Collection
+PUBLIC FUNCTION getFrames(OPTIONAL body AS String = NULL) AS Collection
   
   DIM result AS NEW Collection
   DIM h AS CTagv2FrameHeader
   DIM f AS CTagv2Frame
   DIM fbody AS String
   DIM x AS Integer
+  
+  IF IsNull(body) THEN body = $body
   
   DO
     IF Left(body) = Chr(0) THEN BREAK 
@@ -152,7 +154,7 @@ PUBLIC FUNCTION getFrames(OPTIONAL body AS String = $body) AS Collection
     'f = NEW CTagv2Frame(ME, h)
     
     result.Add(f, h.id)
-    data = Mid(body, 1 + h.size + h.frameSize)
+    body = Mid(body, 1 + h.size + h.frameSize)
   LOOP 
   RETURN result
   
@@ -223,31 +225,38 @@ END
 
 
 PRIVATE FUNCTION artist_Read() AS String[]
-  RETURN ME["TOPE"].content
+  IF NOT IsNull(ME["TPE1"]) THEN RETURN ME["TPE1"].content
+  RETURN NULL
 END
 PRIVATE SUB artist_Write(Value AS String[])
 END
 PRIVATE FUNCTION album_Read() AS String[]
-  RETURN ME["TOAL"].content
+  IF NOT IsNull(ME["TALB"]) THEN RETURN ME["TALB"].content
+  RETURN NULL
 END
 PRIVATE SUB album_Write(Value AS String[])
 END
-PRIVATE FUNCTION track_Read() AS Integer[]
-  RETURN Val(ME["TRCK"].content)
+PRIVATE FUNCTION track_Read() AS String[]
+  IF NOT IsNull(ME["TRCK"]) THEN RETURN ME["TRCK"].content
+  RETURN NULL
 END
-PRIVATE SUB track_Write(Value AS Integer[])
+PRIVATE SUB track_Write(Value AS String[])
 END
-PRIVATE FUNCTION year_Read() AS Integer[]
-  RETURN Val(ME["TDOR"].content)
+PRIVATE FUNCTION year_Read() AS String[]
+  IF NOT IsNull(ME["TYER"]) THEN RETURN ME["TYER"].content
+  RETURN NULL
 END
-PRIVATE SUB year_Write(Value AS Integer[])
+PRIVATE SUB year_Write(Value AS String[])
 END
 PRIVATE FUNCTION genre_Read() AS String[]
-  RETURN ME["TCON"].content
+  IF NOT IsNull(ME["TCON"]) THEN RETURN ME["TCON"].content
+  RETURN NULL
 END
 PRIVATE SUB genre_Write(Value AS String[])
 END
 PRIVATE FUNCTION title_Read() AS String[]
+  IF NOT IsNull(ME["TIT2"]) THEN RETURN ME["TIT2"].content
+  RETURN NULL
 END
 PRIVATE SUB title_Write(Value AS String[])
 END
@@ -262,6 +271,7 @@ PRIVATE FUNCTION isEmpty_Read() AS Boolean
   RETURN TRUE
 END 
 PRIVATE FUNCTION comment_Read() AS String
+  RETURN ""
 END
 PRIVATE SUB comment_Write(Value AS String)
 END

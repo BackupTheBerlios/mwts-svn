@@ -138,7 +138,7 @@ PUBLIC SUB ToolButton2_Click()
   $aktTag = If($aktTag = 1, 2, 1)
   Flist.tag2Display = $aktTag
   ToolButton2.Text = "Showing ID3v" & $aktTag & "-Tag"
-  UpdFlist
+  'UpdFlist
 END
 
 ' get (original, not modified) path to files of all selected entries in FList 
@@ -337,5 +337,11 @@ PUBLIC SUB Form_Close()
   Settings["cols"] = cols.Join(",")
   Settings.Save
   ME.Delete 
+
+END
+
+PUBLIC SUB Button1_Click()
+
+  STOP 
 
 END

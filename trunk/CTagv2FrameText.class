@@ -31,7 +31,7 @@ PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
   ELSE
     $encoding = CByte(Asc(rawData))
     t = Conv(Mid(rawData, 2), System.Charset, Desktop.Charset)
-    tmp2 = Split(t, ME.encSplit[$encoding])
+    tmp2 = Split(t, CTagv2FrameText.encSplit[$encoding])
   END IF
   $content = tmp2
   

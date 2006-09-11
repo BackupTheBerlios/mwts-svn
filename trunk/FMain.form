@@ -118,6 +118,11 @@
         Text = ("")
         Picture = Picture["icons/stop.png"]
       }
+      { Button1 Button
+        MoveScaled(53,0,11,4)
+        'Move(371,0,77,28)
+        Text = ("Button1")
+      }
     }
     { HSplit1 HSplit
       MoveScaled(2,6,104,71)
@@ -155,7 +160,7 @@
           MoveScaled(1,5,30,63)
           'Move(7,35,210,441)
           Expand = True
-          Root = "/home/kane/atmp"
+          Root = "/home/kane/"
         }
       }
       { VBox3 VBox
