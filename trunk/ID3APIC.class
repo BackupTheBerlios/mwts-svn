@@ -49,7 +49,7 @@ PUBLIC SUB _new(OPTIONAL rawData AS String = NULL, OPTIONAL path AS String = NUL
     
     WHILE Asc(rawData) > 0
       $mime = Left(rawData)
-      rawData &= Mid(rawData, 2)
+      rawData = Mid(rawData, 2)
     WEND 
     rawData = Mid(rawData, 2)
     

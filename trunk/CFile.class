@@ -17,9 +17,9 @@ PUBLIC SUB _new(OPTIONAL filepath AS String = "")
   DIM t AS CMPEGHeader
   
   IF NOT Exist(filepath) THEN RETURN 
-  $tag = NEW CTag(ME, filepath)
   $path = filepath
   $newpath = filepath
+  $tag = NEW CTag(ME, filepath)
   $header = getFileHeader(filepath)
   
 END
@@ -96,7 +96,7 @@ STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
       IF (Asc(u) AND &HE0) = &HE0 THEN 
         READ #f, v, 2
         result = NEW CMPEGHeader(t & u & v)
-        BREAK 
+        RETURN result 
       ELSE IF u = Chr(255) THEN 
         t = u
         GOTO bla
@@ -128,6 +128,7 @@ STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
 '     END IF
 '     x = InStr(t, Chr(255), x + 4)
 '   WEND
+  result = NEW CMPEGHeader
   RETURN result
   
 END

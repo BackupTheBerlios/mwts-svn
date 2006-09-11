@@ -29,8 +29,8 @@ PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
     $encoding = CTagv2FrameText.encUTF8
     tmp2 = [rawData]
   ELSE
-    $encoding = CByte(Asc(rawData))
-    t = Conv(Mid(rawData, 2), System.Charset, Desktop.Charset)
+    ME.encoding = CByte(Asc(rawData))
+    t = Conv(Mid(rawData, 2), "ISO-8859-1", Desktop.Charset)
     tmp2 = Split(t, CTagv2FrameText.encSplit[$encoding])
   END IF
   $content = tmp2
@@ -65,7 +65,7 @@ PRIVATE FUNCTION encoding_Read() AS Integer
   RETURN $encoding
 END
 PRIVATE SUB encoding_Write(Value AS Integer)
-  $encoding = Value
+  IF Value < CTagv2FrameText.encString.Count AND Value >= 0 THEN $encoding = Value
 END
 
 

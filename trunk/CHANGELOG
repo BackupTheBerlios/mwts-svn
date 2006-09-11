@@ -1,8 +1,12 @@
 * Sun Sep 08 2006 Franz Brauße <mike-nought@gmx.de>
   - fixed bug preventing compiling caused by usage of a global variable in function parameter
   - eased usage of file-view-class a bit
-  - read-in of ID3v2-tag works now (as far as implemented)
+  - read-in of ID3v2-tag basically works now (as far as implemented)
   - showing of ID3v2-tag-data works now
+  - another version of file-seek-function (4 times faster, but still too slow)
+    (not used yet, so only files, whose tags are placed at the beginning of the file, can be parsed)
+  - some bugfixes in v2-classes
+  - fixed bug causing a nullpointer at MPEG header access
 
 * Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
   - first (still unsuccessful) tests for ID3v2.4.0-support

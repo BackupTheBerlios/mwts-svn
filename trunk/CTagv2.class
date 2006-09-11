@@ -33,6 +33,7 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   DIM y AS Integer
   DIM f AS File
   DIM bsize AS Integer
+  DIM z AS Long = -1
   
   DIM begin AS Integer
   DIM size AS Integer
@@ -41,20 +42,22 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   
   $parent = parent
   
-  IF IsNull(path) OR NOT Exist(path) THEN
-    $header = NEW CTagv2Header
-    $extHeader = NEW CTagv2ExtHeader
-    $frames = NEW Collection
-    $status = TRUE
+  IF IsNull(path) OR NOT Exist(path) THEN 
+    die
     RETURN 
   END IF
   
   f = OPEN path FOR INPUT 
-  begin = MHelp.fseek(path, MHelp.str2pat("ID3")) 
+  'begin = MHelp.fseek(path, MHelp.str2pat("ID3")) 
+  'begin = MHelp.fseekf(path, "ID3")
   IF begin = -1 THEN RETURN 
   
   SEEK #f, begin
-  READ #f, s, 10
+  TRY READ #f, s, 10
+  IF ERROR THEN 
+    die
+    RETURN 
+  END IF
   $header = NEW CTagv2Header(s, begin)
   $version = $header.version
   IF $header.useExtHeader THEN 
@@ -65,12 +68,18 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
     y = $extHeader.size
   END IF
   
-  bsize = $header.tagSize - y - CInt(If($header.useFooter, 10, 0))
+  z = $header.tagSize
+  bsize = z - y - CInt(If($header.useFooter, 10, 0))
+  
   READ #f, $body, bsize
   CLOSE #f
-  
-  $frames = getFrames($body)
-  $status = TRUE
+   
+  IF z > -1 THEN ' no error during parsing of synchsafe integers
+    $frames = getFrames($body)
+    $status = TRUE
+  ELSE 
+    'die
+  END IF
   
 '   s = File.Load(path)
 '   begin = InStr(s, "ID3")
@@ -87,6 +96,17 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
 '   $status = TRUE
   
 END
+
+PRIVATE SUB die()
+  
+  $header = NEW CTagv2Header
+  $extHeader = NEW CTagv2ExtHeader
+  $frames = NEW Collection
+  $status = FALSE
+  RETURN 
+  
+END
+
 
 PUBLIC SUB _free()
   $parent = NULL
@@ -118,9 +138,9 @@ PUBLIC FUNCTION getFrames(OPTIONAL body AS String = NULL) AS Collection
     x += h.size
     
     IF h.id = "TXXX" THEN ' user-defined text-frame
-      f = NEW CTagv2FrameText
+      f = NEW CTagv2FrameText(NULL, ME, h)
     ELSE IF h.id = "WXXX" THEN ' user-defined url-frame
-      f = NEW CTagv2FrameURL
+      f = NEW CTagv2FrameURL(NULL, ME, h)
     ELSE 
       IF Left(h.id) = "T" THEN ' text-frame
         f = NEW CTagv2FrameText(fbody, ME, h)
@@ -155,7 +175,7 @@ PUBLIC FUNCTION getFrames(OPTIONAL body AS String = NULL) AS Collection
     
     result.Add(f, h.id)
     body = Mid(body, 1 + h.size + h.frameSize)
-  LOOP 
+  LOOP UNTIL Asc(body) = 0
   RETURN result
   
 END
@@ -170,7 +190,7 @@ STATIC PUBLIC FUNCTION DeSynchsafe(s AS String) AS Long
   
   FOR x = Len(s) TO 1 STEP -1
     y = CByte(Asc(s, x))
-    IF BTst(y, 7) THEN STOP 
+    IF BTst(y, 7) THEN RETURN -1 
     DO
       IF BTst(y, z MOD 7) THEN result = BSet(result, z)
       INC z
@@ -225,38 +245,44 @@ END
 
 
 PRIVATE FUNCTION artist_Read() AS String[]
-  IF NOT IsNull(ME["TPE1"]) THEN RETURN ME["TPE1"].content
-  RETURN NULL
+  IF IsNull(ME["TPE1"]) THEN RETURN NULL
+  IF ME["TPE1"].content.Count = 0 THEN RETURN NULL
+  RETURN ME["TPE1"].content
 END
 PRIVATE SUB artist_Write(Value AS String[])
 END
 PRIVATE FUNCTION album_Read() AS String[]
-  IF NOT IsNull(ME["TALB"]) THEN RETURN ME["TALB"].content
-  RETURN NULL
+  IF IsNull(ME["TALB"]) THEN RETURN NULL
+  IF ME["TALB"].content.Count = 0 THEN RETURN NULL
+  RETURN ME["TALB"].content
 END
 PRIVATE SUB album_Write(Value AS String[])
 END
 PRIVATE FUNCTION track_Read() AS String[]
-  IF NOT IsNull(ME["TRCK"]) THEN RETURN ME["TRCK"].content
-  RETURN NULL
+  IF IsNull(ME["TRCK"]) THEN RETURN NULL
+  IF ME["TRCK"].content.Count = 0 THEN RETURN NULL
+  RETURN ME["TRCK"].content
 END
 PRIVATE SUB track_Write(Value AS String[])
 END
 PRIVATE FUNCTION year_Read() AS String[]
-  IF NOT IsNull(ME["TYER"]) THEN RETURN ME["TYER"].content
-  RETURN NULL
+  IF IsNull(ME["TYER"]) THEN RETURN NULL
+  IF ME["TYER"].content.Count = 0 THEN RETURN NULL
+  RETURN ME["TYER"].content
 END
 PRIVATE SUB year_Write(Value AS String[])
 END
 PRIVATE FUNCTION genre_Read() AS String[]
-  IF NOT IsNull(ME["TCON"]) THEN RETURN ME["TCON"].content
-  RETURN NULL
+  IF IsNull(ME["TCON"]) THEN RETURN NULL
+  IF ME["TCON"].content.Count = 0 THEN RETURN NULL
+  RETURN ME["TCON"].content
 END
 PRIVATE SUB genre_Write(Value AS String[])
 END
 PRIVATE FUNCTION title_Read() AS String[]
-  IF NOT IsNull(ME["TIT2"]) THEN RETURN ME["TIT2"].content
-  RETURN NULL
+  IF IsNull(ME["TIT2"]) THEN RETURN NULL
+  IF ME["TIT2"].content.Count = 0 THEN RETURN NULL
+  RETURN ME["TIT2"].content
 END
 PRIVATE SUB title_Write(Value AS String[])
 END

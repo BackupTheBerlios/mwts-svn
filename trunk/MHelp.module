@@ -115,6 +115,43 @@ PUBLIC FUNCTION fseek(path AS String, pattern AS Boolean[]) AS Integer
   
 END
 
+PUBLIC FUNCTION fseekf(path AS String, pattern AS String) AS Integer
+  
+  DIM f AS File
+  DIM x AS Integer
+  DIM s AS Byte
+  DIM t AS NEW Byte[]
+  
+  FOR x = 1 TO Len(pattern)
+    t.Add(Asc(pattern, x))
+  NEXT 
+  x = 0
+  
+  f = OPEN path FOR INPUT  
+  
+  WHILE NOT Eof(f)
+    READ #f, s, 1
+    bla:
+    IF s = t[x] THEN
+      IF x = t.Max THEN 
+        x = Seek(f) - t.Max
+        CLOSE #f
+        RETURN x
+      END IF
+      INC x
+    ELSE 
+      IF x > 0 THEN 
+        x = 0
+        GOTO bla
+      END IF
+    END IF
+  WEND 
+  
+  CLOSE #f
+  RETURN -1
+  
+END
+
 PUBLIC FUNCTION replaceByPattern(text AS String, f AS CFile) AS String
   
   DIM p AS String

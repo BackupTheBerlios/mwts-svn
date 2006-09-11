@@ -28,7 +28,7 @@ PUBLIC SUB _new(rawData AS String, tStart AS Integer, OPTIONAL id AS String = NU
     IF Len(id) <> 4 THEN STOP 
     IF size = 0 THEN STOP
     $data = id
-    $data &= CTagv2.Synchsafe(size, 4)
+    $data &= String(4, Chr(0)) 'CTagv2.Synchsafe(size, 4)
     $data &= Chr(0) & Chr(0)
   ELSE 
     $data = rawData
@@ -48,7 +48,8 @@ PRIVATE FUNCTION id_Read() AS String
   RETURN Left($data, 4)
 END
 PRIVATE FUNCTION frameSize_Read() AS Integer
-  RETURN CInt(CTagv2.DeSynchsafe(Mid($data, 5, 4)))
+  IF ME.unsynchronised THEN RETURN CInt(CTagv2.DeSynchsafe(Mid($data, 5, 4)))
+  RETURN 256 ^ 3 * Asc($data, 5) + 256 ^ 2 * Asc($data, 6) + 256 * Asc($data, 7) + Asc($data, 8)
 END
 PRIVATE FUNCTION tagAlterPreservation_Read() AS Boolean
   RETURN NOT BTst($statusFlags, 6)

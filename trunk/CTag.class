@@ -82,7 +82,7 @@ PRIVATE SUB v2_Write(Value AS CTagv2)
 END
 
 PRIVATE FUNCTION artist_Read() AS String
-  IF $akt = 0 THEN RETURN If($v1.artist = $v2.artist, $v1.artist, "")
+  'IF $akt = 0 THEN RETURN If($v1.artist = $v2.artist, $v1.artist, "")
   IF $akt = 1 THEN RETURN $v1.artist
   IF $akt = 2 THEN 
     IF IsNull($v2.artist) THEN RETURN ""
@@ -95,7 +95,7 @@ PRIVATE SUB artist_Write(Value AS String)
   $changed = TRUE
 END
 PRIVATE FUNCTION album_Read() AS String
-  IF $akt = 0 THEN RETURN If($v1.album = $v2.album, $v1.album, "")
+  'IF $akt = 0 THEN RETURN If($v1.album = $v2.album, $v1.album, "")
   IF $akt = 1 THEN RETURN $v1.album
   IF $akt = 2 THEN
     IF IsNull($v2.album) THEN RETURN ""
@@ -108,11 +108,12 @@ PRIVATE SUB album_Write(Value AS String)
   $changed = TRUE
 END
 PRIVATE FUNCTION track_Read() AS Integer
-  IF $akt = 0 THEN RETURN If($v1.track = $v2.track, $v1.track, 0)
+  'IF $akt = 0 THEN RETURN If($v1.track = $v2.track, $v1.track, 0)
   IF $akt = 1 THEN RETURN $v1.track
   IF $akt = 2 THEN 
     IF IsNull($v2.track) THEN RETURN 0
-    RETURN Val($v2.track[0])
+    IF IsNull(Val($v2.track[0])) THEN RETURN 0
+    RETURN CInt(Val($v2.track[0]))
   END IF
 END
 PRIVATE SUB track_Write(Value AS Integer)
@@ -121,11 +122,12 @@ PRIVATE SUB track_Write(Value AS Integer)
   $changed = TRUE
 END
 PRIVATE FUNCTION year_Read() AS Integer
-  IF $akt = 0 THEN RETURN If($v1.year = $v2.year, $v1.year, 0)
+  'IF $akt = 0 THEN RETURN If($v1.year = $v2.year, $v1.year, 0)
   IF $akt = 1 THEN RETURN $v1.year
   IF $akt = 2 THEN
     IF IsNull($v2.year) THEN RETURN 0
-    RETURN Val($v2.year[0])
+    IF IsNull(Val($v2.year[0])) THEN RETURN 0
+    RETURN CInt(Val($v2.year[0]))
   END IF
 END
 PRIVATE SUB year_Write(Value AS Integer)
@@ -134,7 +136,7 @@ PRIVATE SUB year_Write(Value AS Integer)
   $changed = TRUE
 END
 PRIVATE FUNCTION genre_Read() AS String
-  IF $akt = 0 THEN RETURN If($v1.getsGenre = $v2.genre, $v2.genre, "")
+  'IF $akt = 0 THEN RETURN If($v1.getsGenre = $v2.genre, $v2.genre, "")
   IF $akt = 1 THEN RETURN $v1.getsGenre()
   IF $akt = 2 THEN
     IF IsNull($v2.genre) THEN RETURN ""
@@ -147,7 +149,7 @@ PRIVATE SUB genre_Write(Value AS String)
   $changed = TRUE
 END
 PRIVATE FUNCTION title_Read() AS String
-  IF $akt = 0 THEN RETURN If($v1.title = $v2.title, $v1.title, "")
+  'IF $akt = 0 THEN RETURN If($v1.title = $v2.title, $v1.title, "")
   IF $akt = 1 THEN RETURN $v1.title
   IF $akt = 2 THEN
     IF IsNull($v2.title) THEN RETURN ""
@@ -165,7 +167,7 @@ PRIVATE FUNCTION isEmpty_Read() AS Boolean
   IF $akt = 2 THEN RETURN $v2.isEmpty
 END 
 PRIVATE FUNCTION comment_Read() AS String
-  IF $akt = 0 THEN RETURN If($v1.comment = $v2.comment, $v1.comment, "")
+  'IF $akt = 0 THEN RETURN If($v1.comment = $v2.comment, $v1.comment, "")
   IF $akt = 1 THEN RETURN $v1.comment
   IF $akt = 2 THEN
     IF IsNull($v2.comment) THEN RETURN ""
