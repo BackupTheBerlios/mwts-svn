@@ -241,6 +241,8 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
   DIM tmpArray AS Object[]
   
   IF values.Count = 0 THEN RETURN NULL
+  IF NOT IsObject(values[0]) THEN RETURN NULL
+  IF values.Count = 1 THEN RETURN values[0]
   t = Object.Type(values[0])
   
   result = NEW (t)

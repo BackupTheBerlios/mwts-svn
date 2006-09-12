@@ -10,6 +10,18 @@ STATIC PUBLIC SUB _init()
   
 END
 
+PUBLIC SUB _new()
+  
+  DIM s AS String
+  
+  FOR EACH s IN FFNamev1.patterns
+    ComboBox1.Add(s)
+  NEXT 
+  ComboBox1.Index = 0
+  
+END
+
+
 STATIC PUBLIC FUNCTION Run() AS Boolean
 
   DIM hForm AS Form
@@ -21,7 +33,7 @@ END
 
 PUBLIC SUB btnOK_Click()
   
-  IF NOT ComboBox1.Find(ComboBox1.Text) THEN patterns.Add(ComboBox1.Text)
+  IF NOT ComboBox1.Find(ComboBox1.Text) THEN FFNamev1.patterns.Add(ComboBox1.Text)
   FFNamev1.pattern = ComboBox1.Text
   ME.Close(TRUE)
 

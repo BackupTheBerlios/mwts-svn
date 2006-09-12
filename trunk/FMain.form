@@ -1,6 +1,6 @@
 # Gambas Form File 1.0
 
-{ FMain Form
+{ Form Form
   MoveScaled(0,0,112,84)
   'Move(0,0,784,588)
   Expand = True

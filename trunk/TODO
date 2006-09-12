@@ -21,6 +21,7 @@
 - search for/mark duplicate files
 - search for functional audio-converters and offer to encode files to different formats
   - preserve tag-entries
+- re-adjust MHelp.merge()
 
 
 BUGS:

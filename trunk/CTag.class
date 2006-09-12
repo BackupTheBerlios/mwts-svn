@@ -50,8 +50,8 @@ END
 PUBLIC SUB _free()
   $v1 = NULL
   $v2 = NULL
-  $parent = NULL
 END
+
 
 ' needed for MHelp.merge()
 PUBLIC FUNCTION getNone(which AS String) AS Variant

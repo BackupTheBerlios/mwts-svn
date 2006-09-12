@@ -1,3 +1,4 @@
+' Gambas class file
 
 INHERITS UserControl
 
@@ -59,23 +60,21 @@ PUBLIC SUB _new()
   FList = NEW ColumnView(SUPER.Container) AS "FList"
   
   Flist.Editable = TRUE
-  Flist.Mode = ColumnView.Extended
+  Flist.Mode = Select.Multiple
   Flist.Sorted = TRUE
   Flist.Header = TRUE
   Flist.Resizable = TRUE
-  Flist.Root = FALSE
   Flist.ScrollBar = Scroll.Both
   Flist.Columns.Sort = 0
   
 END
 
 PUBLIC SUB _free()
-  Flist = NULL
-  $tim = NULL
-  $cols.Clear
-  $cols = NULL
-  $fall.Clear
-  $fall = NULL
+  FOR EACH $fall
+    $fall[$fall.Key].tag.v1 = NULL
+    $fall[$fall.Key].tag.v2 = NULL
+    $fall[$fall.Key].tag = NULL
+  NEXT 
 END
 
 PUBLIC FUNCTION _get(Item AS Variant) AS CFViewItem
@@ -85,7 +84,7 @@ PUBLIC FUNCTION _get(Item AS Variant) AS CFViewItem
   DIM e AS CFile
   
   IF IsString(Item) THEN 
-    IF IsNull(Flist[Key]) THEN RETURN NULL
+    IF IsNull(Flist[Item]) THEN RETURN NULL
     result = NEW CFViewItem(ME, Flist, Item)
     RETURN result
     
@@ -146,7 +145,12 @@ PUBLIC SUB tim_Timer()
 END
 
 PUBLIC SUB Clear()
-  $fall.Clear
+  FOR EACH $fall
+    $fall[$fall.Key].tag.v1 = NULL
+    $fall[$fall.Key].tag.v2 = NULL
+    $fall[$fall.Key].tag = NULL
+  NEXT 
+  $fall.Clear  
   Flist.Clear
 END
 PUBLIC FUNCTION MoveFirst() AS Boolean
@@ -302,6 +306,7 @@ PRIVATE SUB fall_Write(Value AS Collection)
 END
 PRIVATE FUNCTION selected_Read() AS Object[]
   DIM result AS NEW Object[]
+  IF Flist.Count = 0 THEN RETURN NULL
   TRY Flist.MoveFirst
   DO
     IF Flist.Item.Selected THEN result.Add($fall[Flist.Item.Key])

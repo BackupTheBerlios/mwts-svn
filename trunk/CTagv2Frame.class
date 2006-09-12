@@ -1,3 +1,4 @@
+' Gambas class file
 
 STATIC PRIVATE $FTypes AS NEW Collection
 
@@ -18,6 +19,7 @@ END
 
 PUBLIC SUB _free()
   $parent = NULL
+  $header = NULL
 END
 
 

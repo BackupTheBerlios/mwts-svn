@@ -1,3 +1,4 @@
+' Gambas class file
 
 PROPERTY READ AFile AS CFile ' returns the associated CFile-object to this CFView-item
 PROPERTY READ Children AS Integer ' returns the number of child-items
@@ -17,12 +18,6 @@ PUBLIC SUB _new(par AS CFView, parent AS ColumnView, sKey AS String)
   $key = sKey
   $parent = parent
   $par = par
-END
-
-PUBLIC SUB _free()
-  $key = ""
-  $par = NULL
-  $parent = NULL
 END
 
 PUBLIC FUNCTION _get(Column AS Integer) AS String

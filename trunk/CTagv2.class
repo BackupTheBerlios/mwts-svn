@@ -1,3 +1,4 @@
+' Gambas class file
 
 PUBLIC CONST trackNone AS Integer = 0
 
@@ -109,10 +110,9 @@ END
 
 
 PUBLIC SUB _free()
-  $parent = NULL
-  $header = NULL
-  $extHeader = NULL
-  $frames = NULL
+  FOR EACH $frames
+    $frames[$frames.Key] = NULL
+  NEXT 
 END
 
 PUBLIC FUNCTION _get(id AS String) AS Object

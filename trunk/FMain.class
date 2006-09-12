@@ -196,7 +196,7 @@ PUBLIC SUB ToggleButton2_Click()
 END
 
 PUBLIC SUB Flist_Menu()
-  IF Flist.selected.Count > 0 THEN Menu3.Popup
+  IF NOT IsNull(Flist.selected) THEN Menu3.Popup
 END
 
 PUBLIC SUB renameFFile(fkey AS String, newname AS String)

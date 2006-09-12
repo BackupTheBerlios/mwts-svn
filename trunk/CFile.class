@@ -1,3 +1,4 @@
+' Gambas class file
 
 PROPERTY READ path AS String ' contains the filename including full path on hdd
 PROPERTY newpath AS String ' if not set differently, contains the same as path, will be applied on save
@@ -23,12 +24,6 @@ PUBLIC SUB _new(OPTIONAL filepath AS String = "")
   $header = getFileHeader(filepath)
   
 END
-
-PUBLIC SUB _free()
-  $tag = NULL
-  $header = NULL
-END
-
 
 ' this function is needed in every class which shall be mergable
 ' it is used by MHelp.merge() to determine the "None"-value for each item, because this might differ

@@ -1,4 +1,9 @@
-* Sun Sep 08 2006 Franz Brauße <mike-nought@gmx.de>
+* Tue Sep 12 2006 Franz Brauße <mike-nought@gmx.de>
+  - finally fixed memory leak on quit
+  - a bit code-cleanup and adjustments for new Gambas release 1.9.42
+  - prevented crash of MWTS on right-click if file-view is empty
+
+* Sun Sep 10 2006 Franz Brauße <mike-nought@gmx.de>
   - fixed bug preventing compiling caused by usage of a global variable in function parameter
   - eased usage of file-view-class a bit
   - read-in of ID3v2-tag basically works now (as far as implemented)
@@ -8,7 +13,7 @@
   - some bugfixes in v2-classes
   - fixed bug causing a nullpointer at MPEG header access
 
-* Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
+* Sat Sep 09 2006 Franz Brauße <mike-nought@gmx.de>
   - first (still unsuccessful) tests for ID3v2.4.0-support
   - fixed many errors in class-structure (constructors, properties, etc.)
   - fixed bug in new file-seek function:
@@ -21,7 +26,7 @@
   - fixed bug in DeSynchronise-function which made it always return 0
   - fixed bug in tag-header parser: version was converted wrongly
 
-* Sat Sep 07 2006 Franz Brauße <mike-nought@gmx.de>
+* Sat Sep 09 2006 Franz Brauße <mike-nought@gmx.de>
   - added many comments to code
   - fixed some possible memory leaks
   - added 3 frame-types (PRIV, PCNT and POPM)
