@@ -1,5 +1,6 @@
+' Gambas class file
 
-INHERITS CTagv2FrameText
+INHERITS CTagv2Frame
 
 PROPERTY language AS String
 PROPERTY contentDescription AS String

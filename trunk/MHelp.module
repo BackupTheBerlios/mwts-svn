@@ -16,6 +16,10 @@ PUBLIC SUB _init()
   desc.Add("Bitrate", "%b")
   desc.Add("Samplerate", "%s")
   
+  desc.Add("ID3v1", "%v1")
+  desc.Add("ID3v2", "%v2")
+  desc.Add("Vorbis", "%v")
+  
 END
 
 PUBLIC SUB _exit()
@@ -189,6 +193,12 @@ PUBLIC FUNCTION getDesc(pattern AS String, f AS CFile) AS String
       RETURN f.header.bitrate
     CASE "%s"
       RETURN f.header.sampleRate
+    CASE "%v1"
+      RETURN "1." & f.tag.v1.version
+    CASE "%v2"
+      RETURN f.tag.v2.header.version
+    CASE "%v"
+      RETURN ""
       
   END SELECT 
   
@@ -245,7 +255,7 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
   IF NOT IsObject(values[0]) OR IsNull(values[0]) THEN RETURN NULL
   IF values.Count = 1 THEN RETURN values[0]
   t = Object.Class(values[0])
-  
+  IF Right(t, 2) = "[]" THEN RETURN values[0]
   result = NEW (t, NULL)
   
   FOR EACH i IN Classes[t].Symbols

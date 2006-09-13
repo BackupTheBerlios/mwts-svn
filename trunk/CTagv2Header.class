@@ -1,3 +1,4 @@
+' Gambas class file
 
 PROPERTY READ size AS Integer ' returns the size of the tag-header (always 10 bytes per definition)
 PROPERTY READ tagSize AS Integer ' returns the size of the complete tag (after compression/encryption/unsynchronisation/etc.)
@@ -11,12 +12,14 @@ PROPERTY READ fStart AS Integer ' returns the location of the beginning of the t
 
 PRIVATE $data AS String
 PRIVATE $fStart AS Integer
+PRIVATE $tagSize AS Integer
 
 PUBLIC SUB _new(OPTIONAL data AS String = NULL, OPTIONAL fStart AS Integer = -1)
   
   IF Left(data, 3) <> "ID3" THEN RETURN 
   $data = data
   $fStart = fStart
+  $tagSize = CInt(CTagv2.DeSynchsafe(Right($data, 4)))
   
 END
 
@@ -24,7 +27,7 @@ PRIVATE FUNCTION size_Read() AS Integer
   RETURN 10
 END
 PRIVATE FUNCTION tagSize_Read() AS Integer
-  RETURN CInt(CTagv2.DeSynchsafe(Right($data, 4)))
+  RETURN $tagSize
 END
 PRIVATE FUNCTION version_Read() AS String
   RETURN "2." & Str(Asc($data, 4)) & "." & Str(Asc($data, 5))

@@ -33,6 +33,9 @@ PUBLIC SUB _new()
   aCols.Add("%Y", "Year", NULL, "Tag")
   aCols.Add("%K", "Track", NULL, "Tag")
   aCols.Add("%G", "Genre", NULL, "Tag")
+  aCols.Add("%v1", "ID3v1 version", NULL, "Tag")
+  aCols.Add("%v2", "ID3v2 version", NULL, "Tag")
+  aCols.Add("&v", "OGG Comment v.", NULL, "Tag")
   
   aCols.Add("File", "File specific")
   aCols.Add("%f", "Filename", NULL, "File")
@@ -48,6 +51,9 @@ PUBLIC SUB _new()
   Button2.Enabled = FALSE
   Button3.Enabled = FALSE
   Button4.Enabled = FALSE
+  
+  aCols["Tag"].Expanded = TRUE
+  aCols["File"].Expanded = TRUE
   
   ME.Center
   

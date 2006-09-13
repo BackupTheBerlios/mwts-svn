@@ -46,9 +46,6 @@ END
 
 PUBLIC SUB save()
   
-  DIM t AS CTagv1
-  
-  t = NEW CTagv1($path)
   
   
 END
@@ -79,8 +76,6 @@ STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
   
   IF NOT Exist(path) THEN RETURN result
   
-
-' single, faster than below (especially when reading for the first time (cache => wtf? (?))
   f = OPEN path FOR INPUT  
   
   WHILE NOT Eof(f)
@@ -100,29 +95,6 @@ STATIC PUBLIC FUNCTION getFileHeader(path AS String) AS CMPEGHeader
   WEND 
   
   CLOSE #f
-  
-' single, full read needed
-'   t = File.Load(path)
-'   
-'   x = InStr(t, Chr(255))
-'   WHILE x
-'     IF (Asc(Mid(t, x + 1, 1)) AND &HE0) = &HE0 THEN 
-'       result = NEW CMPEGHeader(Mid(t, x, 4))
-'       BREAK 
-'     END IF
-'     x = InStr(t, Chr(255), x + 4)
-'   WEND 
-
-' multiple, slow
-'   t = File.Load(path)
-'   x = InStr(t, Chr(255))
-'   WHILE x
-'     IF (Asc(Mid(t, x + 1, 1)) AND &HE0) = &HE0 THEN 
-'       a = NEW CMPEGHeader(Mid(t, x, 4))
-'       result.Add(a)
-'     END IF
-'     x = InStr(t, Chr(255), x + 4)
-'   WEND
   result = NEW CMPEGHeader
   RETURN result
   

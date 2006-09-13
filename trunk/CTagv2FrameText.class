@@ -31,7 +31,8 @@ PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
     tmp2 = [rawData]
   ELSE
     ME.encoding = CByte(Asc(rawData))
-    t = Conv(Mid(rawData, 2), CTagv2FrameText.encString[ME.encoding], Desktop.Charset)
+    TRY t = Conv(Mid(rawData, 2), CTagv2FrameText.encString[ME.encoding], Desktop.Charset)
+    'IF ERROR THEN STOP 
     tmp2 = Split(t, CTagv2FrameText.encSplit[$encoding])
   END IF
   $content = tmp2
@@ -46,6 +47,14 @@ STATIC PUBLIC SUB _exit()
   ENC = NULL
   ENC_Split = NULL
 END
+
+
+PUBLIC FUNCTION render() AS String
+  
+  
+  
+END
+
 
 STATIC PRIVATE FUNCTION encString_Read() AS String[]
   RETURN ENC

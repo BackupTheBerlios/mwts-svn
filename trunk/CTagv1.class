@@ -68,11 +68,11 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
     END IF
     READ #f, t, 1
     $genre = Asc(t)
+    
+    $status = TRUE
   END IF
   
   CLOSE #f
-  
-  $status = TRUE
   
 END
 

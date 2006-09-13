@@ -1,2 +1,69 @@
+' Gambas class file
 
-INHERITS ID3USLT
+INHERITS CTagv2Frame
+
+PROPERTY description AS String
+PROPERTY content AS String
+PROPERTY language AS String
+PROPERTY encoding AS Integer
+
+PRIVATE $desc AS String
+PRIVATE $content AS String
+PRIVATE $language AS String
+PRIVATE $encoding AS Integer
+
+PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
+  
+  DIM s AS String
+  DIM x AS Integer
+  
+  IF IsNull(rawData) THEN RETURN 
+  
+  ME.encoding = Asc(Left(rawData))
+  $language = Mid(rawData, 2, 3)
+  s = Conv(Mid(rawData, 5), CTagv2FrameText.encString[ME.encoding], Desktop.Charset)
+  x = InStr(s, Chr(0))
+  $desc = Left(s, x - 1)
+  $content = Mid(s, x)
+  
+END
+
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM result AS String
+  
+  result = Chr($encoding)
+  result &= $language
+  result &= Conv($desc, Desktop.Charset, CTagv2FrameText.encString[$encoding])
+  result &= CTagv2FrameText.encSplit[$encoding]
+  result &= Conv($content, Desktop.Charset, CTagv2FrameText.encString[$encoding])
+  RETURN result
+  
+END
+
+
+PRIVATE FUNCTION content_Read() AS String
+  RETURN $content
+END
+PRIVATE SUB content_Write(Value AS String)
+  $content = Value
+END
+PRIVATE FUNCTION encoding_Read() AS Integer
+  RETURN $encoding
+END
+PRIVATE SUB encoding_Write(Value AS Integer)
+  IF Value < CTagv2FrameText.encString.Count AND Value >= 0 THEN $encoding = Value
+END
+PRIVATE FUNCTION language_Read() AS String
+  RETURN $language
+END
+PRIVATE SUB language_Write(Value AS String)
+  $language = Value
+END
+PRIVATE FUNCTION description_Read() AS String
+  RETURN $desc
+END
+PRIVATE SUB description_Write(Value AS String)
+  $desc = Value
+END

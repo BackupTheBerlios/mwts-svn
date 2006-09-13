@@ -1,3 +1,16 @@
+* Thu Sep 14 2006 Franz Brauße <mike-nought@gmx.de>
+  - added displaying of tag-versions
+  - added nearly complete Vorbis Comment-tag parsing / rendering
+  - fixed COMM-frame of ID3v2-tag
+  - fixed error on opening settings as result of Gambas version upgrade
+  - fixed minor GUI-bugs
+  - fixed bug in ID3v2-header class which caused an infinite loop if tag-version was 2.0.0
+  - some code cleanup
+  - fixed another bug in merge-function causing program termination on viewing ID3v1 contents
+  - temporarily removed USLT-frame of ID3v2-parser due to incorrect implementation
+  - fixed bug in ID3v2-parsing causing an infinite loop if no padding but a footer were set
+  - fixed save of wrong settings on quit
+
 * Wed Sep 13 2006 Franz Brauße <mike-nought@gmx.de>
   - release 0.1.0
   - fixed merge-function to handle slightly modified class-structure correctly

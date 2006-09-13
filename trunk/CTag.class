@@ -1,7 +1,12 @@
 ' Gambas class file
 
+CONST id3v1 AS Integer = 1
+CONST id3v2 AS Integer = 2
+CONST vorbisComment AS Integer = 3
+
 PROPERTY v1 AS CTagv1 ' holds an instance of the ID3v1-Tag from the file, this CTag belongs to
 PROPERTY v2 AS CTagv2 ' holds an instance of the ID3v2-Tag from the file, this CTag belongs to
+PROPERTY ogg AS CTagVorbis ' holds an instance of the Vorbis Comment from the file, this CTag belongs to
 
 PROPERTY artist AS String ' returns the artist-field, subjected to aktTag
 PROPERTY album AS String ' returns the album-field, subjected to aktTag
@@ -11,8 +16,8 @@ PROPERTY genre AS String ' returns the genre-field, subjected to aktTag
 PROPERTY title AS String ' returns the title-field, subjected to aktTag
 PROPERTY comment AS String ' returns the comment-field, subjected to aktTag
 
-' Tag to edit via the properties above
-' if set to 0, both tags are edited simultaneously and returned merged on reading
+' Tag-type to edit / get via the properties above
+' if set to 0, all tags are edited simultaneously and returned merged on reading
 PROPERTY aktTag AS Integer 
 PROPERTY READ changed AS Boolean ' returns whether any of the tags has been modified
 PROPERTY READ parent AS CFile ' needed for communication between tags and the file for dynamic reload of content
@@ -21,6 +26,7 @@ PUBLIC CONST trackNone AS Integer = 0 ' value to set for the track-field if info
 
 PRIVATE $v1 AS CTagv1
 PRIVATE $v2 AS CTagv2
+PRIVATE $ogg AS CTagVorbis
 
 PRIVATE $artist AS String
 PRIVATE $album AS String
@@ -41,6 +47,7 @@ PUBLIC SUB _new(parent AS CFile, OPTIONAL path AS String = NULL)
   
   $v1 = NEW CTagv1(path)
   $v2 = NEW CTagv2(ME, path)
+  $ogg = NEW CTagVorbis(ME, path)
   
 END
 
@@ -182,4 +189,10 @@ PRIVATE FUNCTION changed_Read() AS Boolean
 END
 PRIVATE FUNCTION parent_Read() AS CFile
   RETURN $parent
+END
+PRIVATE FUNCTION ogg_Read() AS CTagVorbis
+  RETURN $ogg
+END
+PRIVATE SUB ogg_Write(Value AS CTagVorbis)
+  $ogg = Value
 END

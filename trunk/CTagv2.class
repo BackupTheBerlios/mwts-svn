@@ -82,32 +82,17 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
     die
   END IF
   
-'   s = File.Load(path)
-'   begin = InStr(s, "ID3")
-'   IF begin = 0 THEN RETURN
-'   $header = NEW CTagv2Header(Mid(s, begin, 10), begin)
-'   $version = $header.version
-'   IF header.useExtHeader THEN 
-'     $extHeader = NEW CTagv2ExtHeader(Mid(s, begin + $header.size))
-'     y = $extHeader.size
-'   END IF
-'   $body = Mid(s, begin + $header.size + y, $header.tagSize - y)
-'   
-'   $frames = getFrames($body)
-'   $status = TRUE
-  
 END
 
 PRIVATE SUB die()
   
   $header = NEW CTagv2Header
   $extHeader = NEW CTagv2ExtHeader
-  $frames = NEW Collection
+  $frames = NEW Collection(gb.Text)
   $status = FALSE
   RETURN 
   
 END
-
 
 PUBLIC SUB _free()
   FOR EACH $frames
@@ -121,9 +106,10 @@ PUBLIC FUNCTION _get(id AS String) AS Object
   RETURN NULL
 END
 
+
 PUBLIC FUNCTION getFrames(OPTIONAL body AS String = NULL) AS Collection
   
-  DIM result AS NEW Collection
+  DIM result AS NEW Collection(gb.Text)
   DIM h AS CTagv2FrameHeader
   DIM f AS CTagv2Frame
   DIM fbody AS String
@@ -137,6 +123,7 @@ PUBLIC FUNCTION getFrames(OPTIONAL body AS String = NULL) AS Collection
     fbody = Mid(body, h.size + 1, h.frameSize)
     x += h.size
     
+    f = NULL
     IF h.id = "TXXX" THEN ' user-defined text-frame
       f = NEW CTagv2FrameText(NULL, ME, h)
     ELSE IF h.id = "WXXX" THEN ' user-defined url-frame
@@ -166,20 +153,29 @@ PUBLIC FUNCTION getFrames(OPTIONAL body AS String = NULL) AS Collection
             f = NEW ID3PRIV(fbody, ME, h)
           CASE "UFID"
             f = NEW ID3UFID(fbody, ME, h)
-          CASE "USLT"
-            f = NEW ID3USLT(fbody, ME, h)
+          'CASE "USLT"
+          '  f = NEW ID3USLT(fbody, ME, h)
         END SELECT 
       END IF
     END IF
-    'f = NEW CTagv2Frame(ME, h)
     
-    result.Add(f, h.id)
+    IF NOT IsNull(f) THEN result.Add(f, h.id)
     body = Mid(body, 1 + h.size + h.frameSize)
-  LOOP UNTIL Asc(body) = 0
+    
+    IF $header.tagSize - h.tStart - h.frameSize = 0 THEN ' tag-size reached
+      IF $header.useFooter AND Left(body, 3) = "3DI" THEN BREAK ' start footer
+    ELSE IF $header.tagSize - h.tStart - h.frameSize <= 0 THEN 
+      BREAK 
+    END IF
+  LOOP UNTIL Asc(body) = 0 ' start padding
   RETURN result
   
 END
 
+PUBLIC SUB AddFrame(id AS String, ID3Frame AS Object)
+  IF Len(id) <> 4 THEN RETURN 
+  IF NOT $frames.Exist(id) THEN $frames.Add(ID3Frame, id)
+END
 
 STATIC PUBLIC FUNCTION DeSynchsafe(s AS String) AS Long
 

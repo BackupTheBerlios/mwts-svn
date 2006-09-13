@@ -1,0 +1,244 @@
+' Gambas class file
+
+STATIC PROPERTY READ stdFields AS String[]
+
+PROPERTY artist AS String[]
+PROPERTY album AS String[]
+PROPERTY track AS String[]
+PROPERTY year AS String[]
+PROPERTY genre AS String[]
+PROPERTY title AS String[]
+PROPERTY comment AS String[]
+
+PROPERTY READ changed AS Boolean
+PROPERTY READ statusOK AS Boolean
+
+PRIVATE $fields AS Collection
+PRIVATE $changed AS Boolean
+PRIVATE $status AS Boolean
+
+PRIVATE $vendor AS String
+
+STATIC PRIVATE $stdFields AS String[]
+
+PUBLIC SUB _new(parent AS Object, OPTIONAL path AS String = NULL)
+  
+  DIM tag AS String
+  DIM x AS Long
+  DIM y AS Long
+  DIM z AS Long
+  DIM a AS Long
+  DIM s AS String
+  DIM v AS String[]
+  
+  $fields = NEW Collection(gb.Text)
+  
+  IF NOT Exist(path) THEN RETURN 
+  RETURN 
+  
+  ' TODO: find tag
+  
+  x = 256 ^ 3 * Asc(tag, 1) + 256 ^ 2 * Asc(tag, 2) + 256 * Asc(tag, 3) + Asc(tag, 4)
+  $vendor = Conv(Mid(tag, 5, x), "UTF-8", Desktop.Charset)
+  x += 4
+  
+  y = 256 ^ 3 * Asc(tag, x + 1) + 256 ^ 2 * Asc(tag, x + 2) + 256 * Asc(tag, x + 3) + Asc(tag, x + 4)
+  x += 4
+  FOR z = 0 TO y
+    a = 256 ^ 3 * Asc(tag, x + 1) + 256 ^ 2 * Asc(tag, x + 2) + 256 * Asc(tag, x + 3) + Asc(tag, x + 4)
+    x += 4
+    v = Split(Mid(tag, x + 1, a), "=")
+    ME.Add(v[0], Conv(v[1], "UTF-8", Desktop.Charset))
+    x += a
+  NEXT 
+  $status = BTst(Asc(tag, x + 1), 7)
+  
+END
+
+PUBLIC SUB _free()
+  FOR EACH $fields
+    $fields[$fields.Key] = NULL
+  NEXT   
+END
+
+PUBLIC FUNCTION _get(id AS String) AS String[]
+  DIM result AS NEW String[]
+  IF $fields.Exist(Upper(id)) THEN RETURN $fields[Upper(id)]
+  RETURN result
+END
+
+PUBLIC SUB _put(data AS String[], id AS String)
+  IF IsNull(data) THEN data = NEW String[]
+  IF $fields.Exist(Upper(id)) THEN 
+    $fields[Upper(id)] = data
+  ELSE 
+    $fields.Add(data, Upper(id))
+  END IF
+  $changed = TRUE
+END
+
+
+PUBLIC SUB Add(id AS String, data AS String)
+  IF ME[id].Find = -1 THEN ME[id].Add(data)
+END
+
+PUBLIC SUB Remove(id AS String, data AS String)
+  IF ME[id].Find(data) > -1 THEN ME[id].Remove(ME[id].Find(data))
+END
+
+PUBLIC SUB Clear()
+  FOR EACH $fields
+    $fields[$fields.Key] = NULL
+  NEXT   
+  $fields.Clear
+END
+
+PUBLIC FUNCTION Find(data AS String) AS String
+  FOR EACH $fields
+    IF ME[$fields.Key].Find(data) > -1 THEN RETURN $fields.Key
+  NEXT 
+END
+
+
+PUBLIC FUNCTION render() AS String
+  
+  DIM result AS String
+  DIM vendor AS String = Conv("MWTS - Music without Tags is Shit v" & Application.Version, Desktop.Charset, "UTF-8")
+  DIM x AS Long
+  DIM t AS Collection = getFilledFields()
+  DIM s AS String
+  DIM v AS String
+  
+  result = CLng(Len(vendor)) AND &HFF000000
+  result &= CLng(Len(vendor)) AND &H00FF0000
+  result &= CLng(Len(vendor)) AND &H0000FF00
+  result &= CLng(Len(vendor)) AND &H000000FF
+  result &= vendor
+  
+  FOR EACH t
+    FOR EACH s IN t[t.Key]
+      INC x
+    NEXT 
+  NEXT 
+  DEC x
+  result &= x AND &HFF000000
+  result &= x AND &H00FF0000
+  result &= x AND &H0000FF00
+  result &= x AND &H000000FF
+  FOR EACH t
+    FOR EACH s IN t[t.Key]
+      v = t.Key & "=" & Conv(s, Desktop.Charset, "UTF-8")
+      result &= CLng(Len(v)) AND &HFF000000
+      result &= CLng(Len(v)) AND &H00FF0000
+      result &= CLng(Len(v)) AND &H0000FF00
+      result &= CLng(Len(v)) AND &H000000FF
+      result &= v
+    NEXT 
+  NEXT 
+  result &= Chr(&X10000000)
+  
+  RETURN result
+  
+END
+
+PRIVATE FUNCTION getFilledFields() AS Collection
+  
+  DIM result AS NEW Collection(gb.Text)
+  DIM filled AS Boolean
+  DIM s AS String
+  
+  FOR EACH $fields
+    FOR EACH s IN $fields[$fields.Key]
+      IF Len(s) > 0 THEN 
+        IF filled THEN 
+          result[$fields.Key].Add(s)
+        ELSE 
+          result.Add([s], $fields.Key)
+        END IF
+        filled = TRUE
+      END IF
+    NEXT 
+    filled = FALSE
+  NEXT 
+  RETURN result
+  
+END
+
+
+PRIVATE FUNCTION comment_Read() AS String[]
+  RETURN ME["COMMENT"]
+END
+PRIVATE SUB comment_Write(Value AS String[])
+  ME["COMMENT"] = Value
+END
+PRIVATE FUNCTION title_Read() AS String[]
+  RETURN ME["TITLE"]
+END
+PRIVATE SUB title_Write(Value AS String[])
+  ME["TITLE"] = Value
+END
+PRIVATE FUNCTION genre_Read() AS String[]
+  RETURN ME["GENRE"]
+END
+PRIVATE SUB genre_Write(Value AS String[])
+  ME["GENRE"] = Value
+END
+PRIVATE FUNCTION year_Read() AS String[]
+  RETURN ME["DATE"]
+END
+PRIVATE SUB year_Write(Value AS String[])
+  ME["DATE"] = Value
+END
+PRIVATE FUNCTION track_Read() AS String[]
+  RETURN ME["TRACKNUMBER"]
+END
+PRIVATE SUB track_Write(Value AS String[])
+  ME["TRACKNUMBER"] = Value
+END
+PRIVATE FUNCTION album_Read() AS String[]
+  RETURN ME["ALBUM"]
+END
+PRIVATE SUB album_Write(Value AS String[])
+  ME["ALBUM"] = Value
+END
+PRIVATE FUNCTION artist_Read() AS String[]
+  RETURN ME["ARTIST"]
+END
+PRIVATE SUB artist_Write(Value AS String[])
+  ME["ARTIST"] = Value
+END
+STATIC PRIVATE FUNCTION stdFields_Read() AS String[]
+  RETURN $stdFields
+END
+PRIVATE FUNCTION changed_Read() AS Boolean
+  RETURN $changed
+END
+PRIVATE FUNCTION statusOK_Read() AS Boolean
+  RETURN $status
+END
+
+STATIC PUBLIC SUB _init()
+  
+  $stdFields = NEW String[]
+  $stdFields.Add("TITLE")
+  $stdFields.Add("VERSION")
+  $stdFields.Add("ALBUM")
+  $stdFields.Add("TRACKNUMBER")
+  $stdFields.Add("ARTIST")
+  $stdFields.Add("PERFORMER")
+  $stdFields.Add("COPYRIGHT")
+  $stdFields.Add("LICENSE")
+  $stdFields.Add("ORGANIZATION")
+  $stdFields.Add("DESCRIPTION")
+  $stdFields.Add("GENRE")
+  $stdFields.Add("DATE")
+  $stdFields.Add("LOCATION")
+  $stdFields.Add("CONTACT")
+  $stdFields.Add("ISRC")
+    
+END
+
+STATIC PUBLIC SUB _exit()
+  $stdFields = NULL  
+END
+

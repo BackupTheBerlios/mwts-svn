@@ -34,7 +34,7 @@
       { sCols TreeView
         MoveScaled(32,1,22,30)
         'Move(224,7,154,210)
-        Root = False
+        'Root = False
       }
       { Button3 Button
         MoveScaled(24,8,7,4)

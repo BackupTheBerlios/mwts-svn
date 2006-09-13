@@ -26,7 +26,7 @@ PUBLIC SUB _new()
   
   cols = Split(Settings["cols", "%f,%T,%A,%B,%Y,%G,%b"], ",")
   Flist.cols = cols
-  
+  DirView1_Select
   ME.Center
   
 END
@@ -132,6 +132,7 @@ END
 ' MouseClick or other change of selected item in left DirView
 PUBLIC SUB DirView1_Select()
   UpdFlist
+  IF ComboBox1.Find(DirView1.Current) = -1 THEN ComboBox1.Add(DirView1.Current, 0)
 END
 
 ' change from viewing the v1-Tag to v2-Tag or the other way round
@@ -328,14 +329,14 @@ PUBLIC SUB Menu14_Click()
   IF FConfig.Run() THEN 
     Flist.cols = FConfig.cols
     Flist.tips = Settings["tips"]
-    'actFlist
+    Flist.refresh
   END IF
 
 END
 
 PUBLIC SUB Form_Close()
 
-  Settings["cols"] = cols.Join(",")
+  Settings["cols"] = Flist.cols.Join(",")
   Settings.Save
   ME.Delete 
 
@@ -344,5 +345,16 @@ END
 PUBLIC SUB Button1_Click()
 
   STOP 
+
+END
+
+PUBLIC SUB ComboBox1_KeyPress()
+
+  IF Key.Code = Key.Enter OR Key.Code = Key.Return THEN 
+    IF Exist(ComboBox1.Text) THEN
+      DirView1.Current = ComboBox1.Text
+      DirView1_Select
+    END IF
+  END IF 
 
 END

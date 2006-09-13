@@ -1,3 +1,4 @@
+' Gambas class file
 
 PROPERTY READ id AS String ' returns the frame-id such as TXXX, see CTagv2Frame.FTypes
 PROPERTY READ size AS Integer ' returns the size of the header (always 10 bytes)
@@ -17,6 +18,7 @@ PRIVATE $data AS String
 PRIVATE $tStart AS Integer
 PRIVATE $statusFlags AS Byte
 PRIVATE $formatFlags AS Byte
+PRIVATE $frameSize AS Integer
 
 ' creates a new frame-header:
 ' s = NULL: a standard frame header is created
@@ -38,6 +40,12 @@ PUBLIC SUB _new(rawData AS String, tStart AS Integer, OPTIONAL id AS String = NU
   $statusFlags = CByte(Asc($data, 9))
   $formatFlags = CByte(Asc($data, 10))
   
+  IF ME.unsynchronised THEN
+    $frameSize = CInt(CTagv2.DeSynchsafe(Mid($data, 5, 4)))
+  ELSE 
+    $frameSize = 256 ^ 3 * Asc($data, 5) + 256 ^ 2 * Asc($data, 6) + 256 * Asc($data, 7) + Asc($data, 8)
+  END IF
+  
 END
 
 PUBLIC SUB render() AS String
@@ -48,8 +56,7 @@ PRIVATE FUNCTION id_Read() AS String
   RETURN Left($data, 4)
 END
 PRIVATE FUNCTION frameSize_Read() AS Integer
-  IF ME.unsynchronised THEN RETURN CInt(CTagv2.DeSynchsafe(Mid($data, 5, 4)))
-  RETURN 256 ^ 3 * Asc($data, 5) + 256 ^ 2 * Asc($data, 6) + 256 * Asc($data, 7) + Asc($data, 8)
+  RETURN $frameSize
 END
 PRIVATE FUNCTION tagAlterPreservation_Read() AS Boolean
   RETURN NOT BTst($statusFlags, 6)
