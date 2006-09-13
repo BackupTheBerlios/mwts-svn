@@ -1,3 +1,4 @@
+' Gambas module file
 
 PUBLIC desc AS NEW Collection
 
@@ -241,16 +242,17 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
   DIM tmpArray AS Object[]
   
   IF values.Count = 0 THEN RETURN NULL
-  IF NOT IsObject(values[0]) THEN RETURN NULL
+  IF NOT IsObject(values[0]) OR IsNull(values[0]) THEN RETURN NULL
   IF values.Count = 1 THEN RETURN values[0]
-  t = Object.Type(values[0])
+  t = Object.Class(values[0])
   
-  result = NEW (t)
+  result = NEW (t, NULL)
   
   FOR EACH i IN Classes[t].Symbols
     IF NOT (Classes[t][i].Kind = Class.Property) THEN CONTINUE 
     IF Classes[t][i].ReadOnly THEN CONTINUE 
     FOR EACH o IN values
+      'Message(TypeOf(Classes[t][i]) & " / " & Classes[t][i].Type & " / " & Classes[t][i].Kind)
       IF NOT x THEN 
         TRY Object.SetProperty(result, i, Object.GetProperty(o, i))
         x = TRUE
@@ -266,13 +268,11 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
             CASE mergeDelete
               IF IsNumber(v1) THEN 
                 TRY Object.SetProperty(result, i, Object.Call(result, "getNone", [i]))
-              ELSE IF IsString(v1) THEN 
-                TRY Object.SetProperty(result, i, "")
               ELSE IF IsObject(v1) THEN 
                 tmpArray = NEW Object[]
                 tmpArray.Add(v1)
                 tmpArray.Add(v2)
-                TRY Object.SetProperty(result, i, merge(tmpArray))
+                Object.SetProperty(result, i, merge(tmpArray))
               ELSE 
                 TRY Object.SetProperty(result, i, NULL)
               END IF

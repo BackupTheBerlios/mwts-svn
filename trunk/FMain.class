@@ -1,3 +1,4 @@
+' Gambas class file
 
 PRIVATE $aktTag AS Integer = 1 ' tag-version to use
 PRIVATE $recursive AS Boolean = FALSE ' list files recursively
@@ -221,11 +222,11 @@ PUBLIC SUB ToolButton6_Click()
   DIM t AS String
   'DIM fsel AS NEW CTag
   
-  sel = getSelected()
-  edit = getACTags(sel)
-  
+  'sel = getSelected()
+  'edit = getACTags(sel)
+  edit = Flist.selected
   'fsel.v1 = CTagv1.mergeTags(edit)
-  FEditv1.v1tag = MHelp.merge(edit)
+  FEditv1.v1tag = MHelp.merge(edit).tag
   IF IsNull(FEditv1.v1tag) THEN RETURN 
   IF FEditv1.Run() THEN 
     IF FEditv1.changed = 0 THEN RETURN 

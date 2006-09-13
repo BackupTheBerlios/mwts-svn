@@ -1,3 +1,9 @@
+* Wed Sep 13 2006 Franz Brauße <mike-nought@gmx.de>
+  - release 0.1.0
+  - fixed merge-function to handle slightly modified class-structure correctly
+  - fixed wrong text-decoding in text frames of ID3v2 tags (if different from ISO-8859-1)
+  - fixed: different years merged are empty now
+
 * Tue Sep 12 2006 Franz Brauße <mike-nought@gmx.de>
   - finally fixed memory leak on quit
   - a bit code-cleanup and adjustments for new Gambas release 1.9.42

@@ -1,14 +1,10 @@
 # Gambas Project File 1.0
 Title=Music without Tags is Shit
 Startup=FMain
-TabSize=2
-Version=0.1.2
+Version=0.1.1
 Library=gb.qt
 Library=gb.form
 Library=gb.settings
-Translate=0
-KeepDebugInfo=0
-CreateShortcut=0
+TabSize=2
 ControlPublic=1
-ExecPath=/home/kane/mwts/trunk/ehehe.gambas
-Prefix=0
+ExecPath=/home/kane/mwts/trunk/mwts.gambas

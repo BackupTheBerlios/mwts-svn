@@ -1,3 +1,5 @@
+' Gambas class file
+
 ' This class represents the ID3v1-Tag of the file
 
 ' holds the string-names for all available genres in ID3v1 including (nearly-standard) winamp-extensions
@@ -5,6 +7,7 @@ STATIC PUBLIC genreDef AS NEW String[]
 
 PUBLIC CONST genreNone AS Integer = 255 ' value to set for the genre-field if information is unknown 
 PUBLIC CONST trackNone AS Integer = 0 ' value to set for the track-field if information is unknown
+PUBLIC CONST yearNone AS Integer = 0
 
 PROPERTY artist AS String
 PROPERTY album AS String
@@ -81,6 +84,8 @@ PUBLIC FUNCTION getNone(which AS String) AS Variant
       RETURN genreNone
     CASE "track"
       RETURN trackNone
+    CASE "year"
+      RETURN yearNone
     CASE ELSE  
       RETURN ""
   END SELECT 

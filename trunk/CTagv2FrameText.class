@@ -1,3 +1,4 @@
+' Gambas class file
 
 INHERITS CTagv2Frame
 
@@ -30,7 +31,7 @@ PUBLIC SUB _new(OPTIONAL rawData AS String = NULL)
     tmp2 = [rawData]
   ELSE
     ME.encoding = CByte(Asc(rawData))
-    t = Conv(Mid(rawData, 2), "ISO-8859-1", Desktop.Charset)
+    t = Conv(Mid(rawData, 2), CTagv2FrameText.encString[ME.encoding], Desktop.Charset)
     tmp2 = Split(t, CTagv2FrameText.encSplit[$encoding])
   END IF
   $content = tmp2

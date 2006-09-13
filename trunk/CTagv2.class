@@ -79,7 +79,7 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
     $frames = getFrames($body)
     $status = TRUE
   ELSE 
-    'die
+    die
   END IF
   
 '   s = File.Load(path)
