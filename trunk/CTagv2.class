@@ -60,6 +60,10 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
     RETURN 
   END IF
   $header = NEW CTagv2Header(s, begin)
+  IF NOT $header.statusOK THEN 
+    die
+    RETURN 
+  END IF
   $version = $header.version
   IF $header.useExtHeader THEN 
     READ #f, s, 4
@@ -72,10 +76,10 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   z = $header.tagSize
   bsize = z - y - CInt(If($header.useFooter, 10, 0))
   
-  READ #f, $body, bsize
+  TRY READ #f, $body, bsize
   CLOSE #f
-   
-  IF z > -1 THEN ' no error during parsing of synchsafe integers
+  
+  IF z > -1 OR ERROR THEN ' no error during parsing of synchsafe integers
     $frames = getFrames($body)
     $status = TRUE
   ELSE 

@@ -7,12 +7,13 @@ PROPERTY READ useUnsync AS Boolean ' returns whether the tag explicitely uses un
 PROPERTY READ useExtHeader AS Boolean ' returns whether an extended header is used to further describe the tag
 PROPERTY READ useExperimental AS Boolean
 PROPERTY READ useFooter AS Boolean ' returns whether a footer is used
-
+PROPERTY READ statusOK AS Boolean
 PROPERTY READ fStart AS Integer ' returns the location of the beginning of the tag-header in the file
 
 PRIVATE $data AS String
 PRIVATE $fStart AS Integer
 PRIVATE $tagSize AS Integer
+PRIVATE $status AS Boolean
 
 PUBLIC SUB _new(OPTIONAL data AS String = NULL, OPTIONAL fStart AS Integer = -1)
   
@@ -20,6 +21,7 @@ PUBLIC SUB _new(OPTIONAL data AS String = NULL, OPTIONAL fStart AS Integer = -1)
   $data = data
   $fStart = fStart
   $tagSize = CInt(CTagv2.DeSynchsafe(Right($data, 4)))
+  $status = (ME.version = "2.3.0" OR ME.version = "2.4.0")
   
 END
 
@@ -46,4 +48,7 @@ PRIVATE FUNCTION useFooter_Read() AS Boolean
 END
 PRIVATE FUNCTION fStart_Read() AS Integer
   RETURN $fStart
+END
+PRIVATE FUNCTION statusOK_Read() AS Boolean
+  RETURN $status
 END

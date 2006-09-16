@@ -1,3 +1,11 @@
+* Sat Sep 16 2006 Franz Brauße <mike-nought@gmx.de>
+  - Columns become smaller now too, if content changes
+  - speeded up file-read-in at the expense of file-list updates
+  - bug-fix for ID3v2-parser: wrong tag-size doesn't kill the application anymore
+  - ID3v2-parser now stops read-in if an error occured or the tag-version is not 2.3.0 or 2.4.0,
+    because 2.2.0 is not implemented yet
+  - a little bit code-cleanup
+
 * Thu Sep 14 2006 Franz Brauße <mike-nought@gmx.de>
   - added displaying of tag-versions
   - added nearly complete Vorbis Comment-tag parsing / rendering

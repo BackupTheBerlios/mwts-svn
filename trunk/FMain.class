@@ -62,7 +62,7 @@ PUBLIC SUB UpdFlist()
     pass = RDir(DirView1.Current, "*.mp3").Sort(gb.Ascent AND gb.Text)
     IF pass.Count > 250 THEN
       DEC Application.Busy
-      IF Message.Warning("Do you really want to display all files in this Directory recursively? This might take quite a long time...", "Yes", "No") = 2 THEN
+      IF Message.Warning("Do you really want to display all files in this Directory recursively?\nPlease consider that this might take quite a long time and that a huge list of files generates much CPU-load.", "Yes", "No") = 2 THEN
         ToggleButton2.Value = FALSE
         RETURN
       END IF
@@ -71,14 +71,14 @@ PUBLIC SUB UpdFlist()
   ELSE
     pass = Dir(DirView1.Current, "*.mp3").Sort(gb.Descent AND gb.Binary)
   END IF
-  z = Timer()
+  'z = Timer()
   ToolButton1.Enabled = TRUE
   ProgressBar1.Visible = TRUE
   FOR x = 0 TO pass.Max ' absolute paths to files in pass
     IF NOT Exist(DirView1.Current &/ pass[x]) THEN CONTINUE  
     e = NEW CFile(DirView1.Current &/ pass[x])
     Flist.Add(e)
-    IF CInt((z - Timer()) * 10) MOD 5 = 0 THEN
+    IF x MOD 10 = 0 THEN 
       Status.Text = "Reading file-Tags (" & Str(x) & "/" & Str(pass.Max) & ")"
       ProgressBar1.Value = x / pass.Count
       WAIT 0.001 
@@ -139,7 +139,8 @@ END
 PUBLIC SUB ToolButton2_Click()
   $aktTag = If($aktTag = 1, 2, 1)
   Flist.tag2Display = $aktTag
-  ToolButton2.Text = "Showing ID3v" & $aktTag & "-Tag"
+  ToolButton2.Text = "Showing ID3v" & Flist.tag2Display & "-Tag"
+  Status.Text = "Showing ID3v" & Flist.tag2Display & "-Tag of " & Str(Flist.Count) & " files"
   'UpdFlist
 END
 

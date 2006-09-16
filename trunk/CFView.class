@@ -145,13 +145,17 @@ PUBLIC SUB tim_Timer()
 END
 
 PUBLIC SUB Clear()
+  DIM x AS Integer
   FOR EACH $fall
     $fall[$fall.Key].tag.v1 = NULL
     $fall[$fall.Key].tag.v2 = NULL
     $fall[$fall.Key].tag = NULL
   NEXT 
-  $fall.Clear  
+  $fall.Clear
   Flist.Clear
+  FOR x = 0 TO Flist.Columns.Count - 1
+    Flist.Columns[x].Width = 40
+  NEXT 
 END
 PUBLIC FUNCTION MoveFirst() AS Boolean
   RETURN Flist.MoveFirst()
@@ -192,12 +196,14 @@ END
 ' replaces ColumnView.Add()
 PUBLIC SUB Add(entry AS CFile, OPTIONAL pos AS Integer = -1)
   
-  IF pos = -1 THEN 
-    Flist.Add(entry.path, File.Name(entry.path))
-  ELSE  
-    Flist.Add(entry.path, File.Name(entry.path), NULL, NULL, pos)
-  END IF
-  $fall.Add(entry, entry.path)
+  ' IF pos = -1 THEN 
+  '   'Flist.Add(entry.path, File.Name(entry.path))
+  '   Flist.Add(entry.path, "")
+  ' ELSE  
+  '   'Flist.Add(entry.path, File.Name(entry.path), NULL, NULL, pos)
+  '   Flist.Add(entry.path, "", NULL, NULL, pos)
+  ' END IF
+  IF NOT $fall.Exist(entry.path) THEN $fall.Add(entry, entry.path)
   'refresh([entry.path])
   
 END
@@ -243,38 +249,26 @@ PUBLIC SUB refresh(OPTIONAL paths AS String[] = NULL)
   
   IF IsNull(paths) THEN 
     FOR EACH e IN $fall
-      'IF NOT Flist.Exist(e.path) THEN Flist.Add(e.path, "")
+      IF NOT Flist.Exist(e.path) THEN Flist.Add(e.path, "")
       Flist[e.path].Picture = If(e.changed, ed, bl)
       e.tag.aktTag = $tag
       FOR y = 0 TO $cols.Max
-        IF ($cols[y] = "%b") THEN 
-          IF MHelp.getDesc($cols[y], e) = "-1" THEN 
-            Flist[e.path][y] = "Variable"
-          ELSE 
-            Flist[e.path][y] = MHelp.getDesc($cols[y], e) & " KBit/s"
-          END IF
-        ELSE
-          Flist[e.path][y] = MHelp.getDesc($cols[y], e)
-        END IF
+        Flist[e.path][y] = MHelp.getDesc($cols[y], e)
+        IF ($cols[y] = "%b") AND MHelp.getDesc($cols[y], e) <> "Variable" THEN Flist[e.path][y] = Flist[e.path][y] & " KBit/s"
       NEXT 
     NEXT 
   ELSE 
     FOR EACH s IN paths
       IF NOT $fall.Exist(s) THEN CONTINUE 
-      'IF NOT Flist.Exist(s) THEN Flist.Add(s, "")
+      IF NOT Flist.Exist(s) THEN Flist.Add(s, "")
       e = $fall[s]
       e.tag.aktTag = $tag
       Flist[s].Picture = If(e.changed, ed, bl)
       FOR y = 0 TO $cols.Max
-        IF ($cols[y] = "%b") THEN 
-          IF MHelp.getDesc($cols[y], e) = "-1" THEN 
-            Flist[s][y] = "Variable"
-          ELSE 
-            Flist[s][y] = MHelp.getDesc($cols[y], e) & " KBit/s"
-          END IF
-        ELSE
-          Flist[s][y] = MHelp.getDesc($cols[y], e)
-        END IF
+        Flist[s][y] = MHelp.getDesc($cols[y], e)
+        IF ($cols[y] = "%b") AND MHelp.getDesc($cols[y], e) <> "Variable" THEN Flist[s][y] = Flist[s][y] & " KBit/s"
+        'Flist.Columns[y].Width = 40
+        'Flist.Columns[y].AutoResize = TRUE
       NEXT 
     NEXT 
   END IF
@@ -292,6 +286,8 @@ PRIVATE SUB cols_Write(Value AS String[])
   Flist.Columns.Count = Value.Count
   FOR x = 0 TO Value.Max
     Flist.Columns[x].Text = MHelp.desc[Value[x]]
+    'Flist.Columns[x].Width = 40
+    Flist.Columns[x].AutoResize = NOT ((Value[x] = "%v") OR (Value[x] = "%v1") OR (Value[x] = "%v2") OR (Value[x] = "%Y") OR (Value[x] = "%s"))
   NEXT
   $cols = Value
   'Flist.Columns.Sort = y

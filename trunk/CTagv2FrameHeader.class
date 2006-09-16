@@ -4,7 +4,7 @@ PROPERTY READ id AS String ' returns the frame-id such as TXXX, see CTagv2Frame.
 PROPERTY READ size AS Integer ' returns the size of the header (always 10 bytes)
 PROPERTY READ tStart AS Integer ' returns the location of the beginning of the frame-header in the tag
 
-PROPERTY READ frameSize AS Integer ' returns the size of the frame exclusive it's header
+PROPERTY READ frameSize AS Long ' returns the size of the frame exclusive it's header
 PROPERTY READ tagAlterPreservation AS Boolean
 PROPERTY READ fileAlterPreservation AS Boolean
 PROPERTY READ readOnly AS Boolean ' the frame is read-only
@@ -18,7 +18,7 @@ PRIVATE $data AS String
 PRIVATE $tStart AS Integer
 PRIVATE $statusFlags AS Byte
 PRIVATE $formatFlags AS Byte
-PRIVATE $frameSize AS Integer
+PRIVATE $frameSize AS Long
 
 ' creates a new frame-header:
 ' s = NULL: a standard frame header is created
@@ -41,7 +41,7 @@ PUBLIC SUB _new(rawData AS String, tStart AS Integer, OPTIONAL id AS String = NU
   $formatFlags = CByte(Asc($data, 10))
   
   IF ME.unsynchronised THEN
-    $frameSize = CInt(CTagv2.DeSynchsafe(Mid($data, 5, 4)))
+    $frameSize = CTagv2.DeSynchsafe(Mid($data, 5, 4))
   ELSE 
     $frameSize = 256 ^ 3 * Asc($data, 5) + 256 ^ 2 * Asc($data, 6) + 256 * Asc($data, 7) + Asc($data, 8)
   END IF
@@ -55,8 +55,8 @@ END
 PRIVATE FUNCTION id_Read() AS String
   RETURN Left($data, 4)
 END
-PRIVATE FUNCTION frameSize_Read() AS Integer
-  RETURN $frameSize
+PRIVATE FUNCTION frameSize_Read() AS Long
+  RETURN If($frameSize >= 0, $frameSize, 1)
 END
 PRIVATE FUNCTION tagAlterPreservation_Read() AS Boolean
   RETURN NOT BTst($statusFlags, 6)

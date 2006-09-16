@@ -190,7 +190,7 @@ PUBLIC FUNCTION getDesc(pattern AS String, f AS CFile) AS String
     CASE "%d"
       RETURN File.Dir(f.newpath)
     CASE "%b"
-      RETURN f.header.bitrate
+      RETURN If(f.header.bitrate = -1, "Variable", Str(f.header.bitrate))
     CASE "%s"
       RETURN f.header.sampleRate
     CASE "%v1"
