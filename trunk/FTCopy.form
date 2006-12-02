@@ -1,19 +1,19 @@
 # Gambas Form File 1.0
 
-{ FTCopy Form
+{ Form Form
   MoveScaled(0,0,65,37)
   'Move(0,0,455,259)
   Text = ("")
   Border = Window.Fixed
   { btnOK Button
-    MoveScaled(37.2857,32,12.5714,3.4286)
-    'Move(261,224,88,24)
+    MoveScaled(37.1429,32,12.4286,3.4286)
+    'Move(260,224,87,24)
     Text = ("OK")
     Default = True
   }
   { btnCancel Button
-    MoveScaled(51,32,12.5714,3.4286)
-    'Move(357,224,88,24)
+    MoveScaled(51,32,12.4286,3.4286)
+    'Move(357,224,87,24)
     Text = ("Cancel")
     Cancel = True
   }

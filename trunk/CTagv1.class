@@ -21,6 +21,8 @@ PROPERTY READ isEmpty AS Boolean ' returns if no properties of the Tag are set
 PROPERTY READ version AS Integer ' returns either 0 or 1 according to the setting of the track-property
 PROPERTY READ changed AS Boolean ' returns if any external changes were made
 PROPERTY READ statusOK AS Boolean
+PROPERTY READ getPositions AS Long[] ' returns the begin- and end-position of this tag in the file
+PROPERTY READ exists AS Boolean ' returns whether the tag is present in the read file
 
 PRIVATE $artist AS String
 PRIVATE $album AS String
@@ -29,9 +31,12 @@ PRIVATE $year AS Integer
 PRIVATE $genre AS Integer = genreNone
 PRIVATE $title AS String
 PRIVATE $comment AS String
+PRIVATE $begin AS Long
+PRIVATE $end AS Long
 
 PRIVATE $changed AS Boolean
 PRIVATE $status AS Boolean
+PRIVATE $exists AS Boolean
 
 ' if path is specified, the ID3-Tag of this file will be parsed (ISO-8859-1 is the standard charset vor v1)
 PUBLIC SUB _new(OPTIONAL path AS String = NULL)
@@ -48,8 +53,10 @@ PUBLIC SUB _new(OPTIONAL path AS String = NULL)
   SEEK #f, -128
   READ #f, t, 3
   
-  
   IF (t = "TAG") THEN
+    $exists = TRUE
+    $begin = Seek(f) - 3
+    $end = $begin + 128
     READ #f, t, 30
     $title = Conv(CFile.trimzero(t), "ISO-8859-1", Desktop.Charset)
     READ #f, t, 30
@@ -197,6 +204,12 @@ PRIVATE FUNCTION changed_Read() AS Boolean
 END
 PRIVATE FUNCTION statusOK_Read() AS Boolean
   RETURN $status
+END
+PRIVATE FUNCTION getPositions_Read() AS Long[]
+  RETURN [$begin, $end]
+END
+PRIVATE FUNCTION exists_Read() AS Boolean
+  RETURN $exists
 END
 
 STATIC PUBLIC SUB _exit()
@@ -358,5 +371,6 @@ STATIC PUBLIC SUB _init()
   genreDef.Add("SynthPop")
   
 END
+
 
 

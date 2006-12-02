@@ -1,3 +1,4 @@
+' Gambas class file
 
 INHERITS CTagv2Frame
 
@@ -40,6 +41,7 @@ PRIVATE $frameSeek AS Integer
 PUBLIC SUB _new(OPTIONAL rawData AS String = NULL, OPTIONAL path AS String = NULL)
   
   DIM x AS Integer = Len(rawData)
+  ME.body = rawData
   
   IF IsNull(rawData) THEN
     IF Exist(path) THEN $path = path

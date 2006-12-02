@@ -1,6 +1,6 @@
 # Gambas Form File 1.0
 
-{ FConfig Form
+{ Form Form
   MoveScaled(0,0,60,45)
   'Move(0,0,420,315)
   Text = ("Settings")
@@ -34,7 +34,6 @@
       { sCols TreeView
         MoveScaled(32,1,22,30)
         'Move(224,7,154,210)
-        'Root = False
       }
       { Button3 Button
         MoveScaled(24,8,7,4)

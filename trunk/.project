@@ -1,6 +1,7 @@
 # Gambas Project File 1.0
 Title=Music without Tags is Shit
 Startup=FMain
+Stack=4
 Version=0.1.1
 Library=gb.qt
 Library=gb.form

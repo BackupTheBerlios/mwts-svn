@@ -251,6 +251,7 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
   DIM avg AS NEW Collection
   DIM tmpArray AS Object[]
   
+  IF IsNull(values) THEN RETURN NULL
   IF values.Count = 0 THEN RETURN NULL
   IF NOT IsObject(values[0]) OR IsNull(values[0]) THEN RETURN NULL
   IF values.Count = 1 THEN RETURN values[0]
@@ -276,9 +277,9 @@ PUBLIC FUNCTION merge(values AS Object[], OPTIONAL onDiffer AS Integer = mergeDe
           SELECT CASE onDiffer
           
             CASE mergeDelete
-              IF IsNumber(v1) THEN 
+              IF IsNumber(v1) AND IsNumber(v2) THEN 
                 TRY Object.SetProperty(result, i, Object.Call(result, "getNone", [i]))
-              ELSE IF IsObject(v1) THEN 
+              ELSE IF IsObject(v1) AND IsObject(v2) THEN 
                 tmpArray = NEW Object[]
                 tmpArray.Add(v1)
                 tmpArray.Add(v2)

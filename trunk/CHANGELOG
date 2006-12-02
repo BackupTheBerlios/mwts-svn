@@ -1,3 +1,11 @@
+* Sun Dec 02 2006 Franz Brauße <mike-nought@gmx.de>
+  - added (yet untested) write-support for ID3v1-tags and prepared it for ID3v2-tag
+  - tags now know their begin- and end-position in the file
+
+* Thu Oct 12 2006 Franz Brauße <mike-nought@gmx.de>
+  - fixed small type-cast bug in merge-function
+  - small fix for GUI: folder-selection can be hidden now and adaption to Gambas 1.9.44
+
 * Sat Sep 16 2006 Franz Brauße <mike-nought@gmx.de>
   - Columns become smaller now too, if content changes
   - speeded up file-read-in at the expense of file-list updates

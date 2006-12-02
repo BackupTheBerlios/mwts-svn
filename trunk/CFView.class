@@ -1,6 +1,6 @@
 ' Gambas class file
 
-INHERITS UserControl
+'INHERITS UserControl
 
 EVENT ErrorNotFound()
 
@@ -55,9 +55,9 @@ PRIVATE FList AS ColumnView
 PRIVATE $pointer AS String
 PRIVATE $tag AS Integer = 1
 
-PUBLIC SUB _new()
+PUBLIC SUB _new(parent AS Container)
   
-  FList = NEW ColumnView(SUPER.Container) AS "FList"
+  FList = NEW ColumnView(parent) AS "FList"
   
   Flist.Editable = TRUE
   Flist.Mode = Select.Multiple
@@ -66,6 +66,11 @@ PUBLIC SUB _new()
   Flist.Resizable = TRUE
   Flist.ScrollBar = Scroll.Both
   Flist.Columns.Sort = 0
+  Flist.Expand = TRUE
+  Flist.Height = 500
+  FList.Width = 500
+  'SUPER.Expand = FALSE
+  'SUPER.Visible = FALSE
   
 END
 

@@ -21,6 +21,11 @@ PROPERTY comment AS String ' returns the comment-field, subjected to aktTag
 PROPERTY aktTag AS Integer 
 PROPERTY READ changed AS Boolean ' returns whether any of the tags has been modified
 PROPERTY READ parent AS CFile ' needed for communication between tags and the file for dynamic reload of content
+' returns whether the changed tag requires a complete rewrite of the file, i.e. due to an enlarged ID3v2-tag at the
+' beginning of the file
+PROPERTY READ fileNeedsRewrite AS Boolean 
+' returns the begin- and end-positions of all discovered tags in the file
+PROPERTY READ positionsInFile AS Object[]
 
 PUBLIC CONST trackNone AS Integer = 0 ' value to set for the track-field if information is unknown
 
@@ -195,4 +200,10 @@ PRIVATE FUNCTION ogg_Read() AS CTagVorbis
 END
 PRIVATE SUB ogg_Write(Value AS CTagVorbis)
   $ogg = Value
+END
+PRIVATE FUNCTION fileNeedsRewrite_Read() AS Boolean
+  RETURN $akt = 2 AND $v2.fileNeedsRewrite
+END
+PRIVATE FUNCTION positionsInFile_Read() AS Object[]
+  RETURN [$v1.getPositions, $v2.getPositions, $ogg.getPositions]
 END

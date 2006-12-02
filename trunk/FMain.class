@@ -18,15 +18,16 @@ PUBLIC SUB _new()
   
   Flist = NEW CFView(VBox3) AS "Flist"
   'Object.Attach(Flist, ME, "Flist")
-  Flist.x = 7
-  Flist.y = 7
-  Flist.W = 469
-  Flist.h = 441
-  Flist.expand = TRUE
+  'Flist.x = 7
+  'Flist.y = 7
+  'Flist.W = 469
+  'Flist.h = 441
+  'Flist.expand = TRUE
   
   cols = Split(Settings["cols", "%f,%T,%A,%B,%Y,%G,%b"], ",")
   Flist.cols = cols
   DirView1_Select
+  
   ME.Center
   
 END
@@ -220,6 +221,7 @@ END
 PUBLIC SUB ToolButton6_Click()
 
   DIM sel AS String[]
+  DIM tmp AS Object
   DIM edit AS Object[]
   DIM t AS String
   'DIM fsel AS NEW CTag
@@ -227,8 +229,11 @@ PUBLIC SUB ToolButton6_Click()
   'sel = getSelected()
   'edit = getACTags(sel)
   edit = Flist.selected
+  IF IsNull(edit) THEN RETURN 
   'fsel.v1 = CTagv1.mergeTags(edit)
-  FEditv1.v1tag = MHelp.merge(edit).tag
+  tmp = MHelp.merge(edit)
+  IF IsNull(tmp) THEN RETURN 
+  FEditv1.v1tag = tmp.tag
   IF IsNull(FEditv1.v1tag) THEN RETURN 
   IF FEditv1.Run() THEN 
     IF FEditv1.changed = 0 THEN RETURN 

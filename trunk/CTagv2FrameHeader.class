@@ -48,7 +48,9 @@ PUBLIC SUB _new(rawData AS String, tStart AS Integer, OPTIONAL id AS String = NU
   
 END
 
-PUBLIC SUB render() AS String
+PUBLIC SUB render(size AS Long) AS String
+  $frameSize = size
+  ' TODO: must regenerate the stuff
   RETURN $data
 END
 

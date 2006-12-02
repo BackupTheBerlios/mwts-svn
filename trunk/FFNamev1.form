@@ -1,19 +1,19 @@
 # Gambas Form File 1.0
 
-{ FFNamev1 Form
+{ Form Form
   MoveScaled(0,0,57,27)
   'Move(0,0,399,189)
   Text = ("")
   Border = Window.Fixed
   { btnOK Button
-    MoveScaled(29,23,12.5714,3.4286)
-    'Move(203,161,88,24)
+    MoveScaled(29,23,12.4286,3.4286)
+    'Move(203,161,87,24)
     Text = ("OK")
     Default = True
   }
   { btnCancel Button
-    MoveScaled(42.7143,23,12.5714,3.4286)
-    'Move(299,161,88,24)
+    MoveScaled(42.7143,23,12.4286,3.4286)
+    'Move(299,161,87,24)
     Text = ("Cancel")
     Cancel = True
   }

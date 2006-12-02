@@ -9,6 +9,7 @@ PROPERTY READ parent AS CTagv2 ' needed for dynamic reload of content by frames 
 
 PRIVATE $header AS CTagv2FrameHeader
 PRIVATE $parent AS CTagv2
+PUBLIC body AS String
 
 PUBLIC SUB _new(parent AS Object, OPTIONAL header AS CTagv2FrameHeader = NULL)
   
@@ -21,6 +22,10 @@ END
 PUBLIC SUB _free()
   $parent = NULL
   $header = NULL
+END
+
+PUBLIC FUNCTION render() AS String
+  RETURN $header.render(CLong(Len(body))) & body
 END
 
 

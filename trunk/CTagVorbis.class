@@ -12,10 +12,13 @@ PROPERTY comment AS String[]
 
 PROPERTY READ changed AS Boolean
 PROPERTY READ statusOK AS Boolean
+PROPERTY READ getPositions AS Long[] ' returns the begin- and end-position of this tag in the file
 
 PRIVATE $fields AS Collection
 PRIVATE $changed AS Boolean
 PRIVATE $status AS Boolean
+PRIVATE $begin AS Long
+PRIVATE $end AS Long
 
 PRIVATE $vendor AS String
 
@@ -37,6 +40,7 @@ PUBLIC SUB _new(parent AS Object, OPTIONAL path AS String = NULL)
   RETURN 
   
   ' TODO: find tag
+  '$begin = 
   
   x = 256 ^ 3 * Asc(tag, 1) + 256 ^ 2 * Asc(tag, 2) + 256 * Asc(tag, 3) + Asc(tag, 4)
   $vendor = Conv(Mid(tag, 5, x), "UTF-8", Desktop.Charset)
@@ -51,6 +55,7 @@ PUBLIC SUB _new(parent AS Object, OPTIONAL path AS String = NULL)
     ME.Add(v[0], Conv(v[1], "UTF-8", Desktop.Charset))
     x += a
   NEXT 
+  '$end = 
   $status = BTst(Asc(tag, x + 1), 7)
   
 END
@@ -215,6 +220,9 @@ PRIVATE FUNCTION changed_Read() AS Boolean
 END
 PRIVATE FUNCTION statusOK_Read() AS Boolean
   RETURN $status
+END
+PRIVATE FUNCTION getPositions_Read() AS Long[]
+  RETURN [$begin, $end]
 END
 
 STATIC PUBLIC SUB _init()

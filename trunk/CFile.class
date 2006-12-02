@@ -1,16 +1,22 @@
 ' Gambas class file
 
+PUBLIC CONST TYPE_UNKNOWN AS Integer = -1
+PUBLIC CONST TYPE_MP3 AS Integer = 0
+PUBLIC CONST TYPE_OGG AS Integer = 1
+
 PROPERTY READ path AS String ' contains the filename including full path on hdd
 PROPERTY newpath AS String ' if not set differently, contains the same as path, will be applied on save
 PROPERTY tag AS CTag ' contains all (supported) tags of the specified file
 PROPERTY READ changed AS Boolean ' returns whether anything on this file was changed (not yet saved)
 PROPERTY READ header AS CMPEGHeader ' contains some informations from MPEG-header(s to come)
+PROPERTY READ fileType AS Integer ' returns what type the music file is of
 
 PRIVATE $tag AS CTag
 PRIVATE $path AS String
 PRIVATE $changed AS Boolean
 PRIVATE $newpath AS String
 PRIVATE $header AS CMPEGHeader
+PRIVATE $filetype AS Integer = TYPE_UNKNOWN
 
 ' reading all "knowable" information: tags and headers
 PUBLIC SUB _new(OPTIONAL filepath AS String = "")
@@ -20,6 +26,8 @@ PUBLIC SUB _new(OPTIONAL filepath AS String = "")
   IF NOT Exist(filepath) THEN RETURN 
   $path = filepath
   $newpath = filepath
+  IF String.LCase(File.Ext(filepath)) = "mp3" THEN $filetype = TYPE_MP3
+  IF String.LCase(File.Ext(filepath)) = "ogg" OR String.LCase(File.Ext(filepath)) = "flac" THEN $filetype = TYPE_OGG
   $tag = NEW CTag(ME, filepath)
   $header = getFileHeader(filepath)
   
@@ -44,13 +52,93 @@ PUBLIC FUNCTION getNone(which AS String) AS Variant
   
 END
 
-PUBLIC SUB save()
+PUBLIC SUB save(OPTIONAL tagversion AS Integer = 0)
   
+  DIM tmp AS String
+  DIM f AS File
   
+  SELECT CASE ME.fileType
+    CASE CFile.TYPE_MP3
+      IF $tag.needsRewrite THEN 
+        tmp = Temp()
+        f = OPEN tmp FOR WRITE 
+        IF NOT $tag.v2.isEmpty THEN writev2Tag(f)
+        appendAudio(f)
+        IF NOT $tag.v1.isEmpty THEN writev1Tag(f)
+        CLOSE #f
+        KILL $path
+        MOVE tmp TO $path
+      ELSE 
+        IF NOT $tag.v2.isEmpty THEN writev2Tag()
+        IF NOT $tag.v1.isEmpty THEN writev1Tag()
+      END IF
+      
+    CASE CFile.TYPE_OGG
+      
+    CASE CFile.TYPE_UNKNOWN
+      ' FIXME: what to do if filetype could not be discovered?
+  END SELECT 
   
 END
 
-PUBLIC FUNCTION getFromFile(start AS Integer, size AS Integer) AS String
+PRIVATE SUB appendAudio(file AS File)
+  
+  DIM f AS File
+  DIM pf AS Object[] = $tag.positionsInFile
+  DIM x AS Integer
+  DIM pos AS Long = 0
+  DIM tmp AS String
+  
+  f = OPEN $path FOR READ 
+  FOR x = 0 TO pf.Max
+    IF pf[x][0] < pf[x][1] AND pf[x][0] > 0 THEN 
+      SEEK #f, pos
+      READ #f, tmp, pf[x][0] - pos
+      WRITE #file, tmp
+    END IF
+    IF pf[x][1] > 0 THEN pos = pf[x][1] + 1
+  NEXT 
+  CLOSE #f
+  
+END
+
+PRIVATE SUB writev2Tag(OPTIONAL file AS File = NULL)
+  
+  DIM f AS File
+  
+  SELECT CASE IsNull(file)
+    CASE TRUE ' overwrites tag in _this_ file
+      f = OPEN $path FOR WRITE 
+      WRITE #f, $tag.v2.render()
+      CLOSE #f
+      
+    CASE FALSE ' writes tag to the beginning of the file-argument
+      SEEK #file, 0
+      WRITE #file, $tag.v2.render()
+      
+  END SELECT 
+  
+END
+
+PUBLIC SUB writev1Tag(OPTIONAL file AS File = NULL)
+  
+  DIM f AS File
+  
+  SELECT CASE IsNull(file)
+    CASE TRUE
+      f = OPEN $path FOR WRITE
+      SEEK #f, If($tag.v1.exists, 0, -128)
+      WRITE #f, $tag.v1.render()
+      CLOSE #f
+      
+    CASE FALSE
+      WRITE #file, $tag.v1.render()
+      
+  END SELECT 
+  
+END
+
+PUBLIC FUNCTION getBytesFromFile(start AS Integer, size AS Integer) AS String
   
   DIM f AS File
   DIM s AS String
@@ -128,4 +216,6 @@ END
 PRIVATE FUNCTION header_Read() AS CMPEGHeader
   RETURN $header
 END
-
+PRIVATE FUNCTION fileType_Read() AS Integer
+  RETURN $filetype
+END

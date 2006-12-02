@@ -3,13 +3,10 @@
 - FMain.Flist:
   - adjust size of Samplerate column accurately if first column
 
-- ID3v1-Tag
-  - write support
-
 - ID3v2-Tag
   - class itself
     - Frame classes
-  - write support
+  - render
   - edit-Dialog
 
 - Lyrics3:  http://wiki.hydrogenaudio.org/index.php?title=Lyrics3

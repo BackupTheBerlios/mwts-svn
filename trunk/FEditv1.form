@@ -1,6 +1,6 @@
 # Gambas Form File 1.0
 
-{ FEditv1 Form
+{ Form Form
   MoveScaled(0,0,49,29)
   'Move(0,0,343,203)
   Text = ("")
@@ -12,8 +12,8 @@
     Default = True
   }
   { btnCancel Button
-    MoveScaled(34.8571,24,12.4286,3.4286)
-    'Move(244,168,87,24)
+    MoveScaled(34.7143,24,12.4286,3.4286)
+    'Move(243,168,87,24)
     Text = ("Cancel")
     Cancel = True
   }

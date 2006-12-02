@@ -17,6 +17,11 @@ PROPERTY READ header AS CTagv2Header ' the header of this tag
 PROPERTY READ extHeader AS CTagv2ExtHeader ' the extended header of this tag; might be NULL
 PROPERTY READ statusOK AS Boolean ' returns whether the tag has been parsed completely without any errors
 PROPERTY READ parent AS CTag ' needed for dynamic reload of content by some frames containing binary data
+' returns whether the changed tag requires a complete rewrite of the file, i.e. due to an enlarged ID3v2-tag at the
+' beginning of the file
+PROPERTY READ fileNeedsRewrite AS Boolean
+PROPERTY READ getPositions AS Long[] ' returns the begin- and end-position of this tag in the file
+
 
 PRIVATE $changed AS Boolean
 PRIVATE $status AS Boolean
@@ -26,6 +31,8 @@ PRIVATE $extHeader AS CTagv2ExtHeader
 PRIVATE $body AS String ' contains all frames and the optional padding
 PRIVATE $frames AS Collection ' contains all frames
 PRIVATE $parent AS CTag
+PRIVATE $begin AS Long
+PRIVATE $end AS Long
 
 PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
   
@@ -64,6 +71,9 @@ PUBLIC SUB _new(parent AS CTag, OPTIONAL path AS String = NULL)
     die
     RETURN 
   END IF
+  $begin = begin
+  $end = $begin + $header.size + $header.tagSize
+  
   $version = $header.version
   IF $header.useExtHeader THEN 
     READ #f, s, 4
@@ -229,8 +239,42 @@ PUBLIC FUNCTION render() AS String
   
   DIM useFooter AS Boolean = Settings["ID3v2_UseFooter"]
   DIM usePadding AS Boolean = Settings["ID3v2_UsePadding"]
+  DIM frame AS CTagv2Frame
+  DIM result AS String
+  DIM tmp AS String
+  DIM cstat AS String[]
+  
+  result = genHeader()
+  ' FIXME: how to determine whether to use the extended header?
+  IF usePadding THEN
+    SHELL "stat -t " & $parent.parent.path WAIT TO tmp
+    cstat = Split(tmp, " ")
+    result &= String(Val(cstat[cstat.Max]) - Len(result), Chr(0))
+  END IF
+  FOR EACH frame IN $frames
+    result &= frame.render()
+  NEXT 
+  IF useFooter THEN result &= genFooter()
+  
+  IF NOT IsNull(Settings["ID3v2_Charset"]) AND NOT Settings["ID3v2_Charset"] = "UTF-8" THEN
+    result = Conv$(result, Desktop.Charset, Settings["ID3v2_Charset"])
+  END IF
+  RETURN result
   
 END
+
+PRIVATE FUNCTION genHeader() AS String
+  
+  
+  
+END
+
+PRIVATE FUNCTION genFooter() AS String
+  
+  
+  
+END
+
 
 PUBLIC FUNCTION getNone(which AS String) AS Variant
   
@@ -321,4 +365,10 @@ PRIVATE FUNCTION statusOK_Read() AS Boolean
 END
 PRIVATE FUNCTION parent_Read() AS CTag
   RETURN $parent
+END
+PRIVATE FUNCTION fileNeedsRewrite_Read() AS Boolean
+  RETURN $changed
+END
+PRIVATE FUNCTION getPositions_Read() AS Long[]
+  RETURN [$begin, $end]
 END
